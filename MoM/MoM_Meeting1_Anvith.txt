@@ -1,0 +1,23 @@
+MOM
+
+- social impact can't be measured; different tools to measure them
+
+- this org intervenes at grassroots level to try and ascertain the positive impact corporates have on them
+
+- corporates work on developmental projects
+
+- their clients want to stay updated about the status of their projects - hence we need to create the dashboard
+
+- ease of uploading data and viewing progress and milestones
+
+- client should be able to input milestones, targets, indicators, timeline
+
+- include as a separate portal in their main website
+
+- provide means of communication like comments, or integrate a simple messaging system
+
+- include feature to filter by parameters like area, field of impact
+
+- have a look at m&e dashboards
+
+-  
