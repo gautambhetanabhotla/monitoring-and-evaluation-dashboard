@@ -1,4 +1,4 @@
-import ProjectPage from './pages/project-page.jsx';
+import ProjectPage from './project-page.jsx';
 
 const App = () => {
   return (
