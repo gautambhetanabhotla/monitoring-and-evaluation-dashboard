@@ -1,3 +1,4 @@
+import React from 'react';
 import Charts from './project-page-charts.jsx';
 
 const UpcomingDeadlines = () => {

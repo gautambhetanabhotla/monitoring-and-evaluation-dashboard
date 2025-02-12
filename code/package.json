@@ -3,7 +3,7 @@
     "private": true,
     "workspaces": ["frontend", "backend"],
     "scripts": {
-        "install:all": "npm install --workspaces",
+        "install:all": "npm install --workspaces --production",
         "build": "cd frontend && npm run build && mkdir -p ../backend/public && cp -r dist/* ../backend/public",
         "start": "cd backend && npm run prod"
     }
