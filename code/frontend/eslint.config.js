@@ -24,16 +24,22 @@ export default [
       'react-refresh': reactRefresh,
     },
     rules: {
-      ...js.configs.recommended.rules,
-      ...react.configs.recommended.rules,
-      ...react.configs['jsx-runtime'].rules,
-      ...reactHooks.configs.recommended.rules,
-      'react/jsx-no-target-blank': 'off',
-      'react-refresh/only-export-components': [
+    ...js.configs.recommended.rules,
+    ...react.configs.recommended.rules,
+    ...react.configs['jsx-runtime'].rules,
+    ...reactHooks.configs.recommended.rules,
+    'react/jsx-no-target-blank': 'off',
+    'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
-      ],
-      'semi': ['error', 'always'],
+    ],
+    'semi': ['error', 'always'],
+    'no-unused-vars': ['error', {
+        vars: 'all',
+        args: 'after-used',
+        ignoreRestSiblings: true,
+        varsIgnorePattern: '^React$'
+    }],
     },
   },
 ];
