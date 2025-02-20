@@ -1,0 +1,11 @@
+## 4th Client Meet
+- Task and update APIs in between, presentation of the UI and view
+- Provision to the admins to add KPIs.
+- UI arranged in the form of tasks and corresponding KPI updates, with dates and chronological timeline. Button to add timelines as well. Sequential form, admins can keep updating APIs and add milestones and tasks as the project progresses.
+- “Would you like a linear view of project? Or all clustered together?” Tab-centric/component-centric view desired.
+- Discussion of having tabs: Admin wants the app as tab-centric view. In the Table of Contents of UI page, make the Overview, Case Studies, Data Visualisation, List of Tasks (Adding photos corresponding to these tasks instead of adding Gallery), Log framework as tabs
+We will design a log framework for one specific project as a test case to unit test and then implement it and integrate into the product.
+- Log framework page for one project would be provided by the Anusandhan team to us, so that we have a chunk of real time data to deal with stuff, and also feed into the frontend and backend as well, in data visualisations page, so on and so forth if our manual functionalities and algorithms of estimating progress are working properly.
+- Not a huge difference between admin and client view except for the permissions provided to add data, and manully change the data. Differential access, so if any design change in frontend is to be implemented across different views (Remember View Schema?), or even backend changes across views, we can implement that later. We will prioritise two things: Developing the front end and backend for the Tab-centric/Component-centric page, and developing the Data Visualisation tab (Project-level, upon tapping it, milestone-level etc) showing the progress bar and thumbnail.
+- Blueprint for the Project Gallery page design and Data Visualisation page design (upon clicking on the respective Tabs) presented by our team to gather opinion from the Anusandhan Team. The progress bars would be clickable to allow manual entering of data+ algorithmic calculation.
+- Opinion of Anusandhan Team: Instead of a rectangular progress bar, they should have a small square box to be progress bar, and a small circular region, where they could also insert a small thumbnail or project picture, somewhat similar to an Amazon app.
