@@ -1,0 +1,13 @@
+- Role-based access. (one role is field staff for example)
+- When admin logs in, show a list of clients.
+- when a client is clicked, show the list of their projects.
+- Give field staff access to a project for a certain time.
+- Field staff shouldn't be able to delete data.
+- have a provision for admin to manually enter the project completion percentage based on their estimations.
+- have a toggle to decide between to use automated percentage determining (a hybrid between how long the project has run for versus what percentage of tasks are done) and manual percentage entering.
+- status indicators - for each task. status will manually be set by admin.
+- let admin add kpis for a project.
+- in case you can't provide a visualization, have a provision for them to upload their own chart.
+- project page will have 3 tabs, visual overview, success stories, gallery.
+- dont worry about drill down and data collection for now
+- TO DO: design the timeline view and show ma'am
