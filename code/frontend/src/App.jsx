@@ -11,6 +11,13 @@ const App = () => {
         <Route path='/project'><ProjectPage /></Route>
       </Routes>
     </BrowserRouter>
+=======
+import ProjectPage from './project-view/project-page';
+import Gallery from './project-gallery/project-gallery';
+
+const App = () => {
+  return (
+    <Gallery />
   );
 };
 
