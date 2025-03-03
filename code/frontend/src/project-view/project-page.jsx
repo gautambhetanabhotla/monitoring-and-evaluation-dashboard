@@ -1,21 +1,11 @@
-import React from 'react';
+// import React from 'react';
+import { Outlet } from 'react-router-dom';
+
+import { Button, ButtonGroup } from "@heroui/button";
+
 import Charts from './project-page-charts.jsx';
 
-const UpcomingDeadlines = () => {
-  return (
-    <>
-    </>
-  );
-};
-
-const Task = () => {
-  return (
-    <>
-    </>
-  );
-};
-
-const ProjectPage = () => {
+const ProjectHeader = () => {
   return (
     <>
       <div className="flex flex-col relative">
@@ -26,19 +16,21 @@ const ProjectPage = () => {
           <article className="prose absolute top-2 text-3xl font-semibold left-4">Client name</article>
         </div>
       </div>
-      <div>
-        <article className="prose text-2xl p-4 m-4">Project description</article>
-      </div>
-      <div>
-        <article className="prose text-6xl font-bold p-4 m-4">Overview</article>
-        <UpcomingDeadlines />
-        <Charts />
-      </div>
-      <div>
-        <article className='prose text-6xl font-bold p-4 m-4'>Project structure</article>
-      </div>
+      <ButtonGroup>
+        <Button></Button>
+        <Button></Button>
+        <Button></Button>
+      </ButtonGroup>
+      <Outlet />
     </>
   );
 };
 
+const ProjectPage = () => {
+  return (
+    <></>
+  );
+};
+
 export default ProjectPage;
+export { ProjectHeader };
