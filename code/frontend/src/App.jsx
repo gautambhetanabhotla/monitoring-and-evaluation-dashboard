@@ -1,8 +1,9 @@
-import ProjectPage from './project-page.jsx';
+import ProjectPage from './project-view/project-page';
+import Gallery from './project-gallery/project-gallery';
 
 const App = () => {
   return (
-    <ProjectPage />
+    <Gallery />
   );
 };
 
