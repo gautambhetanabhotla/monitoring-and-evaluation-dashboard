@@ -45,6 +45,7 @@ export default [
         ignoreRestSiblings: true,
         varsIgnorePattern: '^React$'
     }],
+    'react/prop-types': "off",
     },
   },
   {
