@@ -78,7 +78,7 @@ const ProjectPage = () => {
   return (
     <>
       <ProjectHeader />
-      {/* <Outlet /> */}
+      <Outlet />
     </>
   );
 };
