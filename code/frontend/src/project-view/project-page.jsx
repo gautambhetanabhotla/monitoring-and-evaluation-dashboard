@@ -83,5 +83,6 @@ const ProjectPage = () => {
   );
 };
 
+
 export default ProjectPage;
 export { ProjectHeader, Overview, KPIs, Timeline, SuccessStories, LogFramework };

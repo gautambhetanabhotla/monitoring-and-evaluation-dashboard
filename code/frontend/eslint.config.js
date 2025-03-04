@@ -60,4 +60,16 @@ export default [
       ...jest.configs.recommended.rules,
     },
   },
+  {
+    files: ['**/*.test.{js,jsx}'], // Add this block to apply Jest plugin to test files
+    plugins: {
+      'jest': jest,
+    },
+    env: {
+      'jest/globals': true,
+    },
+    rules: {
+      ...jest.configs.recommended.rules,
+    },
+  },
 ];

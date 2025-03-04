@@ -1,8 +1,9 @@
-import ProjectPage, { Overview, KPIs, Timeline, SuccessStories, LogFramework } from './project-view/project-page.jsx';
+import ProjectPage, { Overview, Charts, KPIs, Timeline, SuccessStories, LogFramework } from './project-page.jsx';
 import ProjectGallery from './project-gallery/project-gallery.jsx';
-import Charts from './project-view/project-page-charts.jsx';
+// import Gallery from './project-gallery/project-gallery';
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
 
 const App = () => {
   return (
