@@ -45,6 +45,19 @@ export default [
         ignoreRestSiblings: true,
         varsIgnorePattern: '^React$'
     }],
+    'react/prop-types': "off",
+    },
+  },
+  {
+    files: ['**/*.test.{js,jsx}'], // Add this block to apply Jest plugin to test files
+    plugins: {
+      'jest': jest,
+    },
+    env: {
+      'jest/globals': true,
+    },
+    rules: {
+      ...jest.configs.recommended.rules,
     },
   },
   {

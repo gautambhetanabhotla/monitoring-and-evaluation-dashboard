@@ -1,9 +1,11 @@
 import typography from "@tailwindcss/typography";
-import heroui from "@heroui/react";
+import { heroui } from "@heroui/react";
 
 export default {
     content: [
-        './node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}'
+        './src/**/*.{js,ts,jsx,tsx,mdx}',
+        './node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}',
+        './node_modules/.vite/**/@heroui*.js'
     ],
     theme: {
         extend: {}
