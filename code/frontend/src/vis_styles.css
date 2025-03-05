@@ -1,301 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .break-inside-avoid {
+    break-inside: avoid;
+  }
+  
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+}
+
 /* General Styles */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  color: #1f2937;
-  margin: 0;
-  padding: 0;
+  @apply font-sans text-gray-800 m-0 p-0;
 }
 
 /* FileUploader Component */
 .dropzone {
-  border: 2px dashed #d1d5db;
-  border-radius: 0.5rem;
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  @apply border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition-all duration-300 ease-in-out;
 }
 
 .dropzone:hover {
-  border-color: #93c5fd;
+  @apply border-blue-300;
 }
 
 .dropzone-active {
-  border-color: #3b82f6;
-  background-color: #eff6ff;
+  @apply border-blue-600 bg-blue-50;
 }
 
 .dropzone-processing {
-  border-color: #d1d5db;
-  background-color: #f9fafb;
-  cursor: wait;
+  @apply border-gray-300 bg-gray-100 cursor-wait;
 }
 
 .upload-icon {
-  height: 3rem;
-  width: 3rem;
-  margin: 0 auto;
-  color: #9ca3af;
+  @apply h-12 w-12 mx-auto text-gray-400;
 }
 
 .upload-icon.processing {
-  color: #d1d5db;
-  animation: pulse 2s infinite;
+  @apply text-gray-300 animate-pulse;
 }
 
 .upload-text {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #1f2937;
+  @apply mt-2 text-sm font-medium text-gray-800;
 }
 
 .upload-subtext {
-  margin-top: 0.25rem;
-  font-size: 0.75rem;
-  color: #6b7280;
+  @apply mt-1 text-xs text-gray-500;
 }
 
 .processing-indicator {
-  margin-top: 0.5rem;
-  display: flex;
-  justify-content: center;
+  @apply mt-2 flex justify-center;
 }
 
 .processing-bar {
-  width: 2.5rem;
-  height: 0.25rem;
-  background-color: #3b82f6;
-  border-radius: 9999px;
-  animation: pulse 2s infinite;
+  @apply w-10 h-1 bg-blue-600 rounded-full animate-pulse;
 }
 
 /* ChartModal Component */
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
 }
 
 .modal-container {
-  background-color: white;
-  border-radius: 0.5rem;
-  width: 100%;
-  max-width: 64rem;
-  max-height: 90vh;
-  overflow: auto;
+  @apply bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-auto;
 }
 
 .modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #e5e7eb;
+  @apply flex justify-between items-center p-4 border-b border-gray-200;
 }
 
 .modal-title {
-  font-size: 1.25rem;
-  font-weight: 600;
+  @apply text-xl font-semibold text-black;
 }
 
 .close-button {
-  color: #6b7280;
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.close-button:hover {
-  color: #1f2937;
+  @apply text-gray-500 bg-transparent border-none cursor-pointer transition-colors duration-200 hover:text-gray-800;
 }
 
 .modal-body {
-  padding: 1.5rem;
+  @apply p-6;
 }
 
 .modal-section-title {
-  font-size: 1.125rem;
-  font-weight: 500;
-  margin-bottom: 1rem;
+  @apply text-lg font-medium mb-4 text-black;
 }
 
 /* Form Controls */
 .form-group {
-  margin-bottom: 1rem;
+  @apply mb-4;
 }
 
 .form-label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #4b5563;
-  margin-bottom: 0.25rem;
+  @apply block text-sm font-medium text-gray-700 mb-1;
 }
 
 .form-input, .form-select {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  @apply w-full p-2 border-2 border-gray-300 rounded-md text-sm transition duration-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-300 bg-white text-gray-800;
 }
 
-.form-input:focus, .form-select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+.form-select option {
+  @apply text-black;
 }
 
 .form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
+  @apply grid grid-cols-2 gap-2;
 }
 
 /* Button Styles */
 .btn {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-align: center;
-  border-radius: 0.375rem;
-  transition: all 0.2s;
-  cursor: pointer;
+  @apply inline-block px-4 py-2 text-sm font-medium text-center rounded-md transition duration-200 cursor-pointer;
 }
 
 .btn-primary {
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-}
-
-.btn-primary:hover {
-  background-color: #2563eb;
-}
-
-.btn-primary:disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
+  @apply bg-blue-600 text-white border-none hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed;
 }
 
 .btn-secondary {
-  background-color: white;
-  color: #4b5563;
-  border: 1px solid #d1d5db;
-}
-
-.btn-secondary:hover {
-  background-color: #f9fafb;
+  @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-100;
 }
 
 .btn-icon {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  @apply flex items-center gap-2;
 }
 
 /* Chart Component */
 .chart-container {
-  position: relative;
-
-  height: 20rem;
-  padding: 1rem;
+  @apply relative h-80 p-4;
 }
 
 .chart-card {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.chart-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  @apply bg-white rounded-lg shadow-sm overflow-hidden transition duration-200 hover:shadow-lg hover:-translate-y-1;
 }
 
 .edit-button {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  z-index: 10;
-  background-color: white;
-  padding: 0.5rem;
-  border-radius: 9999px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.edit-button:hover {
-  background-color: #f9fafb;
+  @apply absolute top-2 right-2 z-10 bg-white p-2 rounded-full shadow cursor-pointer transition duration-200 hover:bg-gray-100;
 }
 
 .edit-icon {
-  width: 1rem;
-  height: 1rem;
-  color: #4b5563;
+  @apply w-4 h-4 text-gray-700;
 }
 
 /* Canvas Layout */
 .dashboard-container {
-  padding: 1.5rem;
-  background-color: #f9fafb;
-  min-height: 100vh;
+  @apply p-6 bg-gray-100 min-h-screen;
 }
 
 .dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
+  @apply flex justify-between items-center mb-6;
 }
 
 .dashboard-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
+  @apply text-2xl font-bold text-gray-800;
 }
 
 .chart-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(500px, 1.1fr));
-  height: 100%;
-  gap: 1.5rem;
+  @apply grid grid-cols-[repeat(auto-fill,_minmax(500px,_1.1fr))] gap-6 h-full;
 }
 
 .empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: white;
-  border-radius: 0.5rem;
-  border: 2px dashed #d1d5db;
-  padding: 3rem;
-  margin-top: 2rem;
+  @apply flex flex-col items-center justify-center bg-white rounded-lg border-2 border-dashed border-gray-300 p-12 mt-8;
 }
 
 .empty-icon {
-  color: #6b7280;
-  margin-bottom: 1rem;
-  width: 3rem;
-  height: 3rem;
+  @apply text-gray-500 mb-4 w-12 h-12;
 }
 
 .empty-text {
-  color: #4b5563;
-  font-size: 1.125rem;
-  margin-bottom: 1rem;
+  @apply text-lg text-gray-700 mb-4;
 }
 
 /* Animations */
@@ -308,104 +181,91 @@ body {
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .chart-grid {
-    grid-template-columns: 1fr;
+    @apply grid-cols-1;
   }
-  
+
   .modal-container {
-    width: 95%;
-    max-height: 90vh;
+    @apply w-[95%] max-h-[90vh];
   }
-  
+
   .form-grid {
-    grid-template-columns: 1fr;
+    @apply grid-cols-1;
   }
 }
 
 /* Additional styles for ChartModal */
 .configuration-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  @apply grid grid-cols-2 gap-6;
 }
 
 .config-section, .preview-section {
-  width: 100%;
+  @apply w-full;
 }
 
 .chart-preview-container {
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  height: 20rem;
+  @apply border border-gray-200 rounded-lg p-4 h-80;
 }
 
 .empty-preview {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6b7280;
+  @apply h-full flex items-center justify-center text-gray-500;
 }
 
 .form-buttons {
-  margin-top: 1.5rem;
-  display: flex;
-  gap: 0.5rem;
+  @apply mt-6 flex gap-2;
 }
 
 @media (max-width: 768px) {
   .configuration-grid {
-    grid-template-columns: 1fr;
+    @apply grid-cols-1;
   }
-  
+
   .chart-preview-container {
-    height: 15rem;
+    @apply h-60;
   }
 }
 
 /* Additional styles */
 .app-container {
-  min-height: 100vh;
-  background-color: #f9fafb;
+  @apply min-h-screen bg-gray-100;
 }
 
 .chart-relative {
-  position: relative;
+  @apply relative;
 }
 
 .unsupported-chart-type {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ef4444;
-  font-weight: 500;
+  @apply h-full flex items-center justify-center text-red-500 font-medium;
 }
 
 .empty-icon-container {
-  margin-bottom: 1rem;
+  @apply mb-4;
 }
 
-/* Let's add some print styles for exporting charts */
+/* Print styles for exporting charts */
 @media print {
   .btn, .edit-button, .empty-state {
-    display: none !important;
+    @apply hidden !important;
   }
-  
+
   .dashboard-container {
-    background-color: white;
-    padding: 0;
+    @apply bg-white p-0;
   }
-  
+
   .chart-card {
+    @apply break-inside-avoid page-break-inside-avoid shadow-none border border-gray-200 my-4;
+  }
+
+  .chart-container {
+    @apply h-60;
+  }
+}
+
+@layer utilities {
+  .break-inside-avoid {
     break-inside: avoid;
-    page-break-inside: avoid;
-    box-shadow: none;
-    border: 1px solid #e5e7eb;
-    margin: 1rem 0;
   }
   
-  .chart-container {
-    height: 15rem;
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
   }
 }
