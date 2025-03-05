@@ -14,38 +14,6 @@ const Overview = () => {
   );
 };
 
-const KPIs = () => {
-  return (
-    <>
-      <h1>KPIs</h1>
-    </>
-  );
-};
-
-const Timeline = () => {
-  return (
-    <>
-      <h1>Timeline</h1>
-    </>
-  );
-};
-
-const SuccessStories = () => {
-  return (
-    <>
-      <h1>Success stories</h1>
-    </>
-  );
-};
-
-const LogFramework = () => {
-  return (
-    <>
-      <h1>Log framework</h1>
-    </>
-  );
-};
-
 const ProjectHeader = () => {
   return (
     <>
@@ -71,7 +39,7 @@ const ProjectHeader = () => {
 const ProjectPage = () => {
   const params = useParams();
 
-  console.log(params);
+  console.dir(params);
 
   return (
     <>
@@ -83,4 +51,4 @@ const ProjectPage = () => {
 
 
 export default ProjectPage;
-export { ProjectHeader, Overview, KPIs, Timeline, SuccessStories, LogFramework };
+export { ProjectHeader, Overview };
