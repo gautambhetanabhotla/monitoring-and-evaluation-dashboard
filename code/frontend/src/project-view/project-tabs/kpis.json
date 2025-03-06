@@ -1,0 +1,83 @@
+[
+    {
+        "indicator": "Employment rate of trained youth",
+        "what_it_tracks": "How many youth get jobs",
+        "logframe_level": "Goal",
+        "explanation": "# 1. Goal (Impact Level)\n**Project Goal:** To improve the employability and income levels of youth by providing electrician training.\n\n## Impact Indicators:\n1. Employment rate of trained youth (%)\n2. Increase in average income of trainees (%)\n\n## Data Source & Collection Method:\n1. Post-training employment surveys, income assessment, industry feedback\n\n## Assumptions & Risks:\n1. Availability of job opportunities in the sector\n2. Youth retention in electrician jobs\n\n## Visualization:\n1. Line charts showing employment and income trends over time\n",  
+        "baseline": 10,
+        "target": 80,
+        "current": 50
+      },
+      {
+        "indicator": "Increase in average income of trainees",
+        "what_it_tracks": "Growth in earnings",
+        "logframe_level": "Goal",
+        "explanation": "# 1. Goal (Impact Level)\n**Project Goal:** To improve the employability and income levels of youth by providing electrician training.\n\n## Impact Indicators:\n1. Employment rate of trained youth (%)\n2. Increase in average income of trainees (%)\n\n## Data Source & Collection Method:\n1. Post-training employment surveys, income assessment, industry feedback\n\n## Assumptions & Risks:\n1. Availability of job opportunities in the sector\n2. Youth retention in electrician jobs\n\n## Visualization:\n1. Line charts showing employment and income trends over time\n",  
+        "baseline": 0,
+        "target": 50,
+        "current": 30
+      },
+      {
+        "indicator": "Percentage of trainees certified",
+        "what_it_tracks": "How many trained youth secure employment/self-employment opportunities",
+        "logframe_level": "Outcome",
+        "explanation": "#2. Outcomes (Purpose Level)\n**Project Outcomes:**\n1. Trained youth secure employment/self-employment opportunities\n2. Certified trainees demonstrate improved technical skills\n\n** Outcome Indicators:**\n1. Percentage of trainees certified\n2. Percentage of trained youth employed within 6 months\n\n**Means of Verification:**\nCertification records, employer feedback, follow-up surveys\n\n **Assumptions & Risks:**\n1. Employers recognize and value certification\n2. Youth willingness to relocate for jobs\n\n**Visualization:**\n1. Bar graphs comparing certification rates and employment rates\n2. Maps showing employment locations",
+        "baseline": 0,
+        "target": 100,
+        "current": 85
+      },
+      {
+        "indicator": "Percentage of trained youth employed within 6 months",
+        "what_it_tracks": "How many certified trainees demonstrate improved technical skills",
+        "logframe_level": "Outcome",
+        "explanation": "#2. Outcomes (Purpose Level)\n**Project Outcomes:**\n1. Trained youth secure employment/self-employment opportunities\n2. Certified trainees demonstrate improved technical skills\n\n** Outcome Indicators:**\n1. Percentage of trainees certified\n2. Percentage of trained youth employed within 6 months\n\n**Means of Verification:**\nCertification records, employer feedback, follow-up surveys\n\n **Assumptions & Risks:**\n1. Employers recognize and value certification\n2. Youth willingness to relocate for jobs\n\n**Visualization:**\n1. Bar graphs comparing certification rates and employment rates\n2. Maps showing employment locations",
+        "baseline": 0,
+        "target": 80,
+        "current": 50
+      },
+      {
+        "indicator": "Number of youth trained",
+        "what_it_tracks": "How many were trained",
+        "logframe_level": "Output",
+        "explanation": "# 3. Outputs(Deliverables)\n**Project Outputs:**\n1. 100 youth trained in electrician skills\n2. 90 youth complete the full training course\n\n** Output Indicators:**\n1. Number of youth trained\n2. Number of youth completing the course\n\n**Data Collection Frequency:**\n1. Monthly/Quarterly updates\n\n **Responsible Team/Partners:**\n1. Training institutes\n2. Assessment agencies\n\n**Visualization:**\n1. Progress bars for % completion of outputs\n2. Pie charts for % of deliverables achieved",  
+        "baseline": 0,
+        "target": 100,
+        "current": 100
+      },
+      {
+        "indicator": "Number of youth completing the course",
+        "what_it_tracks": "How many finished the course",
+        "logframe_level": "Output",
+        "explanation": "# 3. Outputs(Deliverables)\n**Project Outputs:**\n1. 100 youth trained in electrician skills\n2. 90 youth complete the full training course\n\n** Output Indicators:**\n1. Number of youth trained\n2. Number of youth completing the course\n\n**Data Collection Frequency:**\n1. Monthly/Quarterly updates\n\n **Responsible Team/Partners:**\n1. Training institutes\n2. Assessment agencies\n\n**Visualization:**\n1. Progress bars for % completion of outputs\n2. Pie charts for % of deliverables achieved",  
+        "baseline": 0,
+        "target": 90,
+        "current": 85
+      },
+      {
+        "indicator": "Practical training sessions",
+        "what_it_tracks": "Hands-on electrician training",
+        "logframe_level": "Activity",
+        "explanation": "# 4. Activities (Process Level)\n**Key Activities:**\n1. Conducting theoretical and practical training sessions\n 2. Organizing industry exposure visits\n\n** Activity Timeline:**\n1. Training period: 6 months\n\n**Budget Allocation & Utilization:**\n1. Planned vs. Actual expenditure\n\n **Challenges & Mitigation Strategies:**\n1. Trainee dropouts → Counseling and motivation\n2. Placement hurdles → Industry partnerships\n\n**Visualization:**\n1. Gantt chart showing activity timelines\n2. Budget utilization graph (Planned vs. Spent)",
+        "baseline": 0,
+        "target": 50,
+        "current": 40
+      },
+      {
+        "indicator": "Industry exposure visits",
+        "what_it_tracks": "Visits to workplaces",
+        "logframe_level": "Activity",
+        "explanation": "# 4. Activities (Process Level)\n**Key Activities:**\n1. Conducting theoretical and practical training sessions\n 2. Organizing industry exposure visits\n\n** Activity Timeline:**\n1. Training period: 6 months\n\n**Budget Allocation & Utilization:**\n1. Planned vs. Actual expenditure\n\n **Challenges & Mitigation Strategies:**\n1. Trainee dropouts → Counseling and motivation\n2. Placement hurdles → Industry partnerships\n\n**Visualization:**\n1. Gantt chart showing activity timelines\n2. Budget utilization graph (Planned vs. Spent)",
+        "baseline": 0,
+        "target": 5,
+        "current": 4
+      },
+      {
+        "indicator": "Budget utilization",
+        "what_it_tracks": "How money is spent across activities",
+        "logframe_level": "Activity",
+        "explanation": "# 4. Activities (Process Level)\n**Key Activities:**\n1. Conducting theoretical and practical training sessions\n 2. Organizing industry exposure visits\n\n** Activity Timeline:**\n1. Training period: 6 months\n\n**Budget Allocation & Utilization:**\n1. Planned vs. Actual expenditure\n\n **Challenges & Mitigation Strategies:**\n1. Trainee dropouts → Counseling and motivation\n2. Placement hurdles → Industry partnerships\n\n**Visualization:**\n1. Gantt chart showing activity timelines\n2. Budget utilization graph (Planned vs. Spent)",
+        "baseline": 0,
+        "target": 100,
+        "current": 75
+      }
+]
