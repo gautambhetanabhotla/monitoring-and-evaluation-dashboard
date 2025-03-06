@@ -14,38 +14,6 @@ const Overview = () => {
   );
 };
 
-const KPIs = () => {
-  return (
-    <>
-      <h1>KPIs</h1>
-    </>
-  );
-};
-
-const Timeline = () => {
-  return (
-    <>
-      <h1>Timeline</h1>
-    </>
-  );
-};
-
-const SuccessStories = () => {
-  return (
-    <>
-      <h1>Success stories</h1>
-    </>
-  );
-};
-
-const LogFramework = () => {
-  return (
-    <>
-      <h1>Log framework</h1>
-    </>
-  );
-};
-
 const ProjectHeader = () => {
   return (
     <>
@@ -57,13 +25,15 @@ const ProjectHeader = () => {
           <article className="prose absolute top-2 text-3xl font-semibold left-4">Client name</article>
         </div>
       </div>
-      <ButtonGroup>
-        <Link to="overview"><Button color='danger' variant='shadow'>Overview</Button></Link>
-        <Link to="kpis"><Button>KPIs</Button></Link>
-        <Link to="timeline"><Button>Timeline</Button></Link>
-        <Link to="success-stories"><Button>Success stories</Button></Link>
-        <Link to="log-framework"><Button>Log framework</Button></Link>
-      </ButtonGroup>
+      <div className="sticky top-0 z-10 p-5 bg-white m-2 rounded-lg">
+        <ButtonGroup className="flex flex-row justify-between">
+          <Link to="overview"><Button className="px-20">Overview</Button></Link>
+          <Link to="kpis"><Button className="px-20">KPIs</Button></Link>
+          <Link to="timeline"><Button className="px-20">Timeline</Button></Link>
+          <Link to="success-stories"><Button className="px-20">Success stories</Button></Link>
+          <Link to="log-framework"><Button className="px-20">Log framework</Button></Link>
+        </ButtonGroup>
+      </div>
     </>
   );
 };
@@ -71,7 +41,7 @@ const ProjectHeader = () => {
 const ProjectPage = () => {
   const params = useParams();
 
-  console.log(params);
+  console.dir(params);
 
   return (
     <>
@@ -83,4 +53,4 @@ const ProjectPage = () => {
 
 
 export default ProjectPage;
-export { ProjectHeader, Overview, KPIs, Timeline, SuccessStories, LogFramework };
+export { ProjectHeader, Overview };
