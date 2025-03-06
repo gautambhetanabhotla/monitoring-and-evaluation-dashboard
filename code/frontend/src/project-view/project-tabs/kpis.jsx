@@ -5,10 +5,12 @@ import Markdown from "marked-react";
 const KPI = ({ kpi }) => {
   return (
     <>
-      <Card>
-        <CardHeader><span className="prose text-3xl font-bold">{kpi.indicator}</span></CardHeader>
+      <Card className="m-3 z-0">
+        <CardHeader className="relative">
+          <span className="prose text-3xl font-bold py-5 px-2 z-0">{kpi.indicator}</span>
+        </CardHeader>
         <Divider />
-        <CardBody>
+        <CardBody className="px-5">
           <span className="prose text-xl font-bold">What does it track?</span>
           {kpi.what_it_tracks}
           <br />
@@ -16,21 +18,25 @@ const KPI = ({ kpi }) => {
           <Markdown>{kpi.explanation}</Markdown> */}
         </CardBody>
         <Divider />
-        <CardFooter>
+        <CardFooter className="flex justify-center">
           <div className="grid grid-cols-5">
-            <div className="flex flex-col justify-center align-middle">
+            <div className="flex flex-col justify-center align-middle text-red-500">
               <div>BASELINE</div>
-              <div className="text-4xl">{kpi.baseline}</div>
+              <div className="text-4xl flex flex-row justify-center">{kpi.baseline}</div>
             </div>
-            <Divider orientation="vertical" />
-            <div className="flex flex-col justify-center align-middle">
+            <div className="flex flex-row justify-center align-middle">
+              <Divider orientation="vertical" />
+            </div>
+            <div className="flex flex-col justify-center align-middle text-blue-500">
               <div>CURRENT</div>
-              <div className="text-4xl">{kpi.current}</div>
+              <div className="text-4xl flex flex-row justify-center">{kpi.current}</div>
             </div>
-            <Divider orientation="vertical" />
-            <div className="flex flex-col justify-center align-middle">
-              <div>TARGET</div>
-              <div className="text-4xl">{kpi.target}</div>
+            <div className="flex flex-row justify-center align-middle">
+              <Divider orientation="vertical" className="flex flex-col justify-center align-middle" />
+            </div>
+            <div className="flex flex-col justify-center align-middle text-green-500">
+              <div className="flex flex-row justify-center">TARGET</div>
+              <div className="text-4xl flex flex-row justify-center">{kpi.target}</div>
             </div>
           </div>
         </CardFooter>
@@ -69,8 +75,10 @@ const KPIs = () => {
   ]
   return (
     <>
-      <h1 className="prose text-6xl">KPIs</h1>
-      <div className="grid grid-cols-2">
+      <div className="flex flex-row justify-center">
+        <h1 className="prose text-6xl p-10">Key performance indexes (KPIs)</h1>
+      </div>
+      <div className="grid xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1">
         {kpis.map((kpi, index) => {
           return <KPI key={index} kpi={kpi} />
         })}

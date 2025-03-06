@@ -2,7 +2,7 @@ import React from 'react';
 import ChartComponent from './ChartComponent';
 import { PlusCircle } from 'lucide-react';
 
-const Canvas = ({ charts, onAddChart, onEditChart }) => {
+const Canvas = ({ charts, onAddChart, onEditChart ,onRemoveChart}) => {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
@@ -33,7 +33,7 @@ const Canvas = ({ charts, onAddChart, onEditChart }) => {
         <div className="chart-grid">
           {charts.map((chart) => (
             <div key={chart.id} className="chart-card">
-              <ChartComponent chart={chart} onEdit={() => onEditChart(chart.id)} />
+              <ChartComponent chart={chart} onEdit={() => onEditChart(chart.id)} onRemove={() => onRemoveChart(chart.id)} />
             </div>
           ))}
         </div>
