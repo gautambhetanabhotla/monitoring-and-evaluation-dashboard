@@ -47,6 +47,30 @@ const userSchema = new mongoose.Schema({
     ],
 });
 
+// Indexes
+// userSchema.index({ user_id: 1 });
+userSchema.index({ username: 1 });
+userSchema.index({ email: 1 });
+userSchema.index({ phone_number: 1 });
+userSchema.index({ role: 1 });
+
+userSchema.pre('save', function (next) {
+    this.email = this.email.toLowerCase();
+    next();
+});
+
+userSchema.post('save', function (doc) {
+    // Log changes to the user's role
+    if (this.isModified('role')) {
+        console.log(`User role changed: ${doc}`);
+    }
+});
+
+userSchema.post('remove', function (doc) {
+    // Log the deletion of a user account
+    console.log(`User deleted: ${doc}`);
+});
+
 const User = mongoose.model('User', userSchema);
 
 export default User;
