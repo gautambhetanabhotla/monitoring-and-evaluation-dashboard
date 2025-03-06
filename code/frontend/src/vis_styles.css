@@ -131,7 +131,7 @@ body {
 }
 
 .chart-card {
-  @apply bg-white rounded-lg shadow-sm overflow-hidden transition duration-200 hover:shadow-lg hover:-translate-y-1;
+  @apply bg-white rounded-lg shadow-sm overflow-hidden transition duration-200 hover:shadow-lg ;
 }
 
 .edit-button {
@@ -139,6 +139,14 @@ body {
 }
 
 .edit-icon {
+  @apply w-4 h-4 text-gray-700;
+}
+
+.remove-button {
+  @apply absolute top-2 right-14 z-10 bg-white p-2 rounded-full shadow cursor-pointer transition duration-200 hover:bg-gray-100;
+}
+
+.remove-icon {
   @apply w-4 h-4 text-gray-700;
 }
 

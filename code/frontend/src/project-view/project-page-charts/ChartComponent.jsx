@@ -1,6 +1,6 @@
 import React from 'react';
 import { Bar, Line, Pie, Scatter } from 'react-chartjs-2';
-import { Edit2 } from 'lucide-react';
+import { Edit2, Trash2 } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -27,7 +27,7 @@ ChartJS.register(
   Legend
 );
 
-const ChartComponent = ({ chart, onEdit }) => {
+const ChartComponent = ({ chart, onEdit, onRemove }) => {
   const { type, data, xAxis, yAxis, categoryField, valueField, title } = chart;
 
   // Generate appropriate chart data based on chart type
@@ -140,6 +140,13 @@ const ChartComponent = ({ chart, onEdit }) => {
 
   return (
     <div className="chart-relative">
+      <button
+        onClick={onRemove}
+        className="remove-button"
+        title="Remove visualization"
+      >
+        <Trash2 size={16} className="remove-icon" color='red'/>
+      </button>
       <button
         onClick={onEdit}
         className="edit-button"
