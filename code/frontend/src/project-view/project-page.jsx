@@ -1,9 +1,7 @@
 // import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
-
 import { Button, ButtonGroup } from "@heroui/button";
-import { button, button as buttonStyles } from "@heroui/theme";
 import '../index.css';
 
 // import Charts from './project-page-charts.jsx';
@@ -12,38 +10,6 @@ const Overview = () => {
   return (
     <>
       <h1>Overview</h1>
-    </>
-  );
-};
-
-const KPIs = () => {
-  return (
-    <>
-      <h1>KPIs</h1>
-    </>
-  );
-};
-
-const Timeline = () => {
-  return (
-    <>
-      <h1>Timeline</h1>
-    </>
-  );
-};
-
-const SuccessStories = () => {
-  return (
-    <>
-      <h1>Success stories</h1>
-    </>
-  );
-};
-
-const LogFramework = () => {
-  return (
-    <>
-      <h1>Log framework</h1>
     </>
   );
 };
@@ -60,21 +26,21 @@ const ProjectHeader = () => {
         </div>
       </div>
       <ButtonGroup>
-        <Link to="overview" className={buttonStyles({ variant: "bordered", radius: "full" })}><Button color='danger' variant='shadow' className={buttonStyles({ variant: "bordered", radius: "full" })}>Overview</Button></Link>
-        <Link to="kpis"><Button className={buttonStyles({variant: "shadow", color: "primary"})}>KPIs</Button></Link>
+        <Link to="overview"><Button color='danger' variant='shadow'>Overview</Button></Link>
+        <Link to="kpis"><Button>KPIs</Button></Link>
         <Link to="timeline"><Button>Timeline</Button></Link>
         <Link to="success-stories"><Button>Success stories</Button></Link>
         <Link to="log-framework"><Button>Log framework</Button></Link>
       </ButtonGroup>
-      <Button>erfidhvsfui</Button>
-      
     </>
   );
 };
 
 const ProjectPage = () => {
   const params = useParams();
-  console.log(params);
+
+  console.dir(params);
+
   return (
     <>
       <ProjectHeader />
@@ -85,4 +51,4 @@ const ProjectPage = () => {
 
 
 export default ProjectPage;
-export { ProjectHeader, Overview, KPIs, Timeline, SuccessStories, LogFramework };
+export { ProjectHeader, Overview };

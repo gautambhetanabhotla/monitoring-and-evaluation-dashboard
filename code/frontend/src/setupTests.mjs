@@ -5,4 +5,3 @@ import { TextEncoder, TextDecoder } from 'util';
 // These are required by some dependencies but not available in the Jest environment
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
-
