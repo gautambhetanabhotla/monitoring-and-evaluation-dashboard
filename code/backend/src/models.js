@@ -49,10 +49,10 @@ const userSchema = new mongoose.Schema({
 
 // Indexes
 // userSchema.index({ user_id: 1 });
-// userSchema.index({ username: 1 });
-// userSchema.index({ email: 1 });
-// userSchema.index({ phone_number: 1 });
-// userSchema.index({ role: 1 });
+userSchema.index({ username: 1 });
+userSchema.index({ email: 1 });
+userSchema.index({ phone_number: 1 });
+userSchema.index({ role: 1 });
 
 userSchema.pre('save', function (next) {
     this.email = this.email.toLowerCase();
@@ -83,7 +83,7 @@ const projectSchema = new mongoose.Schema(
             minlength: 5,
             maxlength: 100,
         },
-        description: { type: String },
+        description: { type: String, minlength: 300 },
         thrust_areas: [
             { type: String, required: [true, 'Thrust areas are required'] },
         ],
@@ -146,6 +146,10 @@ const projectSchema = new mongoose.Schema(
         targets: [{ type: String }], // COME BACK TO THIS
         tags: [{ type: String }],
         proxy_indicators: [{ type: String }],
+        project_term: {
+            type: String,
+            enum: ['short-term', 'medium-term', 'long-term', 'high impact'],
+        },
         client_id: [
             {
                 type: mongoose.Schema.Types.ObjectId,
@@ -155,7 +159,7 @@ const projectSchema = new mongoose.Schema(
                 },
             },
         ],
-        // status_comparison: { type: mongoose.Schema.Types.Mixed },
+        status_comparison: { type: mongoose.Schema.Types.Mixed },
         completion_status: {
             type: String,
             default: 'Not Started',
@@ -171,11 +175,11 @@ const projectSchema = new mongoose.Schema(
                 'Extended',
             ],
         },
-        // average_budget: { type: Number, min: 0 },
+        average_budget: { type: Number, min: 0 },
         risk_assessment: { type: String },
-        // dependencies: [
-            // { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
-        // ],
+        dependencies: [
+            { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
+        ],
         timeline: {
             start_date: {
                 type: Date,
@@ -187,26 +191,39 @@ const projectSchema = new mongoose.Schema(
             },
             end_date_actual: { type: Date },
         },
-        // duration: { type: Number },
-        // stakeholder_feedback: { type: mongoose.Schema.Types.Mixed },
-        // progress_estimation: { type: mongoose.Schema.Types.Mixed },
-        kpi: [{ type: mongoose.Schema.Types.Mixed }],// COME BACK TO THIS
-        // data_visualization: { type: mongoose.Schema.Types.Mixed },
-        // blog: { type: String },
-        success_stories: [{ type: mongoose.Schema.Types.Mixed }],// COME BACK TO THIS
-        // print_options: { type: mongoose.Schema.Types.Mixed },
-        // summary: { type: String, maxlength: 30 },
-        // reports: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Report' }],
-        // timeline_graph_comparison_with_progress: {
-            // type: mongoose.Schema.Types.Mixed,
-        // },
+        duration: { type: Number },
+        stakeholder_feedback: { type: mongoose.Schema.Types.Mixed },
+        progress_estimation: { type: mongoose.Schema.Types.Mixed },
+        kpi: { type: mongoose.Schema.Types.Mixed },
+        data_visualization: { type: mongoose.Schema.Types.Mixed },
+        blog: { type: String },
+        case_studies: { type: mongoose.Schema.Types.Mixed },
+        progress_bar: {
+            type: Boolean,
+            required: [true, 'Progress bar is required'],
+        },
+        print_options: { type: mongoose.Schema.Types.Mixed },
+        summary: { type: String, maxlength: 30 },
+        reports: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Report' }],
+        timeline_graph_comparison_with_progress: {
+            type: mongoose.Schema.Types.Mixed,
+        },
         documents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Document' }],
         comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
         status_updates: [
             { type: mongoose.Schema.Types.ObjectId, ref: 'StatusUpdate' },
         ],
-        // images: [{ type: String }],
-        // field_observations: { type: String },
+        images: [{ type: String }],
+        field_observations: { type: String },
+        assigned_field_agents: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+                required: function () {
+                    return this.role === 'field staff';
+                },
+            },
+        ],
     },
     {
         timestamps: true,
@@ -214,56 +231,44 @@ const projectSchema = new mongoose.Schema(
 );
 
 // Indexes
-// projectSchema.index({ project_id: 1 });
-// projectSchema.index({ title: 1 });
-// projectSchema.index({ state_union_territory: 1 });
-// projectSchema.index({ client_id: 1 });
-// projectSchema.index({ assigned_field_agents: 1 });
+projectSchema.index({ project_id: 1 });
+projectSchema.index({ title: 1 });
+projectSchema.index({ state_union_territory: 1 });
+projectSchema.index({ client_id: 1 });
+projectSchema.index({ assigned_field_agents: 1 });
 
-// projectSchema.pre('save', function (next) {
-    // if (!this.completion_status) {
-        // this.completion_status = 'Not Started';
-//     }
-//     next();
-// });
+projectSchema.pre('save', function (next) {
+    if (!this.completion_status) {
+        this.completion_status = 'Not Started';
+    }
+    next();
+});
 
-// projectSchema.post('save', function (doc) {
-//     // Log changes to the project's budget
-//     if (this.isModified('budget')) {
-//         console.log(`Project budget changed: ${doc}`);
-//     }
-// });
+projectSchema.post('save', function (doc) {
+    // Log changes to the project's budget
+    if (this.isModified('budget')) {
+        console.log(`Project budget changed: ${doc}`);
+    }
+});
 
 const projectModel = mongoose.model('Project', projectSchema);
 
 // Milestone Schema
-const taskSchema = new mongoose.Schema(
+const milestoneSchema = new mongoose.Schema(
     {
-        project: {
+        milestone_id: { type: Number, unique: true, required: true },
+        project_id: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Project',
             required: true,
         },
-        progress : {
-            type : String ,
-            required : true,
-            enum: [
-                'Not Started',
-                'In Progress',
-                'On Hold',
-                'Successfully Completed',
-                'Delayed',
-                'Cancelled',
-                'Under review',
-                'Failed',
-                'Extended',
-            ]
-        },
         title: {
             type: String,
             required: [true, 'Title is required'],
+            minlength: 5,
+            maxlength: 100,
         },
-        description: { type: String },
+        description: { type: String, minlength: 50 },
         deadline: { type: Date, required: [true, 'Deadline is required'] },
         completion_percentage: {
             type: Number,
@@ -271,84 +276,83 @@ const taskSchema = new mongoose.Schema(
             min: 0,
             max: 100,
         },
-        updates: [
-            {
-                kpi_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Kpi',required: true },
-                updated_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-                updated_at: { type: Date, default: Date.now },
-                value_before: { type: mongoose.Schema.Types.Mixed, required: true },
-                value_after: { type: mongoose.Schema.Types.Mixed, required: true },
-            },
-        ],
-        // stakeholder_feedback: { type: mongoose.Schema.Types.Mixed },
-        // baseline_data: { type: mongoose.Schema.Types.Mixed },
-
+        stakeholder_feedback: { type: mongoose.Schema.Types.Mixed },
+        baseline_data: { type: mongoose.Schema.Types.Mixed },
     },
     {
         timestamps: true,
     }
 );
 
-const KpiSchema = new mongoose.Schema(
-    {
-        project: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Project',
-            required: true,
-        },
-        indicators : {
-            type : [String] ,
-            required : true,
-        },
-        What_it_tracks : {
-            type : [String] ,
-            required : true,
-        },
-        Baseline : {
-            type : Number,
-            required : true,
-        },
-        Target : {
-            type : Number,
-            required : true,
-        },
-        Current_Status : {
-            type : Number,
-            required : true,
-        },
-        Explanation :  { 
-            type : String, // I want it to be in md format
-            required : true,
-        },
-        } ,       
-        // stakeholder_feedback: { type: mongoose.Schema.Types.Mixed },
-        // baseline_data: { type: mongoose.Schema.Types.Mixed },
-    {
-        timestamps: true,
-    }
-);
 // Indexes
-taskSchema.index({ project_id: 1 });
+milestoneSchema.index({ project_id: 1 });
 
 // Triggers
-taskSchema.pre('save', function (next) {
+milestoneSchema.pre('save', function (next) {
     if (this.isNew && this.deadline <= new Date()) {
         return next(new Error('Deadline must be in the future'));
     }
     next();
 });
 
-taskSchema.post('save', function (doc) {
+milestoneSchema.post('save', function (doc) {
     if (this.isModified('deadline')) {
-        console.log(`Task deadline changed: ${doc}`);
+        console.log(`Milestone deadline changed: ${doc}`);
     }
 });
 
-taskSchema.post('remove', function (doc) {
-    console.log(`Task removed: ${doc}`);
+milestoneSchema.post('remove', function (doc) {
+    console.log(`Milestone removed: ${doc}`);
 });
 
-const taskModel = mongoose.model('Task', taskSchema);
-const kpiModel = mongoose.model('Kpi', KpiSchema);
+const milestoneModel = mongoose.model('Milestone', milestoneSchema);
 
-export { userModel, projectModel, taskModel, kpiModel };
+// Authentication Schema
+const authSchema = new mongoose.Schema(
+    {
+        auth_id: {
+            type: Number,
+            unique: true,
+            required: true,
+            autoIncrement: true,
+        },
+        user_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
+        token: {
+            type: String,
+            required: [true, 'Token is required'],
+            minlength: 20,
+        },
+        expiration: {
+            type: Date,
+            required: [true, 'Expiration date is required'],
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+// Indexes
+authSchema.index({ user_id: 1 });
+authSchema.index({ token: 1 });
+
+// Triggers
+authSchema.pre('save', async function (next) {
+    const existingAuth = await authModel.findOne({ token: this.token });
+    if (existingAuth) {
+        return next(new Error('Token must be unique'));
+    }
+    next();
+});
+
+authSchema.post('remove', function (doc) {
+    console.log(`Authentication record removed: ${doc}`);
+});
+
+const authModel = mongoose.model('Auth', authSchema);
+
+export { userModel, projectModel, milestoneModel, authModel };

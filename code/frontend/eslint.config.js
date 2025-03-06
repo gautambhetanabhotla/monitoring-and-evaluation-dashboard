@@ -3,6 +3,7 @@ import globals from 'globals';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import jest from 'eslint-plugin-jest';
 
 export default [
   { ignores: ['dist'] },
@@ -10,7 +11,10 @@ export default [
     files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        ...globals.jest,
+      },
       parserOptions: {
         ecmaVersion: 'latest',
         ecmaFeatures: { jsx: true },
@@ -22,6 +26,7 @@ export default [
       react,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      'jest': jest,
     },
     rules: {
     ...js.configs.recommended.rules,
@@ -40,6 +45,31 @@ export default [
         ignoreRestSiblings: true,
         varsIgnorePattern: '^React$'
     }],
+    'react/prop-types': "off",
+    },
+  },
+  {
+    files: ['**/*.test.{js,jsx}'], // Add this block to apply Jest plugin to test files
+    plugins: {
+      'jest': jest,
+    },
+    env: {
+      'jest/globals': true,
+    },
+    rules: {
+      ...jest.configs.recommended.rules,
+    },
+  },
+  {
+    files: ['**/*.test.{js,jsx}'], // Add this block to apply Jest plugin to test files
+    plugins: {
+      'jest': jest,
+    },
+    env: {
+      'jest/globals': true,
+    },
+    rules: {
+      ...jest.configs.recommended.rules,
     },
   },
 ];
