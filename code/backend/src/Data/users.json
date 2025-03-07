@@ -1,0 +1,37 @@
+[
+    {
+      "username": "admin1",
+      "email": "admin1@example.com",
+      "password": "admin123",
+      "role": "admin",
+      "phone_number": "1234567890"
+    },
+    {
+      "username": "admin2",
+      "email": "admin2@example.com",
+      "password": "admin456",
+      "role": "admin",
+      "phone_number": "0987654321"
+    },
+    {
+      "username": "client1",
+      "email": "client1@example.com",
+      "password": "client123",
+      "role": "client",
+      "phone_number": "1111111111"
+    },
+    {
+      "username": "client2",
+      "email": "client2@example.com",
+      "password": "client456",
+      "role": "client",
+      "phone_number": "2222222222"
+    },
+    {
+      "username": "client3",
+      "email": "client3@example.com",
+      "password": "client789",
+      "role": "client",
+      "phone_number": "3333333333"
+    }
+]

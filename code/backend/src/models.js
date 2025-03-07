@@ -73,7 +73,6 @@ userSchema.post('remove', function (doc) {
 
 const userModel = mongoose.model('User', userSchema);
 
-
 const projectSchema = new mongoose.Schema(
     {
         // project_id: { type: Number, unique: true, required: true },

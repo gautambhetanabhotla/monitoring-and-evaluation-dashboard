@@ -5,6 +5,8 @@ import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import authRouter from './src/routes/auth.routes.js';
 import userRouter from './src/routes/user.routes.js';
+import projectRouter from './src/routes/project.routes.js';
+import visualisationRouter from './src/routes/visualisation.routes.js';
 import cors from 'cors';
 import connectDB from './src/config/connectDB.js';
 
@@ -39,6 +41,9 @@ app.use(
 
 app.use('/auth', authRouter);
 app.use('/user', userRouter);
+app.use('/projects', projectRouter);
+app.use('/visualisation', visualisationRouter);
+
 app.use((req, res) => {
     res.status(404).json({ message: "Route not found" });
 });
