@@ -4,6 +4,7 @@ import process from 'process';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import authRouter from './src/routes/auth.routes.js';
+import userRouter from './src/routes/user.routes.js';
 import cors from 'cors';
 import connectDB from './src/config/connectDB.js';
 
@@ -37,6 +38,10 @@ app.use(
 );
 
 app.use('/auth', authRouter);
+app.use('/user', userRouter);
+app.use((req, res) => {
+    res.status(404).json({ message: "Route not found" });
+});
 
 const PORT = process.env.PORT || 5000;
 

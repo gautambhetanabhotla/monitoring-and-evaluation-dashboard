@@ -1,14 +1,13 @@
 import { useState } from "react";
-
-
-
+import { useNavigate } from "react-router-dom"; // Use useNavigate instead of useHistory
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate(); // Initialize useNavigate
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       setError("Please enter both email and password");
@@ -16,14 +15,29 @@ const Login = () => {
     }
     setError("");
     console.log("Logging in with", email, password);
-    // Add authentication logic here
-    const response = await fetch("http://localhost:5000/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await response.json();
-    console.log(data);
+
+    try {
+      const response = await fetch("http://localhost:5000/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        // Redirect based on user role
+        if (data.role === "admin") {
+          navigate("/admin"); 
+        } else {
+          navigate("/projects"); 
+        }
+      } else {
+        setError(data.message || "Login failed");
+      }
+    } catch (error) {
+      setError("An error occurred during login");
+      console.error("Login error:", error);
+    }
   };
 
   return (
