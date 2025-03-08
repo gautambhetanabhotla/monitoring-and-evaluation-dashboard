@@ -2,7 +2,9 @@ import React from 'react';
 import ChartComponent from './ChartComponent';
 import { PlusCircle } from 'lucide-react';
 
-const Canvas = ({ charts, onAddChart, onEditChart ,onRemoveChart}) => {
+const Canvas = ({ charts = [], onAddChart, onEditChart, onRemoveChart }) => {
+  const chartsArray = Array.isArray(charts) ? charts : [];
+  
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
@@ -26,14 +28,18 @@ const Canvas = ({ charts, onAddChart, onEditChart ,onRemoveChart}) => {
             onClick={onAddChart}
             className="btn btn-primary"
           >
-            Add Your First Visualization
+            Add The First Visualization
           </button>
         </div>
       ) : (
         <div className="chart-grid">
           {charts.map((chart) => (
             <div key={chart.id} className="chart-card">
-              <ChartComponent chart={chart} onEdit={() => onEditChart(chart.id)} onRemove={() => onRemoveChart(chart.id)} />
+              <ChartComponent 
+                chart={chart} 
+                onEdit={() => onEditChart(chart.id)} 
+                onRemove={() => onRemoveChart(chart.id)} 
+              />
             </div>
           ))}
         </div>

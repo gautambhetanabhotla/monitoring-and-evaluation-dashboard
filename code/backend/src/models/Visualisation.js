@@ -21,15 +21,15 @@ const visualisationSchema = new mongoose.Schema({
         enum : ['bar', 'line', 'pie', 'scatter'],
         required : [true, 'Type is required']
     },
-    component1 : {
+    component_1 : {
         type : String,
         trim : true,
-        required : [true, 'Component 1 is required']
+        required : [true, 'X Component is required']
     },
-    component2 : {
+    component_2 : {
         type : String,
         trim : true,
-        required : [true, 'Component 2 is required']
+        required : [true, 'Y Component is required']
     },  
     width : {
         type : Number,

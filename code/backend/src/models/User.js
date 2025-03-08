@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 
 // User Schema
 const userSchema = new mongoose.Schema({
-    // user_id: { type: Number, unique: true, required: true },
     username: {
         type: String,
         unique: true,
@@ -22,10 +21,6 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Role is required'],
         enum: ['admin', 'client', 'field staff'],
     },
-    // state_union_territory: { type: String, required: [true, 'State/Union Territory is required'], enum: ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Lakshadweep', 'Delhi', 'Puducherry', 'Ladakh', 'Jammu and Kashmir'] },
-    // temporary_credentials: { type: String },
-    // last_login: { type: Date },
-    // activity_log: { type: mongoose.Schema.Types.Mixed },
     preferences: { type: mongoose.Schema.Types.Mixed },
     phone_number: {
         type: String,
@@ -33,9 +28,6 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Phone number is required'],
         match: [/^\d{10}$/, 'Invalid phone number format'],
     },
-    // status: { type: String, required: [true, 'Status is required'], enum: ['active', 'inactive'] },
-    // address: { type: String },
-    // data_entry_period: { type: Date, required: function() { return this.role === 'field staff'; } },
     assigned_projects: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -46,13 +38,6 @@ const userSchema = new mongoose.Schema({
         },
     ],
 });
-
-// Indexes
-// userSchema.index({ user_id: 1 });
-userSchema.index({ username: 1 });
-userSchema.index({ email: 1 });
-userSchema.index({ phone_number: 1 });
-userSchema.index({ role: 1 });
 
 userSchema.pre('save', function (next) {
     this.email = this.email.toLowerCase();
