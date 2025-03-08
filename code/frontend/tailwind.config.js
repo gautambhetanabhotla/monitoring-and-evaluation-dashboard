@@ -8,7 +8,11 @@ module.exports = {
     "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      dropShadow: {
+        'white': '0 5px 25px rgba(255, 255, 255, 0.481)',
+      },
+    },
   },
   darkMode: "class",
   plugins: [heroui()],
