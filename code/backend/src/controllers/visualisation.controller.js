@@ -42,7 +42,8 @@ export const getVisualisationsByProject = async (req, res) => {
 
         const visualisations = await Visualisation.find({ project_id });
         console.log("Visualisations fetched successfully");
-        return res.status(200).json({success : true, message : `Visualisations fetched :${visualisations}`});
+
+        return res.status(200).json({success : true, message : `Visualisations fetched successfully`, data : visualisations});
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }

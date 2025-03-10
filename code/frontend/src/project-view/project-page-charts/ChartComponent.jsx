@@ -28,10 +28,26 @@ ChartJS.register(
 );
 
 const ChartComponent = ({ chart, onEdit, onRemove }) => {
+  if(!chart) return null;
   const { type, data, xAxis, yAxis, categoryField, valueField, title } = chart;
 
   // Generate appropriate chart data based on chart type
   let chartData;
+  if (!Array.isArray(data) || data.length === 0) {
+    return (
+      <div className="chart-relative">
+        <button onClick={onRemove} className="remove-button" title="Remove visualization">
+          <Trash2 size={16} className="remove-icon" color='red'/>
+        </button>
+        <button onClick={onEdit} className="edit-button" title="Edit visualization">
+          <Edit2 size={16} className="edit-icon" />
+        </button>
+        <div className="chart-container">
+          <div className="no-data-message">No data available for this chart</div>
+        </div>
+      </div>
+    );
+  }
   
   if (type === 'pie') {
     // Use categoryField and valueField for pie charts

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Canvas from './project-page-charts/Canvas';
 import ChartModal from './project-page-charts/ChartModal';
 
@@ -6,6 +6,45 @@ function Charts() {
   const [charts, setCharts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingChartId, setEditingChartId] = useState(null);
+  const project_id = "660f0e3d9e541b0012f2a2d4";
+
+  useEffect(() => {
+    const fetchCharts = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/visualisation/get-visualisations/${project_id}`);
+        const results = await response.json();
+        if (results.success && Array.isArray(results.data)) {
+          const formattedCharts = results.data.map(item => {
+            try {
+              const data = JSON.parse(item.file);
+              return {
+                id: item._id,
+                title: item.title,
+                type: item.type,
+                data: Array.isArray(data) ? data : [],
+                xAxis: item.component_1,
+                yAxis: item.component_2,
+                categoryField: item.component_1,
+                valueField: item.component_2,
+              };
+            } catch (error) {
+              console.error('Error parsing chart data:', error);
+              return null;
+            }
+          }).filter(chart => chart !== null);
+          setCharts(formattedCharts);
+        }
+        else {
+          setCharts([]);
+        }
+      }
+      catch (error) {
+        console.error('Error fetching charts:', error);
+        setCharts([]);
+      }
+    };
+    fetchCharts();
+  }, []);
 
   const handleAddChart = () => {
     setEditingChartId(null);
@@ -18,9 +57,14 @@ function Charts() {
   };
 
   const onRemoveChart = (id) => {
-    // Remove the chart with the given ID
-    const updatedCharts = charts.filter((chart) => chart.id !== id);
-    setCharts(updatedCharts);
+    try {
+      fetch(`http://localhost:5000/visualisation/delete-visualisation/${id}`, {
+        method: 'DELETE',
+      });
+      setCharts(charts.filter((chart) => chart.id !== id));
+    } catch (error) { 
+      console.error('Error deleting chart:', error);
+    }
   };
 
   const handleSaveChart = async(chartConfig) => {
@@ -31,15 +75,16 @@ function Charts() {
     }
 
     const chartData = {
+      project_id: project_id,
       title : chartConfig.title,
-      file: JSON.stringify(chartConfig),
+      file: JSON.stringify(chartConfig.data),
       type: chartConfig.type,
       component_1: chartConfig.xAxis || chartConfig.categoryField,
       component_2: chartConfig.yAxis || chartConfig.valueField,
     };
     // console.log(chartData.file);
     try {
-      const response= await fetch('http://localhost:5000/project-page-charts/save-chart', {
+      const response= await fetch('http://localhost:5000/visualisation/save-visualisation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
