@@ -32,7 +32,7 @@ jest.mock('@heroicons/react/24/outline', () => ({
 }), { virtual: true });
 
 // Import the component we're testing
-import { ProjectHeader } from '../project-view/project-page';
+import { ProjectHeader } from '../src/project-view/project-page';
 
 describe('ProjectHeader Component', () => {
   test('renders project name text', () => {

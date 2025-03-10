@@ -6,7 +6,7 @@
         "explanation": "# 1. Goal (Impact Level)\n**Project Goal:** To improve the employability and income levels of youth by providing electrician training.\n\n## Impact Indicators:\n1. Employment rate of trained youth (%)\n2. Increase in average income of trainees (%)\n\n## Data Source & Collection Method:\n1. Post-training employment surveys, income assessment, industry feedback\n\n## Assumptions & Risks:\n1. Availability of job opportunities in the sector\n2. Youth retention in electrician jobs\n\n## Visualization:\n1. Line charts showing employment and income trends over time\n",  
         "baseline": 10,
         "target": 80,
-        "current": 50
+        "current": 15
       },
       {
         "indicator": "Increase in average income of trainees",
