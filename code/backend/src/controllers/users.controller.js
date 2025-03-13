@@ -41,17 +41,14 @@ export const addUser = async (req, res) => {
     }
 }
 
-export const getUser = async (req, res) => {
-    const { id } = req.params;
+export const getUser = (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, message: "Not authenticated" });
+    }
+    console.log("Session user", req.session.user);
+    return res.status(200).json({ success: true, user: req.session.user });
+};
 
-    try {
-        const user = await User.findById(id).select("-passwordHash");
-        return res.status(200).json(user);
-    }
-    catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
 
 export const deleteUser = async (req, res) => {
     const { id } = req.params;
