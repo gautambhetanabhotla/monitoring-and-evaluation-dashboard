@@ -65,3 +65,35 @@ export const deleteVisualisation = async (req, res) => {
         return res.status(500).json({ success : false ,message: error.message });
     }
 };
+
+export const updateVisualisation = async (req, res) => {
+    
+    const { id } = req.params;
+    const { file,title, type, component_1, component_2, width, height } = req.body;
+
+    if (!file || !title || !type || !component_1 || !component_2) {
+        return res.status(400).json({ success : false , message: "Please give values for all the fields" });
+    }
+
+    try {
+        const visualisation = await Visualisation.findById(id);
+
+        if (!visualisation) {
+            return res.status(404).json({ success : false , message: "Visualisation not found" });
+        }
+
+        visualisation.file = file;
+        visualisation.title = title;
+        visualisation.type = type;
+        visualisation.component_1 = component_1;
+        visualisation.component_2 = component_2;
+        visualisation.width = width;
+        visualisation.height = height;
+
+        await visualisation.save();
+        console.log("Visualisation updated successfully");
+        return res.status(200).json({ success : true , message: "Visualisation updated successfully" });
+    } catch (error) {
+        return res.status(500).json({ success : false , message: error.message });
+    }
+};

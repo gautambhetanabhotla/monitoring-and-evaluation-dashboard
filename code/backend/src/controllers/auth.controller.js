@@ -20,8 +20,8 @@
             if (!isPasswordCorrect) {
                 return res.status(400).json({ success: false, message: "Invalid credentials" });
             }
-
             req.session.user = { id: user._id, role: user.role, email: user.email };
+            console.log("Session user", req.session);
 
             return res.status(200).json({ success: true, message: "User logged in successfully", role : user.role });
         } catch (error) {
