@@ -14,7 +14,10 @@ dotenv.config();
 connectDB(); // Connect to MongoDB
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true
+}));
 
 
 
@@ -32,17 +35,18 @@ app.use(
             collectionName: 'sessions',
         }),
         cookie: {
-            secure: process.env.NODE_ENV === "production",
+            secure: false,
             httpOnly: true,
+            sameSite: 'none',
             maxAge: 60 * 60 * 1000, // 1-hour session expiry
         },
     })
 );
 
-app.use('/auth', authRouter);
-app.use('/user', userRouter);
-app.use('/projects', projectRouter);
-app.use('/visualisation', visualisationRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
+app.use('/api/projects', projectRouter);
+app.use('/api/visualisation', visualisationRouter);
 
 app.use((req, res) => {
     res.status(404).json({ message: "Route not found" });
