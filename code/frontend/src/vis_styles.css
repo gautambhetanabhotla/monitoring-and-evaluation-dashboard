@@ -176,7 +176,7 @@ body {
 }
 
 .empty-text {
-  @apply text-lg text-gray-700 mb-4;
+  @apply text-lg text-gray-700 mb-4 text-center;
 }
 
 /* Animations */
