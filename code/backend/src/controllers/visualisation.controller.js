@@ -3,9 +3,9 @@ import Visualisation from '../models/Visualisation.js';
 
 // Create a new visualisation
 export const createVisualisation = async (req, res) => {
-    const {project_id,title,file, type, component_1,component_2,width=0,height=0 } = req.body;
+    const {project_id,title,file, type, component_1,component_2,columns,width=0,height=0 } = req.body;
 
-    if (!project_id || !file || !title || !type || !component_1 || !component_2) {
+    if (!project_id || !file || !title || !type || !component_1 || !component_2 || !columns) {
         return res.status(400).json({ success:false, message: "Please give values for all the fields" });
     }
 
@@ -18,6 +18,7 @@ export const createVisualisation = async (req, res) => {
         type,
         component_1,
         component_2,
+        columns,
         width,
         height
     });
@@ -69,9 +70,9 @@ export const deleteVisualisation = async (req, res) => {
 export const updateVisualisation = async (req, res) => {
     
     const { id } = req.params;
-    const { file,title, type, component_1, component_2, width, height } = req.body;
+    const { file,title, type, component_1, component_2, columns,width=0, height=0 } = req.body;
 
-    if (!file || !title || !type || !component_1 || !component_2) {
+    if (!file || !title || !type || !component_1 || !component_2 || !columns) {
         return res.status(400).json({ success : false , message: "Please give values for all the fields" });
     }
 
@@ -89,6 +90,7 @@ export const updateVisualisation = async (req, res) => {
         visualisation.component_2 = component_2;
         visualisation.width = width;
         visualisation.height = height;
+        visualisation.columns = columns;
 
         await visualisation.save();
         console.log("Visualisation updated successfully");

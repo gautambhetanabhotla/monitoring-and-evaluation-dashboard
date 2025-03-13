@@ -31,6 +31,10 @@ const visualisationSchema = new mongoose.Schema({
         trim : true,
         required : [true, 'Y Component is required']
     },  
+    columns : {
+        type : Array,
+        required : [true, 'Columns are required']
+    },
     width : {
         type : Number,
         required : [true, 'Width is required']
