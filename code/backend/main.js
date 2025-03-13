@@ -37,7 +37,7 @@ app.use(
         cookie: {
             secure: false,
             httpOnly: true,
-            sameSite: 'none',
+            sameSite: 'strict',
             maxAge: 60 * 60 * 1000, // 1-hour session expiry
         },
     })
