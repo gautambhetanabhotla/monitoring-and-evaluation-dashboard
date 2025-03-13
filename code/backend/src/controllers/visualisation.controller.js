@@ -70,6 +70,7 @@ export const deleteVisualisation = async (req, res) => {
 export const updateVisualisation = async (req, res) => {
     
     const { id } = req.params;
+
     const { file,title, type, component_1, component_2, columns,width=0, height=0 } = req.body;
 
     if (!file || !title || !type || !component_1 || !component_2 || !columns) {
@@ -91,6 +92,7 @@ export const updateVisualisation = async (req, res) => {
         visualisation.width = width;
         visualisation.height = height;
         visualisation.columns = columns;
+
 
         await visualisation.save();
         console.log("Visualisation updated successfully");
