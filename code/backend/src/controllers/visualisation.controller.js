@@ -69,7 +69,7 @@ export const deleteVisualisation = async (req, res) => {
 export const updateVisualisation = async (req, res) => {
     
     const { id } = req.params;
-    const { file,title, type, component_1, component_2, width, height } = req.body;
+    const { file,title, type, component_1, component_2, width=0, height=0 } = req.body;
 
     if (!file || !title || !type || !component_1 || !component_2) {
         return res.status(400).json({ success : false , message: "Please give values for all the fields" });
