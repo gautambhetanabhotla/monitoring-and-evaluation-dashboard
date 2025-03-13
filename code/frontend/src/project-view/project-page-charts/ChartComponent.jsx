@@ -46,7 +46,6 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
     
     fetchUserDetails();
   }, []);
-
   if(!chart) return null;
   const { type, data, xAxis, yAxis, categoryField, valueField, title } = chart;
 
