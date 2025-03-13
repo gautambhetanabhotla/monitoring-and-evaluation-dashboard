@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Canvas from './project-page-charts/Canvas';
 import ChartModal from './project-page-charts/ChartModal';
+import { Columns } from 'lucide-react';
 
 function Charts() {
   const [charts, setCharts] = useState([]);
@@ -26,6 +27,7 @@ function Charts() {
                 yAxis: item.component_2,
                 categoryField: item.component_1,
                 valueField: item.component_2,
+                columns: item.columns
               };
             } catch (error) {
               console.error('Error parsing chart data:', error);
@@ -77,6 +79,7 @@ function Charts() {
         type: chartConfig.type,
         component_1: chartConfig.xAxis || chartConfig.categoryField,
         component_2: chartConfig.yAxis || chartConfig.valueField,
+        columns : chartConfig.columns
       };
       // console.log(chartData.file);
       try {
@@ -102,6 +105,7 @@ function Charts() {
         type: chartConfig.type,
         component_1: chartConfig.xAxis || chartConfig.categoryField,
         component_2: chartConfig.yAxis || chartConfig.valueField,
+        columns : chartConfig.columns
       };
       // console.log(chartData.file);
       try {
