@@ -11,7 +11,7 @@ function Charts() {
   useEffect(() => {
     const fetchCharts = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/visualisation/get-visualisations/${project_id}`);
+        const response = await fetch(`http://localhost:5000/api/visualisation/get-visualisations/${project_id}`);
         const results = await response.json();
         if (results.success && Array.isArray(results.data)) {
           const formattedCharts = results.data.map(item => {
@@ -58,7 +58,7 @@ function Charts() {
 
   const onRemoveChart = (id) => {
     try {
-      fetch(`http://localhost:5000/visualisation/delete-visualisation/${id}`, {
+      fetch(`http://localhost:5000/api/visualisation/delete-visualisation/${id}`, {
         method: 'DELETE',
       });
       setCharts(charts.filter((chart) => chart.id !== id));
@@ -70,31 +70,53 @@ function Charts() {
   const handleSaveChart = async(chartConfig) => {
     if (editingChartId) {
       setCharts(charts.map((chart) => (chart.id === editingChartId ? chartConfig : chart)));
+      const chartData = {
+        project_id: project_id,
+        title : chartConfig.title,
+        file: JSON.stringify(chartConfig.data),
+        type: chartConfig.type,
+        component_1: chartConfig.xAxis || chartConfig.categoryField,
+        component_2: chartConfig.yAxis || chartConfig.valueField,
+      };
+      // console.log(chartData.file);
+      try {
+        const response= await fetch(`http://localhost:5000/api/visualisation/update-visualisation/${editingChartId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(chartData),
+        });
+        const data = await response.json();
+        console.log(data);
+      } 
+      catch (error) {
+        console.error('Error saving chart:', error);
+      }
     } else {
       setCharts([...charts, chartConfig]);
-    }
-
-    const chartData = {
-      project_id: project_id,
-      title : chartConfig.title,
-      file: JSON.stringify(chartConfig.data),
-      type: chartConfig.type,
-      component_1: chartConfig.xAxis || chartConfig.categoryField,
-      component_2: chartConfig.yAxis || chartConfig.valueField,
-    };
-    // console.log(chartData.file);
-    try {
-      const response= await fetch('http://localhost:5000/visualisation/save-visualisation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(chartData),
-      });
-      const data = await response.json();
-      console.log(data);
-    } catch (error) {
-      console.error('Error saving chart:', error);
+      const chartData = {
+        project_id: project_id,
+        title : chartConfig.title,
+        file: JSON.stringify(chartConfig.data),
+        type: chartConfig.type,
+        component_1: chartConfig.xAxis || chartConfig.categoryField,
+        component_2: chartConfig.yAxis || chartConfig.valueField,
+      };
+      // console.log(chartData.file);
+      try {
+        const response= await fetch('http://localhost:5000/api/visualisation/save-visualisation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(chartData),
+        });
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.error('Error saving chart:', error);
+      }
     }
   };
 

@@ -79,13 +79,13 @@ const projectSchema = new mongoose.Schema(
         title: {
             type: String,
             required: [true, 'Title is required'],
-            minlength: 5,
             maxlength: 100,
         },
-        description: { type: String, minlength: 300 },
+        description: { type: String },
         thrust_areas: [
             { type: String, required: [true, 'Thrust areas are required'] },
         ],
+        funding_partner: { type: String },
         state_union_territory: {
             type: [String],
             required: [true, 'State/Union Territory is required'],
@@ -153,9 +153,9 @@ const projectSchema = new mongoose.Schema(
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'User',
-                required: function () {
-                    return this.role === 'client';
-                },
+                // required: function () {
+                    // return this.role === 'client';
+                // },
             },
         ],
         status_comparison: { type: mongoose.Schema.Types.Mixed },
@@ -193,8 +193,8 @@ const projectSchema = new mongoose.Schema(
         duration: { type: Number },
         stakeholder_feedback: { type: mongoose.Schema.Types.Mixed },
         progress_estimation: { type: mongoose.Schema.Types.Mixed },
-        kpi: { type: mongoose.Schema.Types.Mixed },
-        data_visualization: { type: mongoose.Schema.Types.Mixed },
+        kpis: [{ type: mongoose.Schema.Types.ObjectId, ref: 'KPI' }],
+        visualizations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Visualization' }],
         blog: { type: String },
         case_studies: { type: mongoose.Schema.Types.Mixed },
         progress_bar: {
@@ -223,6 +223,8 @@ const projectSchema = new mongoose.Schema(
                 },
             },
         ],
+        success_stories: [{type: mongoose.Schema.Types.ObjectId, ref: 'SuccessStory'}],
+        tasks: [{type: mongoose.Schema.Types.ObjectId, ref: 'Task'}],
     },
     {
         timestamps: true,
@@ -306,6 +308,148 @@ milestoneSchema.post('remove', function (doc) {
 
 const milestoneModel = mongoose.model('Milestone', milestoneSchema);
 
+const successStorySchema = new mongoose.Schema(
+    {
+        testifier: {
+            type: String,
+            required: [true, 'Testifier is required'],
+        },
+        testimony: {
+            type: String,
+            required: [true, 'Testimony is required'],
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+const visualizationSchema = new mongoose.Schema(
+    {
+        title: {
+            type: String,
+            required: [true, 'Title is required'],
+        },
+        type: {
+            type: String,
+            required: [true, 'Type is required'],
+        },
+        datafile: {
+            type: mongoose.Schema.Types.Mixed,
+            required: [true, 'Datafile is required'],
+        },
+        comparable_components: [
+            {
+                type: String,
+                required: [true, 'Comparable components are required'],
+            },
+        ],
+    },
+    {
+        timestamps: true,
+    }
+);
+
+const visualizationModel = mongoose.model('Visualization', visualizationSchema);
+
+const taskSchema = new mongoose.Schema(
+    {
+        documents: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Document',
+                required: true,
+            },
+        ],
+        kpi_updates: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'KPI',
+                required: true,
+            },
+        ],
+        description: {
+            type: String,
+            required: [true, 'Description is required'],
+        },
+        project: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Project',
+            required: true,
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+const taskModel = mongoose.model('Task', taskSchema);
+
+const documentSchema = new mongoose.Schema(
+    {
+        docType: {
+            type: String,
+            required: [true, 'DocType is required'],
+        },
+        content: {
+            type: String,
+            required: [true, 'Content is required'],
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+const documentModel = mongoose.model('Document', documentSchema);
+
+const kpiUpdateSchema = new mongoose.Schema(
+    {
+        KPI: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'KPI',
+            required: [true, 'KPI is required'],
+        },
+        InitialValue: {
+            type: Number,
+            required: [true, 'InitialValue is required'],
+        },
+        FinalValue: {
+            type: Number,
+            required: [true, 'FinalValue is required'],
+        },
+        UpdateTime: {
+            type: Date,
+            required: [true, 'UpdateTime is required'],
+        },
+        UpdatedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: [true, 'UpdatedBy is required'],
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+const kpiUpdateModel = mongoose.model('KPI_Update', kpiUpdateSchema);
+
+const kpiSchema = new mongoose.Schema(
+    {
+        project: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Project',
+            required: [true, 'Project is required'],
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+const kpiModel = mongoose.model('KPI', kpiSchema);
+
 // Authentication Schema
 const authSchema = new mongoose.Schema(
     {
@@ -354,4 +498,4 @@ authSchema.post('remove', function (doc) {
 
 const authModel = mongoose.model('Auth', authSchema);
 
-export { userModel, projectModel, milestoneModel, authModel };
+export { userModel, projectModel, milestoneModel, authModel, documentModel, successStorySchema, visualizationModel, taskModel, kpiUpdateModel, kpiModel };
