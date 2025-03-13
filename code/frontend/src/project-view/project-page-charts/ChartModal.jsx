@@ -37,7 +37,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   useEffect(() => {
     if (editingChart) {
       setData(editingChart.data);
-      setColumns(editingChart.columns);
+      // Fallback to [] if editingChart.columns is undefined
+      setColumns(editingChart.columns || []);
       setChartType(editingChart.type);
       
       if (editingChart.type === 'pie') {
@@ -49,12 +50,12 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       }
       
       setTitle(editingChart.title);
-      // Fix: Set step to 2 immediately when editing a chart
       setStep(2);
     } else {
       resetForm();
     }
   }, [editingChart, isOpen]);
+  
 
   const resetForm = () => {
     setData([]);
@@ -69,22 +70,28 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   };
 
   const handleDataLoaded = (newData, newColumns) => {
+    console.log("Loaded columns:", newColumns); // Debugging step
+    if (newColumns.length === 0) {
+      alert("No columns found in the uploaded file!");
+      return;
+    }
+    
     setData(newData);
     setColumns(newColumns);
     setStep(2);
-
-    // Set default fields if available
+  
+    // Auto-select default values if available
     if (newColumns.length >= 2) {
       if (chartType === 'pie') {
-        if (!categoryField) setCategoryField(newColumns[0]);
-        if (!valueField) setValueField(newColumns[1]);
+        setCategoryField(newColumns[0]);
+        setValueField(newColumns[1]);
       } else {
-        if (!xAxis) setXAxis(newColumns[0]);
-        if (!yAxis) setYAxis(newColumns[1]);
+        setXAxis(newColumns[0]);
+        setYAxis(newColumns[1]);
       }
     }
   };
-
+  
   // Update default axes when chart type changes
   useEffect(() => {
     if (columns.length >= 2) {
