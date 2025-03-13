@@ -45,6 +45,7 @@ export const getUser = (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ success: false, message: "Not authenticated" });
     }
+    console.log("Session user", req.session.user);
     return res.status(200).json({ success: true, user: req.session.user });
 };
 

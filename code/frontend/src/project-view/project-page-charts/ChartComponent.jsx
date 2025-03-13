@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState,useEffect } from 'react';
 import { Bar, Line, Pie, Scatter } from 'react-chartjs-2';
 import { Edit2, Trash2 } from 'lucide-react';
 import {
@@ -28,6 +28,25 @@ ChartJS.register(
 );
 
 const ChartComponent = ({ chart, onEdit, onRemove }) => {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/user/getUser`, { credentials: 'include' });
+        const data = await response.json();
+        if (data.success) {
+          setUser(data.user);
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    };
+    
+    fetchUserDetails();
+  }, []);
+
   if(!chart) return null;
   const { type, data, xAxis, yAxis, categoryField, valueField, title } = chart;
 
@@ -36,12 +55,16 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="chart-relative">
+        { user?.role === 'admin' &&
         <button onClick={onRemove} className="remove-button" title="Remove visualization">
           <Trash2 size={16} className="remove-icon" color='red'/>
         </button>
+        }
+        { user?.role === 'admin' &&
         <button onClick={onEdit} className="edit-button" title="Edit visualization">
           <Edit2 size={16} className="edit-icon" />
         </button>
+        } 
         <div className="chart-container">
           <div className="no-data-message">No data available for this chart</div>
         </div>
@@ -156,6 +179,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
 
   return (
     <div className="chart-relative">
+      { user?.role === 'admin' &&
       <button
         onClick={onRemove}
         className="remove-button"
@@ -163,6 +187,8 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
       >
         <Trash2 size={16} className="remove-icon" color='red'/>
       </button>
+      }
+      { user?.role === 'admin' && 
       <button
         onClick={onEdit}
         className="edit-button"
@@ -170,6 +196,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
       >
         <Edit2 size={16} className="edit-icon" />
       </button>
+      }
       <div className="chart-container">{renderChart()}</div>
     </div>
   );
