@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
+import { useNavigate } from "react-router-dom";
 
-const getProjectsByClientId = async (clientId) => {
+const getProjectsByClientId = async () => {
     try {
-        const response = await fetch(`http://localhost:5000/projects/getProjects/${clientId}`);
+        const response = await fetch("http://localhost:5000/projects/getProjects", {
+            method: 'GET',
+            credentials: 'include'
+        });
         const data = await response.json();
         if (!data.success) {
             console.error("Error fetching projects:", data.message);
             return [];
         }
-        return data.projects.map(({ name, start_date, project_progress }) => ({
+        return data.projects.map(({ name, start_date, project_progress, _id }) => ({
             name,
             start_date,
-            project_progress
+            project_progress,
+            _id
         }));
     } catch (error) {
         console.error("Error fetching projects:", error);
@@ -24,42 +29,72 @@ const getProjectsByClientId = async (clientId) => {
 const ProjectGallery = () => {
     const [activeTab, setActiveTab] = useState("projects");
     const [clientProjects, setClientProjects] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProjects = async () => {
-            const projects = await getProjectsByClientId("67cadedfd495d72ad2a2c76d");
+            const projects = await getProjectsByClientId();
             setClientProjects(projects);
         };
         fetchProjects();
     }, []);
 
+    const logout = async () => {
+        try {
+            const response = await fetch("http://localhost:5000/auth/logout", {
+                method: "POST",
+                credentials: "include"
+            });
+    
+            const data = await response.json();
+            if (data.success) {
+                navigate("/"); 
+            } else {
+                console.error("Logout failed:", data.message);
+            }
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
+    };
+
     return (
         <div className="flex flex-col h-screen p-6">
             {/* Tabs Section */}
-            <div className="flex space-x-4 mb-6">
+            <div className="flex justify-between mb-6">
+                <div className="flex space-x-4">
+                    <Button
+                        className={`text-xl font-bold py-2 px-4 ${
+                            activeTab === "projects"
+                                ? "bg-amber-300 text-black"
+                                : "bg-amber-100 text-gray-700"
+                        }`}
+                        onPress={() => setActiveTab("projects")}
+                        size="md"
+                        radius="large"
+                    >
+                        Your Projects
+                    </Button>
+                    <Button
+                        className={`text-xl font-bold py-2 px-4 ${
+                            activeTab === "visualization"
+                                ? "bg-amber-300 text-black"
+                                : "bg-amber-100 text-gray-700"
+                        }`}
+                        onPress={() => setActiveTab("visualization")}
+                        size="md"
+                        radius="large"
+                    >
+                        Your Projects in Numbers
+                    </Button>
+                </div>
+                {/* Right-align the logout button */}
                 <Button
-                    className={`text-xl font-bold py-2 px-4 ${
-                        activeTab === "projects"
-                            ? "bg-amber-300 text-black"
-                            : "bg-amber-100 text-gray-700"
-                    }`}
-                    onPress={() => setActiveTab("projects")}
+                    className="text-xl font-bold py-2 px-4 bg-amber-300 text-black"
+                    onPress={logout}
                     size="md"
                     radius="large"
                 >
-                    Your Projects
-                </Button>
-                <Button
-                    className={`text-xl font-bold py-2 px-4 ${
-                        activeTab === "visualization"
-                            ? "bg-amber-300 text-black"
-                            : "bg-amber-100 text-gray-700"
-                    }`}
-                    onPress={() => setActiveTab("visualization")}
-                    size="md"
-                    radius="large"
-                >
-                    Your Projects in Numbers
+                    Logout
                 </Button>
             </div>
 
@@ -77,6 +112,8 @@ const ProjectGallery = () => {
                                 <Card
                                     key={index}
                                     className="border border-amber-400 p-4 rounded-lg shadow-md w-64 h-64"
+                                    isPressable
+                                    onPress={() => navigate(`/${project._id}`)}
                                 >
                                     <CardHeader>
                                         <h2 className="text-lg font-semibold">{project.name}</h2>
