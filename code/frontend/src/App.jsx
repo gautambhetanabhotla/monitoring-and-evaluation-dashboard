@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import ProjectPage, { Overview } from './project-view/project-page.jsx';
-import ProjectGallery from './project-gallery/project-gallery.jsx';
+import ProjectGallery from './project-gallery/project-gallery-client.jsx';
 import Charts from './project-view/project-page-charts.jsx';
 import KPIs from './project-view/project-tabs/kpis.jsx';
 import Timeline from './project-view/project-tabs/timeline.jsx';

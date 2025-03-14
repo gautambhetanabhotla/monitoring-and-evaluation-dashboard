@@ -3,7 +3,7 @@ import User from '../models/User.js';
 import Project from '../models/Project.js';
 
 export const getProjectsByClientId = async (req, res) => {
-    const { clientId } = req.params;
+    const clientId = req.session.user.id;
 
     try {
         if (!mongoose.Types.ObjectId.isValid(clientId)) {
