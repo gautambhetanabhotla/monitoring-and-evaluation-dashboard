@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Canvas from './project-page-charts/Canvas';
 import ChartModal from './project-page-charts/ChartModal';
-import { Columns } from 'lucide-react';
 
 function Charts() {
   const [charts, setCharts] = useState([]);

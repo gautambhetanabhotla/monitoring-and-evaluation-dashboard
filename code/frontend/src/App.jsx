@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import ProjectPage, { Overview } from './project-view/project-page.jsx';
-import ProjectGallery from './project-gallery/project-gallery-client.jsx';
+import ProjectPage from './project-view/project-page.jsx';
+import ProjectGallery from './project-gallery/project-gallery.jsx';
+import Overview from './project-view/project-tabs/overview.jsx';
 import Charts from './project-view/project-page-charts.jsx';
 import KPIs from './project-view/project-tabs/kpis.jsx';
 import Timeline from './project-view/project-tabs/timeline.jsx';
@@ -22,7 +23,8 @@ const App = () => {
         <Route path='/field-staff' element={<Field_Staff/>}/>
         <Route path='/:projectid' element={<ProjectPage />}>
           <Route index element={<Overview />} />
-          <Route path='overview' element={<Charts />} />
+          <Route path='overview' element={<Overview />} />
+          <Route path='charts' element={<Charts />} />
           <Route path='kpis' element={<KPIs />} />
           <Route path='timeline' element={<Timeline />} />
           <Route path='success-stories' element={<SuccessStories />} />
