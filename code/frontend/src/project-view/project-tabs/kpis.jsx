@@ -1,19 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import {Card, CardHeader, CardBody, CardFooter} from "@heroui/card";
 import { Divider } from "@heroui/divider";
 import {Button} from "@heroui/button";
 import {Progress} from '@heroui/progress';
-import Markdown from "marked-react";
+// import Markdown from "marked-react";
 import { PencilSquareIcon } from '@heroicons/react/24/solid';
 
+import { ProjectContext } from '../project-page.jsx';
+
 const KPI = ({ kpi }) => {
-  const percentagecompletion = parseInt(100*((parseFloat(kpi.current) - parseFloat(kpi.baseline))/(parseFloat(kpi.target) - parseFloat(kpi.baseline))))
+  const percentagecompletion = parseInt(100 * (
+    (parseFloat(kpi.current) - parseFloat(kpi.baseline))
+    / (parseFloat(kpi.target) - parseFloat(kpi.baseline))));
   return (
     <>
       <Card className="m-3 z-0">
         <CardHeader className="relative">
-          <span className="prose text-3xl font-bold py-5 px-2 z-0 pr-16">{kpi.indicator}</span>
-          <Button isIconOnly className="absolute right-5 top-10" aria-label="Edit KPI"><PencilSquareIcon className="size-6" /></Button>
+          <span className="prose text-2xl font-bold py-5 px-2 z-0 pr-16">{kpi.indicator}</span>
+          <Button isIconOnly className="absolute right-5 top-5" aria-label="Edit KPI"><PencilSquareIcon className="size-6" /></Button>
         </CardHeader>
         <Divider />
         <CardBody className="px-5 py-6">
@@ -55,35 +59,26 @@ const KPI = ({ kpi }) => {
       </Card>
     </>
   );
-}
+};
 
 const KPIs = () => {
-  const [kpis, setKpis] = useState([]);
-
-  useEffect(() => {
-    fetch('/kpis.json')
-      .then(response => response.json())
-      .then(data => setKpis(data))
-      .catch(error => console.error('Error fetching KPIs:', error));
-  }, []);
-
+  const ctx = useContext(ProjectContext);
   return (
     <>
       <div className="flex flex-row justify-center">
-        <h1 className="prose text-6xl p-10">Key performance indexes (KPIs)</h1>
+        <h1 className="prose text-5xl p-10">Key performance indexes (KPIs)</h1>
       </div>
-      <div className="grid xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1 mx-24">
-        {kpis.map((kpi, index) => {
-          return <KPI key={index} kpi={kpi} />
+      <div className="grid xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1 md:mx-24">
+        {ctx.adjustedKPIs.map((kpi, index) => {
+          return <KPI key={index} kpi={kpi} />;
         })}
       </div>
       <div className="flex flex-row justify-center mt-10">
-        {kpis.length === 0 && <p className='prose text-xl'>No KPIs yet. Get started by adding one.</p>}
+        {ctx.adjustedKPIs.length === 0 && <p className='prose text-xl'>No KPIs yet. Get started by adding one.</p>}
       </div>
       <div className="flex flex-row justify-center pt-10 pb-20">
         <Button className='prose text-xl mb-15 p-10' color='primary' size='lg' aria-label="Add KPI">Add KPI</Button>
       </div>
-      
     </>
   );
 };
