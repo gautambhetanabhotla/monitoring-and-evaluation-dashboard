@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bar, Line, Pie, Scatter } from 'react-chartjs-2';
 import { Edit2, Trash2 } from 'lucide-react';
 import {
@@ -13,8 +13,9 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+// Import and register the datalabels plugin
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-// Register ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -24,7 +25,8 @@ ChartJS.register(
   ArcElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ChartDataLabels
 );
 
 const ChartComponent = ({ chart, onEdit, onRemove }) => {
@@ -43,27 +45,26 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
         console.error('Error fetching user details:', error);
       }
     };
-    
     fetchUserDetails();
   }, []);
 
   if(!chart) return null;
   const { type, data, xAxis, yAxis, categoryField, valueField, title } = chart;
 
-  // Generate appropriate chart data based on chart type
+  // Generate chart data based on type
   let chartData;
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="chart-relative">
         { user?.role === 'admin' &&
-        <button onClick={onRemove} className="remove-button" title="Remove visualization">
-          <Trash2 size={16} className="remove-icon" color='red'/>
-        </button>
+          <button onClick={onRemove} className="remove-button" title="Remove visualization">
+            <Trash2 size={16} className="remove-icon" color='red'/>
+          </button>
         }
         { user?.role === 'admin' &&
-        <button onClick={onEdit} className="edit-button" title="Edit visualization">
-          <Edit2 size={16} className="edit-icon" />
-        </button>
+          <button onClick={onEdit} className="edit-button" title="Edit visualization">
+            <Edit2 size={16} className="edit-icon" />
+          </button>
         } 
         <div className="chart-container">
           <div className="no-data-message">No data available for this chart</div>
@@ -73,7 +74,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
   }
   
   if (type === 'pie') {
-    // Use categoryField and valueField for pie charts
+    // For pie charts, map valid labels and values
     chartData = {
       labels: data.map((item) => item[categoryField]?.toString() || ''),
       datasets: [
@@ -146,10 +147,18 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
     };
   }
 
-  // Create options with specific settings for pie charts
+  // Define options with datalabels for pie charts
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        top: 10,
+        right: 10,
+        bottom: 10,
+        left: 10,
+      },
+    },
     plugins: {
       legend: {
         position: type === 'pie' ? 'right' : 'top',
@@ -159,8 +168,39 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
         display: true,
         text: title,
       },
+      datalabels: type === 'pie'
+        ? {
+            formatter: (value, context) => {
+              const dataArr = context.chart.data.datasets[0].data;
+              const total = dataArr.reduce((sum, val) => sum + val, 0);
+              const percentage = (value / total) * 100;
+              const formattedPercentage = percentage.toFixed(1) + '%';
+              return percentage < 5 ? '↘ ' + formattedPercentage : formattedPercentage;
+            },
+            color: '#fff',
+            align: (context) => {
+              const dataArr = context.chart.data.datasets[0].data;
+              const total = dataArr.reduce((sum, val) => sum + val, 0);
+              const percentage = (context.dataset.data[context.dataIndex] / total) * 100;
+              return percentage < 5 ? 'end' : 'center';
+            },
+            anchor: (context) => {
+              const dataArr = context.chart.data.datasets[0].data;
+              const total = dataArr.reduce((sum, val) => sum + val, 0);
+              const percentage = (context.dataset.data[context.dataIndex] / total) * 100;
+              return percentage < 5 ? 'end' : 'center';
+            },
+            offset: (context) => {
+              const dataArr = context.chart.data.datasets[0].data;
+              const total = dataArr.reduce((sum, val) => sum + val, 0);
+              const percentage = (context.dataset.data[context.dataIndex] / total) * 100;
+              return percentage < 5 ? 10 : 0;
+            },
+          }
+        : { display: false },
     },
   };
+    
 
   const renderChart = () => {
     switch (type) {
@@ -180,22 +220,22 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
   return (
     <div className="chart-relative">
       { user?.role === 'admin' &&
-      <button
-        onClick={onRemove}
-        className="remove-button"
-        title="Remove visualization"
-      >
-        <Trash2 size={16} className="remove-icon" color='red'/>
-      </button>
+        <button
+          onClick={onRemove}
+          className="remove-button"
+          title="Remove visualization"
+        >
+          <Trash2 size={16} className="remove-icon" color='red'/>
+        </button>
       }
       { user?.role === 'admin' && 
-      <button
-        onClick={onEdit}
-        className="edit-button"
-        title="Edit visualization"
-      >
-        <Edit2 size={16} className="edit-icon" />
-      </button>
+        <button
+          onClick={onEdit}
+          className="edit-button"
+          title="Edit visualization"
+        >
+          <Edit2 size={16} className="edit-icon" />
+        </button>
       }
       <div className="chart-container">{renderChart()}</div>
     </div>
