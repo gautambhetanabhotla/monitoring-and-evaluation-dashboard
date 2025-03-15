@@ -4,9 +4,9 @@ import bcrypt from "bcryptjs";
 export const getClients = async (req, res) => {
     try {
         const clients = await User.find({ role: "client" }).select("-passwordHash");
-        return res.status(200).json(clients);
+        return res.status(200).json({success : true,message : "Clients fetched successfully",clients:clients});
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({success :false, message: error.message });
     }
 }
 
@@ -14,7 +14,7 @@ export const addUser = async (req, res) => {
     const { username, email, password, role, phone_number } = req.body;
 
     if (!username || !email || !password || !role || !phone_number) {
-        return res.status(400).json({ message: "Please enter all fields" });
+        return res.status(400).json({success : false, message: "Please enter all fields" });
     }
 
     const user = new User({
@@ -30,14 +30,14 @@ export const addUser = async (req, res) => {
     });
 
     if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
+        return res.status(400).json({success :false, message: "User already exists" });
     }
 
     try {
         const newUser = await user.save();
-        return res.status(201).json(newUser);
+        return res.status(201).json({success : true,message : "User added successfully" ,user:newUser});
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({success:false, message: error.message });
     }
 }
 
@@ -64,6 +64,44 @@ export const deleteUser = async (req, res) => {
     }
     catch (error) {
         return res.status(500).json({success: false, message: error.message });
+    }
+}
+
+export const updateUser = async (req, res) => {
+    const { id } = req.params;
+    const { username, email, role, phone_number } = req.body;
+
+    isUserRoleUpdated = false;
+
+    if (!username || !email || !role || !phone_number) {
+        return res.status(400).json({success:false, message: "Please enter all fields" });
+    }
+
+    try {
+        const user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({success:false, message: "User not found" });
+        }
+
+        if(user.role!==role){
+            isUserRoleUpdated = true;
+        }
+
+        user.username = username;
+        user.email = email;
+        user.role = role;
+        user.phone_number = phone_number;
+
+        const updatedUser = await user.save();
+        if(isUserRoleUpdated){
+            res.session.user.role = role;
+            console.log("Session user", req.session.user);
+        }
+        return res.status(200).json({success : true,user : updatedUser});
+
+    } catch (error) {
+        return res.status(500).json({success : false, message: error.message });
     }
 }
 

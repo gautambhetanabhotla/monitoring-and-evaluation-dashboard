@@ -20,7 +20,7 @@ app.use(session({
     cookie: { secure: false }  // Set to true if using HTTPS
 }));
 
-app.use('/auth', authRouter);
+app.use('/api/auth', authRouter);
 
 let testUser; // ✅ Track test user
 
@@ -32,7 +32,7 @@ beforeAll(async () => {
     const passwordHash = await bcrypt.hash('password123', 10);
     testUser = await User.create({
         email: 'test@example.com',
-        passwordHash : 'password123',
+        passwordHash,
         role: 'admin',
         username : 'admin1',
         phone_number : '1234567890',
@@ -57,9 +57,10 @@ describe('Authentication Tests (Real Database)', () => {
     });
 
     test('Login with correct credentials', async () => {
-        const res = await agent.post('/auth/login').send({
+        const hash = await bcrypt.hash('password123', 10);
+        const res = await agent.post('/api/auth/login').send({
             email: 'test@example.com',
-            password: 'password123',
+            password: hash,
         });
 
         expect(res.statusCode).toBe(200);
@@ -68,9 +69,10 @@ describe('Authentication Tests (Real Database)', () => {
     });
 
     test('Login with incorrect password', async () => {
-        const res = await agent.post('/auth/login').send({
+        const hash = await bcrypt.hash('wrongpassword', 10);
+        const res = await agent.post('/api/auth/login').send({
             email: 'test@example.com',
-            password: 'wrongpassword',
+            password: hash,
         });
 
         expect(res.statusCode).toBe(400);
@@ -79,9 +81,11 @@ describe('Authentication Tests (Real Database)', () => {
     });
 
     test('Login with non-existent user', async () => {
-        const res = await agent.post('/auth/login').send({
+        
+        const hash = await bcrypt.hash('password123', 10);
+        const res = await agent.post('/api/auth/login').send({
             email: 'notfound@example.com',
-            password: 'password123',
+            password: hash,
         });
 
         expect(res.statusCode).toBe(400);
@@ -90,12 +94,13 @@ describe('Authentication Tests (Real Database)', () => {
     });
 
     test('Logout after login', async () => {
-        await agent.post('/auth/login').send({
+        const hash = await bcrypt.hash('password123', 10);
+        await agent.post('/api/auth/login').send({
             email: 'test@example.com',
-            password: 'password123',
+            password: hash,
         });
 
-        const res = await agent.post('/auth/logout');
+        const res = await agent.post('/api/auth/logout');
 
         expect(res.statusCode).toBe(200);
         expect(res.body.success).toBe(true);
@@ -103,7 +108,7 @@ describe('Authentication Tests (Real Database)', () => {
     });
 
     test('Logout without login should fail', async () => {
-        const res = await agent.post('/auth/logout');
+        const res = await agent.post('/api/auth/logout');
 
         expect(res.statusCode).toBe(401);
         expect(res.body.success).toBe(false);
