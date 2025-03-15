@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const getProjectsByClientId = async () => {
     try {
-        const response = await fetch("http://localhost:5000/projects/getProjects", {
+        const response = await fetch("http://localhost:5000/api/projects/getProjects", {
             method: 'GET',
             credentials: 'include'
         });
@@ -41,7 +41,7 @@ const ProjectGallery = () => {
 
     const logout = async () => {
         try {
-            const response = await fetch("http://localhost:5000/auth/logout", {
+            const response = await fetch("http://localhost:5000/api/auth/logout", {
                 method: "POST",
                 credentials: "include"
             });

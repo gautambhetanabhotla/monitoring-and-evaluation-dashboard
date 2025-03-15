@@ -1,6 +1,5 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import process from 'process';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import authRouter from './src/routes/auth.routes.js';
@@ -36,7 +35,7 @@ app.use(
             secure: false,
             httpOnly: true,
             sameSite: 'strict',
-            maxAge: 60 * 60 * 1000, // 1-hour session expiry
+            maxAge: 60*60 * 1000, // 1-hour session expiry
         },
     })
 );

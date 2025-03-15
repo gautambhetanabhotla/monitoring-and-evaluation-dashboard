@@ -33,5 +33,12 @@
       "password": "client789",
       "role": "client",
       "phone_number": "3333333333"
+    },
+    {
+      "username": "fieldstaff1",
+      "email": "fs1@example.com",
+      "password": "fieldstaff1",
+      "role": "field staff",
+      "phone_number": "3333332322"
     }
 ]
