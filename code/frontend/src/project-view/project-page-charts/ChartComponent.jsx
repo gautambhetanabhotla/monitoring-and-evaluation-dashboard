@@ -13,6 +13,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(
@@ -59,6 +60,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="chart-relative">
+
         {user?.role === 'admin' && (
           <>
             <button onClick={onRemove} className="remove-button" title="Remove visualization">
@@ -149,9 +151,6 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
       ],
     };
   }
-
-  // Options for tooltip and datalabels.
-  // Disable built-in legend for pie charts.
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -202,6 +201,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
           : { display: false },
     },
   };
+    
 
   // Handler to toggle segment visibility when a legend item is clicked.
   const handleLegendClick = (index) => {
