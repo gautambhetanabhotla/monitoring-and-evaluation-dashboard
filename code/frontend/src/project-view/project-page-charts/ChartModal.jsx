@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import FileUploader from './FileUploader';
 import { Bar, Line, Pie, Scatter } from 'react-chartjs-2';
+import KpiList from './KpiList';
 
 const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [chartType, setChartType] = useState('bar');
@@ -13,8 +14,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   const [categoryField, setCategoryField] = useState('');
   const [valueField, setValueField] = useState('');
   const [title, setTitle] = useState('');
+  const [selectedKpi, setSelectedKpi] = useState(null);
 
-  // Define chart colors for consistency across all chart types
   const chartColors = {
     backgroundColor: [
       'rgba(255, 99, 132, 0.6)',
@@ -31,16 +32,14 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       'rgba(75, 192, 192, 1)',
       'rgba(153, 102, 255, 1)',
       'rgba(255, 159, 64, 1)',
-    ]
+    ],
   };
 
   useEffect(() => {
     if (editingChart) {
       setData(editingChart.data);
-      // Fallback to [] if editingChart.columns is undefined
       setColumns(editingChart.columns || []);
       setChartType(editingChart.type);
-      
       if (editingChart.type === 'pie') {
         setCategoryField(editingChart.categoryField || '');
         setValueField(editingChart.valueField || '');
@@ -48,14 +47,13 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         setXAxis(editingChart.xAxis || '');
         setYAxis(editingChart.yAxis || '');
       }
-      
       setTitle(editingChart.title);
       setStep(2);
     } else {
       resetForm();
+      setStep(0);
     }
   }, [editingChart, isOpen]);
-  
 
   const resetForm = () => {
     setData([]);
@@ -66,21 +64,17 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     setCategoryField('');
     setValueField('');
     setTitle('');
-    setStep(1);
+    setSelectedKpi(null);
   };
 
   const handleDataLoaded = (newData, newColumns) => {
-    console.log("Loaded columns:", newColumns); // Debugging step
     if (newColumns.length === 0) {
-      alert("No columns found in the uploaded file!");
+      alert('No columns found in the uploaded file!');
       return;
     }
-    
     setData(newData);
     setColumns(newColumns);
     setStep(2);
-  
-    // Auto-select default values if available
     if (newColumns.length >= 2) {
       if (chartType === 'pie') {
         setCategoryField(newColumns[0]);
@@ -91,8 +85,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       }
     }
   };
-  
-  // Update default axes when chart type changes
+
   useEffect(() => {
     if (columns.length >= 2) {
       if (chartType === 'pie') {
@@ -103,7 +96,20 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         if (!yAxis) setYAxis(valueField || columns[1]);
       }
     }
-  }, [chartType]);
+  }, [chartType, columns]);
+
+  // KPI selection callback
+  const handleKpiSelect = (kpi) => {
+    setSelectedKpi(kpi);
+  };
+
+  // When user clicks "Next" from KPI selection, pre-fill title and move to config page
+  const handleKpiNext = () => {
+    if (selectedKpi) {
+      setTitle(selectedKpi.indicator);
+      setStep(2);
+    }
+  };
 
   const handleSave = () => {
     const chartConfig = {
@@ -113,7 +119,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       columns,
       title: title || `${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`,
     };
-    
+
     if (chartType === 'pie') {
       chartConfig.categoryField = categoryField;
       chartConfig.valueField = valueField;
@@ -121,7 +127,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       chartConfig.xAxis = xAxis;
       chartConfig.yAxis = yAxis;
     }
-    
+
     onSave(chartConfig);
     onClose();
     resetForm();
@@ -155,7 +161,6 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         ],
       };
     } else {
-      // For bar and line charts
       return {
         labels: data.map((item) => item[xAxis]?.toString() || ''),
         datasets: [
@@ -177,7 +182,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     plugins: {
       legend: {
         position: 'top',
-        display: true, // Ensure legend is always displayed, especially for pie charts
+        display: true,
       },
       title: {
         display: true,
@@ -191,8 +196,6 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
 
   const renderPreviewChart = () => {
     const chartData = getChartData();
-    
-    // Ensure all chart types render within the canvas
     switch (chartType) {
       case 'bar':
         return <Bar data={chartData} options={options} />;
@@ -209,22 +212,16 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
 
   const isPieChart = chartType === 'pie';
   const isAxisBasedChart = !isPieChart;
-  
-  const canPreview = isPieChart 
-    ? (categoryField && valueField) 
-    : (xAxis && yAxis);
-    
-  const canSave = isPieChart 
-    ? (categoryField && valueField) 
-    : (xAxis && yAxis);
+  const canPreview = isPieChart ? (categoryField && valueField) : (xAxis && yAxis);
+  const canSave = canPreview;
 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-container">
-        <div className="modal-header">
-          <h2 className="modal-title">
+    <div className="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="modal-container bg-white rounded-lg shadow-lg w-full max-w-3xl mx-4">
+        <div className="modal-header flex justify-between items-center p-4 border-b">
+          <h2 className="modal-title text-xl font-semibold">
             {editingChart ? 'Edit Visualization' : 'Add New Visualization'}
           </h2>
           <button className="close-button" onClick={onClose}>
@@ -232,42 +229,84 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
           </button>
         </div>
 
-        <div className="modal-body">
-          {step === 1 && (
-            <div>
-              <h3 className="modal-section-title">Upload Data File</h3>
-              <FileUploader onDataLoaded={handleDataLoaded} />
+        <div className="modal-body p-4">
+          {/* Step 0: Data source selection */}
+          {step === 0 && (
+            <div className="data-source-selection text-center">
+              <h3 className="modal-section-title text-lg font-medium">Select Data Source</h3>
+              <div className="data-source-buttons flex flex-col items-center gap-4 mt-5">
+                <button className="btn btn-primary px-4 py-2 rounded" onClick={() => setStep(1)}>
+                  Add from File
+                </button>
+                <button className="btn btn-primary px-4 py-2 rounded" onClick={() => setStep(3)}>
+                  Add from KPI
+                </button>
+              </div>
             </div>
           )}
 
+          {/* Step 1: File upload flow */}
+          {step === 1 && (
+            <div>
+              <h3 className="modal-section-title text-lg font-medium">Upload Data File</h3>
+              <FileUploader onDataLoaded={handleDataLoaded} />
+              <button className="btn btn-secondary mt-5 px-4 py-2 rounded" onClick={() => setStep(0)}>
+                Back
+              </button>
+            </div>
+          )}
+
+          {/* Step 3: KPI selection flow */}
+          {step === 3 && (
+            <div>
+              <KpiList
+                projectId="p1"
+                onSelectKpi={handleKpiSelect}
+                selectedKpiId={selectedKpi ? selectedKpi.id : null}
+              />
+              <div className="flex gap-4 mt-5 justify-start">
+                <button className="btn btn-secondary px-4 py-2 rounded" onClick={() => setStep(0)}>
+                  Back
+                </button>
+                <button
+                  className="btn btn-primary px-4 py-2 rounded"
+                  onClick={handleKpiNext}
+                  disabled={!selectedKpi}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Final configuration */}
           {step === 2 && (
-            <div className="configuration-grid">
+            <div className="configuration-grid grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="config-section">
-                <h3 className="modal-section-title">Configure Visualization</h3>
-                
-                <div className="form-group">
-                  <label className="form-label">
-                    Chart Title
-                  </label>
+                <h3 className="modal-section-title text-lg font-medium mb-4">
+                  Configure Visualization
+                </h3>
+                <div className="form-group mb-4">
+                  <label className="form-label block mb-1">Chart Title</label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Enter chart title"
-                    className="form-input"
+                    className="form-input w-full border rounded px-3 py-2"
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">
-                    Chart Type
-                  </label>
-                  <div className="form-grid">
-                    {(['bar', 'line', 'pie', 'scatter']).map((type) => (
+                <div className="form-group mb-4">
+                  <label className="form-label block mb-1">Chart Type</label>
+                  <div className="form-grid flex gap-2">
+                    {['bar', 'line', 'pie', 'scatter'].map((type) => (
                       <button
                         key={type}
                         onClick={() => setChartType(type)}
-                        className={`btn ${chartType === type ? 'btn-primary' : 'btn-secondary'}`}
+                        className={`btn px-3 py-2 rounded ${
+                          chartType === type ? 'btn-primary' : 'btn-secondary'
+                        }`}
                       >
                         {type.charAt(0).toUpperCase() + type.slice(1)}
                       </button>
@@ -275,17 +314,14 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                   </div>
                 </div>
 
-                {/* Conditional rendering based on chart type */}
                 {isAxisBasedChart ? (
                   <>
-                    <div className="form-group">
-                      <label className="form-label">
-                        X-Axis (Category)
-                      </label>
+                    <div className="form-group mb-4">
+                      <label className="form-label block mb-1">X-Axis (Category)</label>
                       <select
                         value={xAxis}
                         onChange={(e) => setXAxis(e.target.value)}
-                        className="form-select"
+                        className="form-select w-full border rounded px-3 py-2"
                       >
                         <option value="">Select X-Axis</option>
                         {columns.map((column) => (
@@ -296,14 +332,12 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                       </select>
                     </div>
 
-                    <div className="form-group">
-                      <label className="form-label">
-                        Y-Axis (Value)
-                      </label>
+                    <div className="form-group mb-4">
+                      <label className="form-label block mb-1">Y-Axis (Value)</label>
                       <select
                         value={yAxis}
                         onChange={(e) => setYAxis(e.target.value)}
-                        className="form-select"
+                        className="form-select w-full border rounded px-3 py-2"
                       >
                         <option value="">Select Y-Axis</option>
                         {columns.map((column) => (
@@ -316,14 +350,12 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                   </>
                 ) : (
                   <>
-                    <div className="form-group">
-                      <label className="form-label">
-                        Category Field (Labels)
-                      </label>
+                    <div className="form-group mb-4">
+                      <label className="form-label block mb-1">Category Field (Labels)</label>
                       <select
                         value={categoryField}
                         onChange={(e) => setCategoryField(e.target.value)}
-                        className="form-select"
+                        className="form-select w-full border rounded px-3 py-2"
                       >
                         <option value="">Select Category Field</option>
                         {columns.map((column) => (
@@ -334,14 +366,12 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                       </select>
                     </div>
 
-                    <div className="form-group">
-                      <label className="form-label">
-                        Value Field (Sizes)
-                      </label>
+                    <div className="form-group mb-4">
+                      <label className="form-label block mb-1">Value Field (Sizes)</label>
                       <select
                         value={valueField}
                         onChange={(e) => setValueField(e.target.value)}
-                        className="form-select"
+                        className="form-select w-full border rounded px-3 py-2"
                       >
                         <option value="">Select Value Field</option>
                         {columns.map((column) => (
@@ -354,33 +384,26 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                   </>
                 )}
 
-                <div className="form-buttons">
-                  <button
-                    onClick={() => setStep(1)}
-                    className="btn btn-secondary"
-                  >
+                <div className="form-buttons flex gap-4">
+                  <button className="btn btn-secondary px-4 py-2 rounded" onClick={() => setStep(1)}>
                     Back to Upload
                   </button>
-                  <button
-                    onClick={handleSave}
-                    disabled={!canSave}
-                    className="btn btn-primary"
-                  >
+                  <button onClick={handleSave} disabled={!canSave} className="btn btn-primary px-4 py-2 rounded">
                     Save Visualization
                   </button>
                 </div>
               </div>
 
               <div className="preview-section">
-                <h3 className="modal-section-title">Preview</h3>
-                <div className="chart-preview-container">
+                <h3 className="modal-section-title text-lg font-medium mb-4">Preview</h3>
+                <div className="chart-preview-container border rounded p-3 min-h-[300px]">
                   {canPreview ? (
                     renderPreviewChart()
                   ) : (
-                    <div className="empty-preview">
-                      {isPieChart ? 
-                        'Select category and value fields to preview chart' : 
-                        'Select axes to preview chart'}
+                    <div className="empty-preview text-center text-gray-500">
+                      {isPieChart
+                        ? 'Select category and value fields to preview chart'
+                        : 'Select axes to preview chart'}
                     </div>
                   )}
                 </div>

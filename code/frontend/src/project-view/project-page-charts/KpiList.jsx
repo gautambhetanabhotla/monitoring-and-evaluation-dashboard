@@ -1,0 +1,63 @@
+import React, { useEffect, useState } from 'react';
+
+const KpiList = ({ projectId, onSelectKpi, selectedKpiId }) => {
+  const [kpis, setKpis] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchKpis = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`http://localhost:5000/api/kpilist-visualisation/${projectId}`, { credentials: 'include' });
+        const result = await response.json();
+        if (result.success) {
+          setKpis(result.data);
+        } else {
+          setError(result.message || 'Error fetching KPIs');
+        }
+      } catch (err) {
+        console.error(err);
+        setError('Error fetching KPIs');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (projectId) {
+      fetchKpis();
+    }
+  }, [projectId]);
+
+  if (loading) {
+    return <div className="p-4 text-center">Loading KPIs...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-center text-red-500">{error}</div>;
+  }
+
+  return (
+    <div className="p-4">
+      <h3 className="text-lg font-medium mb-4 text-black">Select KPI</h3>
+      <ul className="space-y-2">
+        {kpis.map((kpi) => {
+          const isSelected = kpi.id === selectedKpiId;
+          return (
+            <li
+              key={kpi.id}
+              onClick={() => onSelectKpi(kpi)}
+              className={`cursor-pointer border p-2 rounded ${
+                isSelected ? 'bg-blue-500 text-white' : 'bg-white text-black hover:bg-gray-200'
+              }`}
+            >
+              <span className="font-semibold">{kpi.indicator}</span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
+
+export default KpiList;
