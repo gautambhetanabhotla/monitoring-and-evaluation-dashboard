@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Bar, Line, Pie, Scatter } from 'react-chartjs-2';
 import { Edit2, Trash2 } from 'lucide-react';
 import {
@@ -13,7 +13,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-// Import and register the datalabels plugin
+
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(
@@ -31,6 +31,11 @@ ChartJS.register(
 
 const ChartComponent = ({ chart, onEdit, onRemove }) => {
   const [user, setUser] = useState(null);
+  // Ref to access the chart instance
+  const chartRef = useRef(null);
+  // State to track hidden segments (by index)
+  const [hiddenSegments, setHiddenSegments] = useState({});
+
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -48,33 +53,32 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
     fetchUserDetails();
   }, []);
 
-  if(!chart) return null;
+  if (!chart) return null;
   const { type, data, xAxis, yAxis, categoryField, valueField, title } = chart;
 
-  // Generate chart data based on type
   let chartData;
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="chart-relative">
-        { user?.role === 'admin' &&
-          <button onClick={onRemove} className="remove-button" title="Remove visualization">
-            <Trash2 size={16} className="remove-icon" color='red'/>
-          </button>
-        }
-        { user?.role === 'admin' &&
-          <button onClick={onEdit} className="edit-button" title="Edit visualization">
-            <Edit2 size={16} className="edit-icon" />
-          </button>
-        } 
+
+        {user?.role === 'admin' && (
+          <>
+            <button onClick={onRemove} className="remove-button" title="Remove visualization">
+              <Trash2 size={16} className="remove-icon" color="red" />
+            </button>
+            <button onClick={onEdit} className="edit-button" title="Edit visualization">
+              <Edit2 size={16} className="edit-icon" />
+            </button>
+          </>
+        )}
         <div className="chart-container">
           <div className="no-data-message">No data available for this chart</div>
         </div>
       </div>
     );
   }
-  
+
   if (type === 'pie') {
-    // For pie charts, map valid labels and values
     chartData = {
       labels: data.map((item) => item[categoryField]?.toString() || ''),
       datasets: [
@@ -116,92 +120,150 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
       ],
     };
   } else {
-    // For bar and line charts
     chartData = {
       labels: data.map((item) => item[xAxis]?.toString() || ''),
       datasets: [
         {
           label: yAxis,
           data: data.map((item) => Number(item[yAxis]) || 0),
-          backgroundColor: type === 'line' 
-            ? 'rgba(54, 162, 235, 0.6)' 
-            : [
-                'rgba(54, 162, 235, 0.6)',
-                'rgba(255, 99, 132, 0.6)',
-                'rgba(255, 206, 86, 0.6)',
-                'rgba(75, 192, 192, 0.6)',
-                'rgba(153, 102, 255, 0.6)',
-              ],
-          borderColor: type === 'line'
-            ? 'rgba(54, 162, 235, 1)'
-            : [
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 99, 132, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-              ],
+          backgroundColor:
+            type === 'line'
+              ? 'rgba(54, 162, 235, 0.6)'
+              : [
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                ],
+          borderColor:
+            type === 'line'
+              ? 'rgba(54, 162, 235, 1)'
+              : [
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)',
+                ],
           borderWidth: 1,
         },
       ],
     };
   }
-
-  // Define options with datalabels for pie charts
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     layout: {
       padding: {
         top: 10,
-        right: 10,
+        right: type === 'pie' ? 10 : 0,
         bottom: 10,
         left: 10,
       },
     },
     plugins: {
       legend: {
+        display: type === 'pie' ? false : true,
         position: type === 'pie' ? 'right' : 'top',
-        display: true,
       },
       title: {
         display: true,
         text: title,
       },
-      datalabels: type === 'pie'
-        ? {
-            formatter: (value, context) => {
-              const dataArr = context.chart.data.datasets[0].data;
-              const total = dataArr.reduce((sum, val) => sum + val, 0);
-              const percentage = (value / total) * 100;
-              const formattedPercentage = percentage.toFixed(1) + '%';
-              return percentage < 5 ? '↘ ' + formattedPercentage : formattedPercentage;
-            },
-            color: '#fff',
-            align: (context) => {
-              const dataArr = context.chart.data.datasets[0].data;
-              const total = dataArr.reduce((sum, val) => sum + val, 0);
-              const percentage = (context.dataset.data[context.dataIndex] / total) * 100;
-              return percentage < 5 ? 'end' : 'center';
-            },
-            anchor: (context) => {
-              const dataArr = context.chart.data.datasets[0].data;
-              const total = dataArr.reduce((sum, val) => sum + val, 0);
-              const percentage = (context.dataset.data[context.dataIndex] / total) * 100;
-              return percentage < 5 ? 'end' : 'center';
-            },
-            offset: (context) => {
-              const dataArr = context.chart.data.datasets[0].data;
-              const total = dataArr.reduce((sum, val) => sum + val, 0);
-              const percentage = (context.dataset.data[context.dataIndex] / total) * 100;
-              return percentage < 5 ? 10 : 0;
-            },
-          }
-        : { display: false },
+      tooltip:
+        type === 'pie'
+          ? {
+              callbacks: {
+                label: (tooltipItem) => {
+                  const dataset = tooltipItem.chart.data.datasets[tooltipItem.datasetIndex];
+                  const currentValue = dataset.data[tooltipItem.dataIndex];
+                  const total = dataset.data.reduce((sum, val) => sum + val, 0);
+                  const percentage = ((currentValue / total) * 100).toFixed(1);
+                  return `${tooltipItem.label}: ${currentValue} (${percentage}%)`;
+                },
+              },
+            }
+          : undefined,
+      datalabels:
+        type === 'pie'
+          ? {
+              formatter: (value, context) => {
+                const dataArr = context.chart.data.datasets[0].data;
+                const total = dataArr.reduce((sum, val) => sum + val, 0);
+                const percentage = (value / total) * 100;
+                return percentage > 10 ? percentage.toFixed(1) + '%' : '';
+              },
+              color: '#000',
+              align: 'center',
+              anchor: 'center',
+            }
+          : { display: false },
     },
   };
     
 
+  // Handler to toggle segment visibility when a legend item is clicked.
+  const handleLegendClick = (index) => {
+    if (chartRef.current) {
+      // Toggle the visibility of the data at the given index.
+      chartRef.current.toggleDataVisibility(index);
+      chartRef.current.update();
+      // Update local state to reflect the hidden state.
+      setHiddenSegments((prev) => ({ ...prev, [index]: !prev[index] }));
+    }
+  };
+
+  // Render a custom, interactive legend for pie charts.
+  // Clicking a legend item toggles its slice visibility, and the label gets a strike-through when hidden.
+  const renderCustomLegend = () => {
+    if (type !== 'pie') return null;
+    const dataset = chartData.datasets[0];
+    return (
+      <div
+        className="custom-legend"
+        style={{
+          maxHeight: '300px',
+          overflowY: 'auto',
+          padding: '2px',
+          marginLeft: '20px',
+          marginTop: '40px', // Starts further down
+          marginBottom: '25px',
+        }}
+      >
+        {chartData.labels.map((label, index) => {
+          const bgColor = dataset.backgroundColor[index % dataset.backgroundColor.length];
+          const isHidden = hiddenSegments[index];
+          return (
+            <div
+              key={index}
+              onClick={() => handleLegendClick(index)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: '4px',
+                cursor: 'pointer',
+              }}
+            >
+              <div
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  backgroundColor: bgColor,
+                  marginRight: '8px',
+                }}
+              ></div>
+              <span style={{ color: 'black', textDecoration: isHidden ? 'line-through' : 'none' }}>
+                {label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // Render the chart. For pie charts, pass the ref for interactive legend functionality.
   const renderChart = () => {
     switch (type) {
       case 'bar':
@@ -209,7 +271,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
       case 'line':
         return <Line data={chartData} options={options} />;
       case 'pie':
-        return <Pie data={chartData} options={options} />;
+        return <Pie ref={chartRef} data={chartData} options={options} />;
       case 'scatter':
         return <Scatter data={chartData} options={options} />;
       default:
@@ -219,25 +281,28 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
 
   return (
     <div className="chart-relative">
-      { user?.role === 'admin' &&
-        <button
-          onClick={onRemove}
-          className="remove-button"
-          title="Remove visualization"
-        >
-          <Trash2 size={16} className="remove-icon" color='red'/>
-        </button>
-      }
-      { user?.role === 'admin' && 
-        <button
-          onClick={onEdit}
-          className="edit-button"
-          title="Edit visualization"
-        >
-          <Edit2 size={16} className="edit-icon" />
-        </button>
-      }
-      <div className="chart-container">{renderChart()}</div>
+      {user?.role === 'admin' && (
+        <>
+          <button onClick={onRemove} className="remove-button" title="Remove visualization">
+            <Trash2 size={16} className="remove-icon" color="red" />
+          </button>
+          <button onClick={onEdit} className="edit-button" title="Edit visualization">
+            <Edit2 size={16} className="edit-icon" />
+          </button>
+        </>
+      )}
+      {type === 'pie' ? (
+        <div style={{ display: 'flex', marginTop: '20px', gap: '20px' }}>
+          <div className="chart-container" style={{ flex: 1 }}>
+            {renderChart()}
+          </div>
+          {renderCustomLegend()}
+        </div>
+      ) : (
+        <div className="chart-container" style={{ marginTop: '20px' }}>
+          {renderChart()}
+        </div>
+      )}
     </div>
   );
 };
