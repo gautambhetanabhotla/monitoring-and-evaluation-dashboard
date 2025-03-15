@@ -65,6 +65,7 @@ function Charts() {
     try {
       fetch(`http://localhost:5000/api/visualisation/delete-visualisation/${id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
       setCharts(charts.filter((chart) => chart.id !== id));
     } catch (error) { 
@@ -91,6 +92,7 @@ function Charts() {
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify(chartData),
         });
         const data = await response.json();
@@ -117,6 +119,7 @@ function Charts() {
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify(chartData),
         });
         const data = await response.json();

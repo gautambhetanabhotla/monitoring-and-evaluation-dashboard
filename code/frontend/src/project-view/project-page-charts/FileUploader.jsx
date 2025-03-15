@@ -18,8 +18,9 @@ const FileUploader = ({ onDataLoaded }) => {
         const lines = csvText.split(/\r\n|\n/);
         if (lines.length < 2) throw new Error('No data rows found in the CSV file.');
         
+        const dataLines = lines.slice(1).filter(line => line.trim() !== '');
         const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, ''));
-        const jsonData = lines.slice(1).map(line => {
+        const jsonData = dataLines.map(line => {
           const values = line.split(',').map(v => v.replace(/^"|"$/g, ''));
           return Object.fromEntries(headers.map((header, i) => [header, values[i] || '']));
         });

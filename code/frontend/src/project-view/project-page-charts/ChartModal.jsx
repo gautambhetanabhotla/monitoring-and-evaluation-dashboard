@@ -183,6 +183,9 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         display: true,
         text: title || `${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`,
       },
+      datalabels: {
+        display: false,
+      },
     },
   };
 
