@@ -6,13 +6,17 @@ function Charts() {
   const [charts, setCharts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingChartId, setEditingChartId] = useState(null);
-  const project_id = "660f0e3d9e541b0012f2a2d4";
+  const project_id = "67cae012ae068409d0b8fda3";
 
   useEffect(() => {
     const fetchCharts = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/visualisation/get-visualisations/${project_id}`);
+        const response = await fetch(`http://localhost:5000/api/visualisation/get-visualisations/${project_id}`,
+          {
+            credentials: 'include',         }
+        );
         const results = await response.json();
+        console.log(results);
         if (results.success && Array.isArray(results.data)) {
           const formattedCharts = results.data.map(item => {
             try {

@@ -26,6 +26,7 @@ const Admin = () => {
           <p><strong>ID:</strong> {user.id}</p>
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Role:</strong> {user.role}</p>
+          <p><strong>Username:</strong> {user.username}</p>
         </div>
       )}
     </div>
