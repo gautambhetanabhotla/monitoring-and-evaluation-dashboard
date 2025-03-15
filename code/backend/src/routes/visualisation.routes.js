@@ -12,4 +12,4 @@ visualisationRouter.get('/get-visualisations/:project_id',requireAuth, getVisual
 visualisationRouter.delete('/delete-visualisation/:id',requireAuth,requireRole(["admin"]), deleteVisualisation);
 visualisationRouter.put('/update-visualisation/:id',requireAuth,requireRole(["admin"]), updateVisualisation);
 
-export default visualisationRouter;
+export default visualisationRouter; 

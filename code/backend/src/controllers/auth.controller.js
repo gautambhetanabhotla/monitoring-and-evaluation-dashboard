@@ -2,58 +2,81 @@ import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 
 export const login = async (req, res) => {
-const { email, password } = req.body;
+  const { email, password } = req.body;
 
-if (!email || !password) {
-    return res.status(400).json({ success: false, message: "Please enter all fields" });
-}
+  if (!email || !password) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please enter all fields" });
+  }
 
-try {
+  try {
     const user = await User.findOne({ email });
 
     if (!user) {
-        return res.status(400).json({ success: false, message: "User does not exist" });
+      return res
+        .status(400)
+        .json({ success: false, message: "User does not exist" });
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, user.passwordHash);
-    
+
     if (!isPasswordCorrect) {
-        return res.status(400).json({ success: false, message: "Invalid credentials" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
-    req.session.user = { id: user._id, role: user.role, email: user.email, name : user.username };
+    req.session.userId = user._id;
 
-    return res.status(200).json({ success: true, message: "User logged in successfully", role : user.role });
-} catch (error) {
+    return res.status(200).json({
+      success: true,
+      message: "User logged in successfully",
+      role: user.role, // You can still return the role in the response if needed.
+    });
+  } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
-}
+  }
 };
 
 export const logout = (req, res) => {
-try {
-    console.log("Session before logout", req.session);
+  try {
     req.session.destroy((err) => {
-        if (err) {
-            return res.status(500).json({ success: false, message: "Logout failed" });
-        }
-        res.clearCookie("connect.sid"); // Remove session cookie
-        return res.status(200).json({ success: true, message: "User logged out successfully" });
+      if (err) {
+        return res
+          .status(500)
+          .json({ success: false, message: "Logout failed" });
+      }
+      res.clearCookie("connect.sid"); // Remove session cookie
+      return res
+        .status(200)
+        .json({ success: true, message: "User logged out successfully" });
     });
-} catch (error) {
+  } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
-}
+  }
 };
 
 export const getCurrentUser = async (req, res) => {
-    if (req.session && req.session.user) {
-    const user = await User.findById(req.session.user.id);
-
-    if (!user) {
-        return res.status(404).json({ success: false, message: "User not found" });
+    if(!req.session.userId){
+      return res.status(401).json({ success: false, message: "Not authenticated" });
     }
-
-    req.session.user = { id: user._id, role: user.role, email: user.email, name : user.username };
-    return res.status(200).json({ success: true, user: req.session.user });
+    try{
+      const user = await User.findById(req.session.userId).select("-passwordHash");
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User Not Found"});
+      }
+      return res.status(200).json({
+        success: true,
+        user: {
+          id: user._id,
+          role: user.role,
+          email: user.email,
+          name: user.username,
+        },
+      });
     }
-    return res.status(401).json({ success: false, message: "Not authenticated" });
+    catch (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
 };
