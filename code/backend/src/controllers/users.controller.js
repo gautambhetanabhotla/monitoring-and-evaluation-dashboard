@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import User from "../models/User.model.js";
 import bcrypt from "bcryptjs";
 
 export const getClients = async (req, res) => {
@@ -61,7 +61,6 @@ export const addUser = async (req, res) => {
 };
 
 export const getUserDetails = async (req, res) => {
-  console.log(req.session?.userId);
   if(!req.session?.userId) {
     return res.status(401).json({ success: false, message: "Not authenticated" });
   }

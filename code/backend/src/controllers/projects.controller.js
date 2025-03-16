@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import User from '../models/User.js'; 
-import Project from '../models/Project.js';
+import User from '../models/User.model.js'; 
+import Project from '../models/Project.model.js';
 
 export const getProjectsByClientId = async (req, res) => {
     const clientId = req.session.userId;
