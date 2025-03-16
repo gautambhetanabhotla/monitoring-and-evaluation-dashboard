@@ -13,7 +13,6 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(
@@ -60,7 +59,6 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="chart-relative">
-
         {user?.role === 'admin' && (
           <>
             <button onClick={onRemove} className="remove-button" title="Remove visualization">
@@ -89,11 +87,11 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
             return isNaN(value) ? 0 : value;
           }),
           backgroundColor: [
-            'rgba(54, 162, 235, 0.6)',
-            'rgba(255, 99, 132, 0.6)',
-            'rgba(255, 206, 86, 0.6)',
-            'rgba(75, 192, 192, 0.6)',
-            'rgba(153, 102, 255, 0.6)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
           ],
           borderColor: [
             'rgba(54, 162, 235, 1)',
@@ -115,7 +113,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
             x: Number(item[xAxis]) || 0,
             y: Number(item[yAxis]) || 0,
           })),
-          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          backgroundColor: 'rgba(54, 162, 235, 1)',
         },
       ],
     };
@@ -128,13 +126,13 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
           data: data.map((item) => Number(item[yAxis]) || 0),
           backgroundColor:
             type === 'line'
-              ? 'rgba(54, 162, 235, 0.6)'
+              ? 'rgba(54, 162, 235, 1)'
               : [
-                  'rgba(54, 162, 235, 0.6)',
-                  'rgba(255, 99, 132, 0.6)',
-                  'rgba(255, 206, 86, 0.6)',
-                  'rgba(75, 192, 192, 0.6)',
-                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)',
                 ],
           borderColor:
             type === 'line'
@@ -192,7 +190,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
                 const dataArr = context.chart.data.datasets[0].data;
                 const total = dataArr.reduce((sum, val) => sum + val, 0);
                 const percentage = (value / total) * 100;
-                return percentage > 10 ? percentage.toFixed(1) + '%' : '';
+                return percentage > 7.5 ? percentage.toFixed(1) + '%' : '';
               },
               color: '#000',
               align: 'center',
@@ -200,9 +198,29 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
             }
           : { display: false },
     },
+    // Add scales for non-pie charts
+    ...(type !== 'pie' && {
+      scales: {
+        x: {
+          ticks: {
+            color: '#ffffff',
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)',
+          },
+        },
+        y: {
+          ticks: {
+            color: '#ffffff',
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)',
+          },
+        },
+      },
+    }),
   };
     
-
   // Handler to toggle segment visibility when a legend item is clicked.
   const handleLegendClick = (index) => {
     if (chartRef.current) {
@@ -227,8 +245,9 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
           overflowY: 'auto',
           padding: '2px',
           marginLeft: '20px',
-          marginTop: '40px', // Starts further down
+          marginTop: '40px',
           marginBottom: '25px',
+          marginRight: '20px',
         }}
       >
         {chartData.labels.map((label, index) => {
