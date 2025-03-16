@@ -5,11 +5,30 @@ const visualisationSchema = new mongoose.Schema({
         type : mongoose.Schema.Types.ObjectId,
         ref : 'Project',
         required : [true, 'Project ID is required'],
-        index : true
     },
     file : {
         type : Object,
-        required : [true, 'File is required']
+        required :[
+            function() {
+                return this.category === 'file';
+            },
+            "File is required if category is file"
+        ],
+    },
+    category : {
+        type : String,
+        required : [true, 'Category is required'],
+        enum : ['KPI', 'file'],
+    },
+    Kpi_id : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'KPI',
+        required : [
+            function() {
+                return this.category === 'KPI';
+            },
+            "KPI ID is required if category is KPI"
+        ],
     },
     title : {
         type : String,

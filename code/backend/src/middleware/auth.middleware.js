@@ -1,5 +1,5 @@
 // backend/middleware/auth.middleware.js
-import User from '../models/User.js';
+import User from '../models/User.model.js';
 
 export const requireAuth = (req, res, next) => {
   if (req.session && req.session.userId) {

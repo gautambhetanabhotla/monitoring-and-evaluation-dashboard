@@ -6,6 +6,8 @@ import authRouter from './src/routes/auth.routes.js';
 import userRouter from './src/routes/user.routes.js';
 import projectRouter from './src/routes/project.routes.js';
 import visualisationRouter from './src/routes/visualisation.routes.js';
+import kpiRouter from './src/routes/kpi.routes.js';
+import taskRouter from './src/routes/task.routes.js';
 import cors from 'cors';
 import connectDB from './src/config/connectDB.js';
 
@@ -35,6 +37,7 @@ app.use(
             secure: false,
             httpOnly: true,
             sameSite: 'strict',
+            // Make session expiry time infinite
             maxAge: 60*60 * 1000, // 1-hour session expiry
         },
     })
@@ -44,6 +47,8 @@ app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/projects', projectRouter);
 app.use('/api/visualisation', visualisationRouter);
+app.use('/api/kpi', kpiRouter);
+app.use('/api/task', taskRouter);
 
 app.use((req, res) => {
     res.status(404).json({ message: "Route not found" });

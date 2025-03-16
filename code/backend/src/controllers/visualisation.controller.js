@@ -3,9 +3,9 @@ import Visualisation from '../models/Visualisation.js';
 
 // Create a new visualisation
 export const createVisualisation = async (req, res) => {
-    const {project_id,title,file, type, component_1,component_2,columns,width=0,height=0 } = req.body;
+    const {project_id,title,file, type, component_1,component_2,columns,category,kpi_id=null,width=0,height=0 } = req.body;
 
-    if (!project_id || !file || !title || !type || !component_1 || !component_2 || !columns) {
+    if (!project_id || !file || !title || !type || !component_1 || !component_2 || !columns || !category) {
         return res.status(400).json({ success:false, message: "Please give values for all the fields" });
     }
 
@@ -19,6 +19,8 @@ export const createVisualisation = async (req, res) => {
         component_1,
         component_2,
         columns,
+        category,
+        kpi_id,
         width,
         height
     });
@@ -71,9 +73,9 @@ export const updateVisualisation = async (req, res) => {
     
     const { id } = req.params;
 
-    const { file,title, type, component_1, component_2, columns,width=0, height=0 } = req.body;
+    const { file,title, type, component_1, component_2, columns, category,kpi_id=null,width=0, height=0 } = req.body;
 
-    if (!file || !title || !type || !component_1 || !component_2 || !columns) {
+    if (!file || !title || !type || !component_1 || !component_2 || !columns || !category) {
         return res.status(400).json({ success : false , message: "Please give values for all the fields" });
     }
 
@@ -92,6 +94,8 @@ export const updateVisualisation = async (req, res) => {
         visualisation.width = width;
         visualisation.height = height;
         visualisation.columns = columns;
+        visualisation.category = category;
+        visualisation.kpi_id = kpi_id;
 
 
         await visualisation.save();
