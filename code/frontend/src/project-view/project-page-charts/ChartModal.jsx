@@ -276,7 +276,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                   Add from File
                 </button>
                 <button
-                  className="btn btn-secondary px-4 py-2 rounded"
+                  className="btn btn-primary px-4 py-2 rounded"
                   onClick={() => {
                     setCategory("KPI");
                     setStep(3);
