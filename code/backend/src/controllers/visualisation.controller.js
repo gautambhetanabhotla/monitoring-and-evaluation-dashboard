@@ -51,7 +51,7 @@ export const getVisualisationsByProject = async (req, res) => {
         // map then as {DateTime : kpiUpdate.updated_at, Value : kpiUpdate.final} and store it as file in visualisation
 
         if (visualisations.length === 0) {
-            return res.status(400).json({ success : false , message: "No visualisations found for this project" });
+            return res.status(200).json({ success : false , message: "No visualisations found for this project" });
         }
 
         for (let i = 0; i < visualisations.length; i++) {
