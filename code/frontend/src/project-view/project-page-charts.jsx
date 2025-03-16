@@ -30,7 +30,9 @@ function Charts() {
                 yAxis: item.component_2,
                 categoryField: item.component_1,
                 valueField: item.component_2,
-                columns: item.columns
+                columns: item.columns,
+                category: item.category,
+                kpi_id: item.kpi_id
               };
             } catch (error) {
               console.error('Error parsing chart data:', error);
@@ -83,7 +85,9 @@ function Charts() {
         type: chartConfig.type,
         component_1: chartConfig.xAxis || chartConfig.categoryField,
         component_2: chartConfig.yAxis || chartConfig.valueField,
-        columns : chartConfig.columns
+        columns : chartConfig.columns,
+        category: chartConfig.category,
+        kpi_id: chartConfig.kpi_id
       };
       // console.log(chartData.file);
       try {
@@ -110,9 +114,11 @@ function Charts() {
         type: chartConfig.type,
         component_1: chartConfig.xAxis || chartConfig.categoryField,
         component_2: chartConfig.yAxis || chartConfig.valueField,
-        columns : chartConfig.columns
+        columns : chartConfig.columns,
+        category: chartConfig.category,
+        kpi_id: chartConfig.kpi_id
       };
-      // console.log(chartData.file);
+      console.log(chartData);
       try {
         const response= await fetch('http://localhost:5000/api/visualisation/save-visualisation', {
           method: 'POST',

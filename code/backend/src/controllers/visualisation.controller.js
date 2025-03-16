@@ -1,5 +1,5 @@
 import mongoose, { Mongoose } from 'mongoose';
-import Visualisation from '../models/Visualisation.js';
+import Visualisation from '../models/Visualisation.model.js';
 
 // Create a new visualisation
 export const createVisualisation = async (req, res) => {
@@ -24,6 +24,8 @@ export const createVisualisation = async (req, res) => {
         width,
         height
     });
+
+    console.log(visualisation);
 
     try {
         const newVisualisation = await visualisation.save();
