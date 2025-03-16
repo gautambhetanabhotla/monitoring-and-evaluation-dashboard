@@ -20,7 +20,7 @@ const visualisationSchema = new mongoose.Schema({
         required : [true, 'Category is required'],
         enum : ['KPI', 'file'],
     },
-    Kpi_id : {
+    kpi_id : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'KPI',
         required : [

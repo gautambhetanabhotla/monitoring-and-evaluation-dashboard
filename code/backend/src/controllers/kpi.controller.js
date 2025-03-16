@@ -1,5 +1,6 @@
 import Kpi from "../models/Kpi.model.js";
 import KpiUpdate from "../models/KpiUpdate.model.js";
+import mongoose from "mongoose";
 
 export const createKpi = async (req, res) => {
     const {project_id, indicator, what_it_tracks, 

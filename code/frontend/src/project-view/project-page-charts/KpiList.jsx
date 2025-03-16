@@ -9,10 +9,10 @@ const KpiList = ({ projectId, onSelectKpi, selectedKpiId }) => {
     const fetchKpis = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/kpilist-visualisation/${projectId}`, { credentials: 'include' });
+        const response = await fetch(`http://localhost:5000/api/visualisation/get-KpibyProject/${projectId}`, { credentials: 'include' });
         const result = await response.json();
         if (result.success) {
-          setKpis(result.data);
+          setKpis(result.data); // Assuming KPI array is returned in data.data
         } else {
           setError(result.message || 'Error fetching KPIs');
         }
@@ -42,13 +42,13 @@ const KpiList = ({ projectId, onSelectKpi, selectedKpiId }) => {
       <h3 className="text-lg font-medium mb-4 text-black">Select KPI</h3>
       <ul className="space-y-2">
         {kpis.map((kpi) => {
-          const isSelected = kpi.id === selectedKpiId;
+          const isSelected = kpi._id === selectedKpiId;
           return (
             <li
-              key={kpi.id}
+              key={kpi._id}
               onClick={() => onSelectKpi(kpi)}
               className={`cursor-pointer border p-2 rounded ${
-                isSelected ? 'bg-blue-500 text-white' : 'bg-white text-black hover:bg-gray-200'
+                isSelected ? 'bg-blue-600 text-white' : 'bg-white text-black hover:bg-gray-200'
               }`}
             >
               <span className="font-semibold">{kpi.indicator}</span>

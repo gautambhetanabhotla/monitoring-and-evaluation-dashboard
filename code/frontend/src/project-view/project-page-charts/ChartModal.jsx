@@ -14,7 +14,12 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   const [categoryField, setCategoryField] = useState('');
   const [valueField, setValueField] = useState('');
   const [title, setTitle] = useState('');
+  // Store the entire selected KPI object.
   const [selectedKpi, setSelectedKpi] = useState(null);
+  // Indicates whether the chart is based on a file or KPI.
+  const [category, setCategory] = useState('');
+  // New state variable for KPI errors.
+  const [kpiError, setKpiError] = useState('');
 
   const chartColors = {
     backgroundColor: [
@@ -48,6 +53,9 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         setYAxis(editingChart.yAxis || '');
       }
       setTitle(editingChart.title);
+      // If editing, assume a KPI was previously selected.
+      setSelectedKpi({ _id: editingChart.kpi_id });
+      setCategory(editingChart.category || '');
       setStep(2);
     } else {
       resetForm();
@@ -65,6 +73,9 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     setValueField('');
     setTitle('');
     setSelectedKpi(null);
+    setCategory('');
+    setKpiError('');
+
   };
 
   const handleDataLoaded = (newData, newColumns) => {
@@ -97,17 +108,35 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       }
     }
   }, [chartType, columns]);
-
-  // KPI selection callback
+  // KPI selection callback stores the entire KPI object.
   const handleKpiSelect = (kpi) => {
     setSelectedKpi(kpi);
+    // Clear any previous error when a new KPI is selected.
+    setKpiError('');
   };
 
-  // When user clicks "Next" from KPI selection, pre-fill title and move to config page
-  const handleKpiNext = () => {
-    if (selectedKpi) {
-      setTitle(selectedKpi.indicator);
-      setStep(2);
+  // When user clicks "Next" from KPI selection,
+  // send a request with the selected KPI’s _id to the backend,
+  // store the returned data, set columns to ["DateTime", "Value"],
+  // and update the title with the KPI's indicator.
+  const handleKpiNext = async () => {
+    if (selectedKpi && selectedKpi._id) {
+      try {
+        const response = await fetch(`http://localhost:5000/api/visualisation/get-kpi-updates-as-data/${selectedKpi._id}`, { credentials: 'include' });
+        const resData = await response.json();
+        if (resData.success) {
+          setData(resData.data);
+          setColumns(["DateTime", "Value"]);
+          setKpiError('');
+          setTitle(selectedKpi.indicator);
+          setStep(2);
+        } else {
+          setKpiError(resData.message || 'Error fetching KPI data');
+        }
+      } catch (error) {
+        console.error(error);
+        setKpiError('Error fetching KPI data');
+      }
     }
   };
 
@@ -118,6 +147,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       data,
       columns,
       title: title || `${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`,
+      category, // "file" or "KPI"
+      kpi_id: selectedKpi ? selectedKpi._id : null,
     };
 
     if (chartType === 'pie') {
@@ -235,10 +266,22 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
             <div className="data-source-selection text-center">
               <h3 className="modal-section-title text-lg font-medium">Select Data Source</h3>
               <div className="data-source-buttons flex flex-col items-center gap-4 mt-5">
-                <button className="btn btn-primary px-4 py-2 rounded" onClick={() => setStep(1)}>
+                <button
+                  className="btn btn-primary px-4 py-2 rounded"
+                  onClick={() => {
+                    setCategory("file");
+                    setStep(1);
+                  }}
+                >
                   Add from File
                 </button>
-                <button className="btn btn-primary px-4 py-2 rounded" onClick={() => setStep(3)}>
+                <button
+                  className="btn btn-secondary px-4 py-2 rounded"
+                  onClick={() => {
+                    setCategory("KPI");
+                    setStep(3);
+                  }}
+                >
                   Add from KPI
                 </button>
               </div>
@@ -260,10 +303,13 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
           {step === 3 && (
             <div>
               <KpiList
-                projectId="p1"
+                projectId="67cae012ae068409d0b8fda3"
                 onSelectKpi={handleKpiSelect}
-                selectedKpiId={selectedKpi ? selectedKpi.id : null}
+                selectedKpiId={selectedKpi ? selectedKpi._id : null}
               />
+              {kpiError && (
+                <p className="mt-3 text-red-500 text-center">{kpiError}</p>
+              )}
               <div className="flex gap-4 mt-5 justify-start">
                 <button className="btn btn-secondary px-4 py-2 rounded" onClick={() => setStep(0)}>
                   Back
@@ -271,7 +317,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                 <button
                   className="btn btn-primary px-4 py-2 rounded"
                   onClick={handleKpiNext}
-                  disabled={!selectedKpi}
+                  disabled={!selectedKpi || kpiError !== ''}
                 >
                   Next
                 </button>
