@@ -1,5 +1,6 @@
-import mongoose, { Mongoose } from 'mongoose';
+import mongoose from 'mongoose';
 import Visualisation from '../models/Visualisation.model.js';
+import KpiUpdate from '../models/KpiUpdate.model.js';
 
 // Create a new visualisation
 export const createVisualisation = async (req, res) => {
@@ -25,8 +26,6 @@ export const createVisualisation = async (req, res) => {
         height
     });
 
-    console.log(visualisation);
-
     try {
         const newVisualisation = await visualisation.save();
         console.log("Visualisation saved successfully");
@@ -46,6 +45,23 @@ export const getVisualisationsByProject = async (req, res) => {
         }
 
         const visualisations = await Visualisation.find({ project_id });
+        // if category is KPI, then get all KPI updates based on KPI id and 
+        // map then as {DateTime : kpiUpdate.updated_at, Value : kpiUpdate.final} and store it as file in visualisation
+
+        if (visualisations.length === 0) {
+            return res.status(400).json({ success : false , message: "No visualisations found for this project" });
+        }
+
+        for (let i = 0; i < visualisations.length; i++) {
+            if (visualisations[i].category === "KPI") {
+                const kpiUpdates = await KpiUpdate.find({ kpi_id: visualisations[i].kpi_id });
+                if (kpiUpdates.length === 0) {
+                    return res.status(400).json({ success : false , message: "No KPI updates found for this KPI" });
+                }
+                visualisations[i].file = JSON.stringify(kpiUpdates.map(kpiUpdate => ({ DateTime : kpiUpdate.updated_at, Value : kpiUpdate.final })));
+            }
+        }
+
         console.log("Visualisations fetched successfully");
 
         return res.status(200).json({success : true, message : `Visualisations fetched successfully`, data : visualisations});
