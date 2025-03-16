@@ -10,7 +10,7 @@ export const createVisualisation = async (req, res) => {
         return res.status(400).json({ success:false, message: "Please give values for all the fields" });
     }
 
-    console.log(req.body);
+    // console.log(req.body);
 
     const visualisation = new Visualisation({
         project_id,
@@ -26,12 +26,12 @@ export const createVisualisation = async (req, res) => {
         height
     });
 
-    console.log(visualisation);
+    // console.log(visualisation);
 
     try {
         const newVisualisation = await visualisation.save();
         console.log("Visualisation saved successfully");
-        return res.status(201).json({message : "Visualisation saved successfully",newVisualisation});
+        return res.status(201).json({message : "Visualisation saved successfully",id: newVisualisation._id});
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -120,7 +120,7 @@ export const updateVisualisation = async (req, res) => {
 
         await visualisation.save();
         console.log("Visualisation updated successfully");
-        return res.status(200).json({ success : true , message: "Visualisation updated successfully" });
+        return res.status(200).json({ success : true , message: "Visualisation updated successfully",id: visualisation._id});
     } catch (error) {
         return res.status(500).json({ success : false , message: error.message });
     }

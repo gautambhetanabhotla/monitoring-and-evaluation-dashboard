@@ -23,12 +23,12 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
 
   const chartColors = {
     backgroundColor: [
-      'rgba(255, 99, 132, 0.6)',
-      'rgba(54, 162, 235, 0.6)',
-      'rgba(255, 206, 86, 0.6)',
-      'rgba(75, 192, 192, 0.6)',
-      'rgba(153, 102, 255, 0.6)',
-      'rgba(255, 159, 64, 0.6)',
+      'rgba(255, 99, 132, 1)',
+      'rgba(54, 162, 235, 1)',
+      'rgba(255, 206, 86, 1)',
+      'rgba(75, 192, 192, 1)',
+      'rgba(153, 102, 255, 1)',
+      'rgba(255, 159, 64, 1)',
     ],
     borderColor: [
       'rgba(255, 99, 132, 1)',
@@ -75,7 +75,6 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     setSelectedKpi(null);
     setCategory('');
     setKpiError('');
-
   };
 
   const handleDataLoaded = (newData, newColumns) => {
@@ -108,6 +107,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       }
     }
   }, [chartType, columns]);
+
   // KPI selection callback stores the entire KPI object.
   const handleKpiSelect = (kpi) => {
     setSelectedKpi(kpi);
@@ -223,6 +223,27 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         display: false,
       },
     },
+    // Add scales for non-pie charts
+    ...(chartType !== 'pie' && {
+      scales: {
+        x: {
+          ticks: {
+            color: '#ffffff',
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)',
+          },
+        },
+        y: {
+          ticks: {
+            color: '#ffffff',
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)',
+          },
+        },
+      },
+    }),
   };
 
   const renderPreviewChart = () => {

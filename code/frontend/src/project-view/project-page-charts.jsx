@@ -16,7 +16,7 @@ function Charts() {
             credentials: 'include',         }
         );
         const results = await response.json();
-        console.log(results);
+        // console.log(results);
         if (results.success && Array.isArray(results.data)) {
           const formattedCharts = results.data.map(item => {
             try {
@@ -77,6 +77,7 @@ function Charts() {
 
   const handleSaveChart = async(chartConfig) => {
     if (editingChartId) {
+      console.log(editingChartId);
       setCharts(charts.map((chart) => (chart.id === editingChartId ? chartConfig : chart)));
       const chartData = {
         project_id: project_id,
@@ -101,6 +102,8 @@ function Charts() {
         });
         const data = await response.json();
         console.log(data);
+        chartConfig.id = data.id;
+        setCharts(charts.map((chart) => (chart.id === editingChartId ? chartConfig : chart)));
       } 
       catch (error) {
         console.error('Error saving chart:', error);
@@ -118,7 +121,7 @@ function Charts() {
         category: chartConfig.category,
         kpi_id: chartConfig.kpi_id
       };
-      console.log(chartData);
+      // console.log(chartData);
       try {
         const response= await fetch('http://localhost:5000/api/visualisation/save-visualisation', {
           method: 'POST',
@@ -130,6 +133,8 @@ function Charts() {
         });
         const data = await response.json();
         console.log(data);
+        chartConfig.id = data.id;
+        setCharts([...charts, chartConfig]);
       } catch (error) {
         console.error('Error saving chart:', error);
       }
@@ -140,7 +145,7 @@ function Charts() {
 
   return (
     <div className="app-container">
-      <Canvas 
+      <Canvas
         charts={charts} 
         onAddChart={handleAddChart} 
         onEditChart={handleEditChart} 

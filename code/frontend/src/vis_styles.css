@@ -6,7 +6,6 @@
   .break-inside-avoid {
     break-inside: avoid;
   }
-  
   .page-break-inside-avoid {
     page-break-inside: avoid;
   }
@@ -14,46 +13,37 @@
 
 /* General Styles */
 body {
-  @apply font-sans text-gray-800 m-0 p-0;
+  @apply font-sans bg-[#121212] text-gray-200 m-0 p-0;
 }
 
 /* FileUploader Component */
 .dropzone {
-  @apply border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition-all duration-300 ease-in-out;
+  @apply border-2 border-dashed border-gray-600 rounded-lg p-8 text-center cursor-pointer transition-all duration-300 ease-in-out;
 }
-
 .dropzone:hover {
-  @apply border-blue-300;
+  @apply border-blue-500;
 }
-
 .dropzone-active {
-  @apply border-blue-600 bg-blue-50;
+  @apply border-blue-600 bg-[#2f2f2f];
 }
-
 .dropzone-processing {
-  @apply border-gray-300 bg-gray-100 cursor-wait;
+  @apply border-gray-600 bg-[#2f2f2f] cursor-wait;
 }
-
 .upload-icon {
   @apply h-12 w-12 mx-auto text-gray-400;
 }
-
 .upload-icon.processing {
-  @apply text-gray-300 animate-pulse;
+  @apply text-gray-500 animate-pulse;
 }
-
 .upload-text {
-  @apply mt-2 text-sm font-medium text-gray-800;
+  @apply mt-2 text-sm font-medium text-gray-200;
 }
-
 .upload-subtext {
-  @apply mt-1 text-xs text-gray-500;
+  @apply mt-1 text-xs text-gray-400;
 }
-
 .processing-indicator {
   @apply mt-2 flex justify-center;
 }
-
 .processing-bar {
   @apply w-10 h-1 bg-blue-600 rounded-full animate-pulse;
 }
@@ -62,48 +52,39 @@ body {
 .modal-overlay {
   @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
 }
-
 .modal-container {
-  @apply bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-auto;
+  @apply bg-[#1f1f1f] rounded-lg w-full max-w-4xl max-h-[90vh] overflow-auto;
 }
-
 .modal-header {
-  @apply flex justify-between items-center p-4 border-b border-gray-200;
+  @apply flex justify-between items-center p-4 border-b border-gray-600;
 }
-
 .modal-title {
-  @apply text-xl font-semibold text-black;
+  @apply text-xl font-semibold text-gray-100;
 }
-
 .close-button {
-  @apply text-gray-500 bg-transparent border-none cursor-pointer transition-colors duration-200 hover:text-gray-800;
+  @apply text-gray-400 bg-transparent border-none cursor-pointer transition-colors duration-200 hover:text-gray-200;
 }
-
 .modal-body {
   @apply p-6;
 }
-
 .modal-section-title {
-  @apply text-lg font-medium mb-4 text-black;
+  @apply text-lg font-medium mb-4 text-gray-100;
 }
 
 /* Form Controls */
 .form-group {
   @apply mb-4;
 }
-
 .form-label {
-  @apply block text-sm font-medium text-gray-700 mb-1;
+  @apply block text-sm font-medium text-gray-300 mb-1;
 }
-
-.form-input, .form-select {
-  @apply w-full p-2 border-2 border-gray-300 rounded-md text-sm transition duration-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-300 bg-white text-gray-800;
+.form-input,
+.form-select {
+  @apply w-full p-2 border border-gray-600 rounded-md text-sm transition duration-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-300 bg-[#2f2f2f] text-gray-200;
 }
-
 .form-select option {
-  @apply text-black;
+  @apply text-gray-200;
 }
-
 .form-grid {
   @apply grid grid-cols-2 gap-2;
 }
@@ -112,15 +93,13 @@ body {
 .btn {
   @apply inline-block px-4 py-2 text-sm font-medium text-center rounded-md transition duration-200 cursor-pointer;
 }
-
 .btn-primary {
-  @apply bg-blue-600 text-white border-none hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed;
+  /* Keep the blue accent if desired */
+  @apply bg-blue-600 text-white border-none hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed;
 }
-
 .btn-secondary {
-  @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-100;
+  @apply bg-[#2f2f2f] text-gray-300 border border-gray-600 hover:bg-[#3a3a3a];
 }
-
 .btn-icon {
   @apply flex items-center gap-2;
 }
@@ -129,54 +108,43 @@ body {
 .chart-container {
   @apply relative h-80 p-4;
 }
-
 .chart-card {
-  @apply bg-white rounded-lg shadow-sm overflow-hidden transition duration-200 hover:shadow-lg ;
+  @apply bg-[#1f1f1f] rounded-lg shadow-sm overflow-hidden transition duration-200 hover:shadow-lg;
 }
-
 .edit-button {
-  @apply absolute top-2 right-2 z-10 bg-white p-2 rounded-full shadow cursor-pointer transition duration-200 hover:bg-gray-100;
+  @apply absolute top-2 right-2 z-10 bg-[#2f2f2f] p-2 rounded-full shadow cursor-pointer transition duration-200 hover:bg-[#3a3a3a];
 }
-
 .edit-icon {
-  @apply w-4 h-4 text-gray-700;
+  @apply w-4 h-4 text-gray-300;
 }
-
 .remove-button {
-  @apply absolute top-2 right-14 z-10 bg-white p-2 rounded-full shadow cursor-pointer transition duration-200 hover:bg-gray-100;
+  @apply absolute top-2 right-14 z-10 bg-[#2f2f2f] p-2 rounded-full shadow cursor-pointer transition duration-200 hover:bg-[#3a3a3a];
 }
-
 .remove-icon {
-  @apply w-4 h-4 text-gray-700;
+  @apply w-4 h-4 text-gray-300;
 }
 
 /* Canvas Layout */
 .dashboard-container {
-  @apply p-6 bg-gray-100 min-h-screen;
+  @apply p-6 bg-[#121212] min-h-screen;
 }
-
 .dashboard-header {
   @apply flex justify-between items-center mb-6;
 }
-
 .dashboard-title {
-  @apply text-2xl font-bold text-gray-800;
+  @apply text-2xl font-bold text-gray-200;
 }
-
 .chart-grid {
   @apply grid grid-cols-[repeat(auto-fill,_minmax(500px,_1.1fr))] gap-6 h-full;
 }
-
 .empty-state {
-  @apply flex flex-col items-center justify-center bg-white rounded-lg border-2 border-dashed border-gray-300 p-12 mt-8;
+  @apply flex flex-col items-center justify-center bg-[#1f1f1f] rounded-lg border-2 border-dashed border-gray-600 p-12 mt-8;
 }
-
 .empty-icon {
-  @apply text-gray-500 mb-4 w-12 h-12;
+  @apply text-gray-400 mb-4 w-12 h-12;
 }
-
 .empty-text {
-  @apply text-lg text-gray-700 mb-4 text-center;
+  @apply text-lg text-gray-300 mb-4 text-center;
 }
 
 /* Animations */
@@ -191,11 +159,9 @@ body {
   .chart-grid {
     @apply grid-cols-1;
   }
-
   .modal-container {
     @apply w-[95%] max-h-[90vh];
   }
-
   .form-grid {
     @apply grid-cols-1;
   }
@@ -205,19 +171,16 @@ body {
 .configuration-grid {
   @apply grid grid-cols-2 gap-6;
 }
-
-.config-section, .preview-section {
+.config-section,
+.preview-section {
   @apply w-full;
 }
-
 .chart-preview-container {
-  @apply border border-gray-200 rounded-lg p-4 h-80;
+  @apply border border-gray-600 rounded-lg p-4 h-80;
 }
-
 .empty-preview {
-  @apply h-full flex items-center justify-center text-gray-500;
+  @apply h-full flex items-center justify-center text-gray-400;
 }
-
 .form-buttons {
   @apply mt-6 flex gap-2;
 }
@@ -226,7 +189,6 @@ body {
   .configuration-grid {
     @apply grid-cols-1;
   }
-
   .chart-preview-container {
     @apply h-60;
   }
@@ -234,46 +196,34 @@ body {
 
 /* Additional styles */
 .app-container {
-  @apply min-h-screen bg-gray-100;
+  @apply min-h-screen bg-[#121212];
 }
-
 .chart-relative {
   @apply relative;
 }
-
 .unsupported-chart-type {
   @apply h-full flex items-center justify-center text-red-500 font-medium;
 }
-
 .empty-icon-container {
   @apply mb-4;
 }
 
 /* Print styles for exporting charts */
 @media print {
-  .btn, .edit-button, .empty-state {
+  .btn,
+  .edit-button,
+  .empty-state {
     @apply hidden !important;
   }
-
   .dashboard-container {
+    /* Typically keep print background white for readability, or remove if you want dark print */
     @apply bg-white p-0;
   }
-
   .chart-card {
     @apply break-inside-avoid page-break-inside-avoid shadow-none border border-gray-200 my-4;
   }
-
   .chart-container {
     @apply h-60;
   }
 }
 
-@layer utilities {
-  .break-inside-avoid {
-    break-inside: avoid;
-  }
-  
-  .page-break-inside-avoid {
-    page-break-inside: avoid;
-  }
-}
