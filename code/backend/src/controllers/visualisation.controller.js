@@ -26,6 +26,8 @@ export const createVisualisation = async (req, res) => {
         height
     });
 
+    console.log(visualisation);
+
     try {
         const newVisualisation = await visualisation.save();
         console.log("Visualisation saved successfully");
