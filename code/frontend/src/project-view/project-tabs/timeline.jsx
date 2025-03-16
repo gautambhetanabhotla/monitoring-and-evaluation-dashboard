@@ -3,67 +3,275 @@ import {Textarea} from "@heroui/input";
 import {Divider} from "@heroui/divider";
 import {Card} from "@heroui/card";
 import {Link} from "@heroui/link";
+import {Autocomplete, AutocompleteItem} from "@heroui/autocomplete";
+import {Select, SelectItem} from "@heroui/select";
+// import {Chip} from "@heroui/chip";
+import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure} from "@heroui/modal";
+import {Form} from "@heroui/form";
+import {Input} from "@heroui/input";
+import {NumberInput} from "@heroui/number-input";
+import {Spacer} from "@heroui/spacer";
 
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 
-import { ProjectContext } from "../project-page.jsx";
+import { ProjectContext } from "../project-context.jsx";
 
 import { PencilSquareIcon,
          CheckCircleIcon,
          ArrowTrendingDownIcon,
          ArrowTrendingUpIcon,
-         PlusIcon } from "@heroicons/react/24/outline";
+         PlusIcon,
+         CheckIcon,
+         ArrowsUpDownIcon } from "@heroicons/react/24/outline";
+
+const AddTaskButton = () => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const ctx = useContext(ProjectContext);
+  return (
+    <>
+      <Popover showArrow>
+        <PopoverTrigger>
+          <Button size='lg' color='primary' startContent={<PlusIcon className="size-6" />}>Add task</Button>
+        </PopoverTrigger>
+        <PopoverContent>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              // console.log("submitting " + title + " " + description);
+              // await axios.fetch
+              ctx.addTask(title, description);
+            }}  
+          >
+            <Spacer />
+            <Input
+              label="Task title"
+              isRequired
+              errorMessage="A title is required."
+              value={title}
+              onValueChange={setTitle}
+            />
+            <Textarea
+              label="Task description"
+              value={description}
+              onValueChange={setDescription}
+            />
+            <Spacer />
+            <Button color='primary' type="submit" startContent={<PlusIcon className="size-6" />}>Add</Button>
+            <Spacer />
+          </Form>
+        </PopoverContent>
+      </Popover>
+    </>
+  );
+};
+
+const KPIUpdateButton = ({ task }) => {
+
+  const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
+
+  const ctx = useContext(ProjectContext);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedKPIid, setSelectedKPIid] = useState(null);
+  const [finalValue, setFinalValue] = useState(null);
+  const [finalValueErrors, setFinalValueErrors] = useState([]);
+  const [note, setNote] = useState('');
+  const initialValue = ctx.adjustedKPIs?.find(kpi => kpi.id === selectedKPIid)?.current;
+
+  const handleKPIselectionChange = (id) => {
+    setSelectedKPIid(id);
+    setSearchQuery(ctx.adjustedKPIs?.find(kpi => kpi.id === id)?.indicator);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log("SUBMITTING");
+    console.log(finalValue);
+    if(!finalValue) {
+      setFinalValueErrors([...finalValueErrors, "Final value is required."]);
+      console.log("SFSDFSFDFSDFSDFSDF");
+    }
+    const update = {
+      id: `kpi${ctx.KPIUpdates.length + 1}`,
+      task: task.id,
+      kpi: selectedKPIid,
+      initial: initialValue,
+      final: finalValue,
+      date: new Date(),
+      updatedby: "You",
+    };
+    ctx.updateKPI(update);
+    onClose();
+  };
+
+  return (
+    <>
+      <Button onPress={onOpen} isIconOnly>
+        <PlusIcon className="size-6" />
+      </Button>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        isDismissable={false}
+        hideCloseButton={false}
+        className="p-7"
+      >
+        <ModalContent>
+          <Form onSubmit={handleSubmit}>
+            <Spacer />
+            <Autocomplete
+              // autoFocus
+              inputValue={searchQuery}
+              onInputChange={setSearchQuery}
+              selectedKey={selectedKPIid}
+              onSelectionChange={handleKPIselectionChange}
+              className="max-w-md"
+              defaultItems={ctx.adjustedKPIs}
+              label="KPI"
+              placeholder="What KPI are you updating?"
+            >
+              {(item) => <AutocompleteItem key={item.id}>{item.indicator}</AutocompleteItem>}
+            </Autocomplete>
+            <NumberInput
+              errorMessage={() => (
+                <ul>
+                  {finalValueErrors.map((error, i) => (
+                    <li key={i}>{error}</li>
+                  ))}
+                </ul>
+              )}
+              isInvalid={finalValueErrors.length > 0}
+              label="Final value"
+              isRequired
+              value={finalValue}
+              onValueChange={setFinalValue}
+            />
+            <Textarea
+              label="Note"
+              value={note}
+              onValueChange={setNote}
+            />
+            <Spacer />
+            <Button color='primary' type="submit" startContent={<CheckIcon className="size-6" />}>Update</Button>
+            <Spacer />
+          </Form>
+        </ModalContent>
+      </Modal>
+          
+    </>
+  );
+};
 
 const Timeline = () => {
-  const [chronologicalOrder, setChronologicalOrder] = useState(false);
+
+  const [chronologicalOrder, setChronologicalOrder] = useState(false); // Chronological order is oldest to newest
+  // setChronologicalOrder(false);
   const ctx = useContext(ProjectContext);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredTasks, setFilteredTasks] = useState(ctx.tasks);
+
+  const [value, setValue] = useState(new Set(['Sort: Newest to oldest']));
+
+  const handleSearchChange = (query) => {
+    setSearchQuery(query);
+    setFilteredTasks(ctx.tasks.filter(task => query.length === 0 || task.title.toLowerCase().includes(query.toLowerCase())));
+  };
+
+  const handleSelectChange = (set) => {
+    if (set.has('Sort: Newest to oldest')) {
+      setChronologicalOrder(false);
+      setValue(set);
+    } else {
+      setChronologicalOrder(true);
+      setValue(set);
+    }
+  };
+
+  useEffect(() => {
+    setFilteredTasks(ctx.tasks);
+  }, [ctx.tasks]);
+
   return (
     <>
       <div className="flex flex-row justify-center">
         <h1 className="prose text-6xl p-10">Project timeline</h1>
       </div>
-      {chronologicalOrder ? 
-        ctx.tasks.map((task, index) => <Task taskdet={task} key={index} /> ) : 
-        ctx.tasks.slice().reverse().map( (task, index) => <Task task={task} key={index} /> )}
-      <div className="flex flex-row justify-center mt-10">
-        {ctx.tasks.length === 0 && <p className='prose text-xl'>No tasks yet. Get started by adding one.</p>}
+      <div className="flex flex-row flex-wrap justify-center items-center gap-3 px-10">
+        <Autocomplete
+          allowsCustomValue
+          inputValue={searchQuery}
+          onInputChange={handleSearchChange}
+          className="max-w-md"
+          defaultItems={ctx.tasks}
+          // label="KPI"
+          aria-label="Search for tasks"
+          placeholder="Search for tasks"
+          size="lg"
+        >
+          {(item) => <AutocompleteItem key={item.id}>{item.title}</AutocompleteItem>}
+        </Autocomplete>
+        <Select
+          className="max-w-xs"
+          size='lg'
+          aria-label="Sort by date"
+          selectedKeys={value}
+          onSelectionChange={handleSelectChange}
+        >
+          <SelectItem key='Sort: Newest to oldest'>Sort: Newest to oldest</SelectItem>
+          <SelectItem key='Sort: Oldest to newest'>Sort: Oldest to newest</SelectItem>
+        </Select>
+        <AddTaskButton />
       </div>
-      <Button
-        className='prose text-xl mb-15 sm:p-8 xs:p-4 fixed bottom-5 right-5'
-        color='primary'
-        size='sm'
-        aria-label="Add task"
-        startContent={<PlusIcon className="size-6" />}
-      >
-        Add task
-      </Button>
+      {chronologicalOrder ? 
+        filteredTasks.map((task, index) => <Task task={task} key={index} /> ) : 
+        filteredTasks.slice().reverse().map( (task, index) => <Task task={task} key={index} /> )}
+      <div className="flex flex-row justify-center mt-10">
+        {filteredTasks.length === 0 &&
+        (ctx.tasks.length === 0 ?
+        <p className='prose text-xl'>No tasks exist yet. Get started by adding one.</p> :
+        <p className='prose text-xl'>No tasks match the search parameters.</p>)
+        }
+      </div>
     </>
   );
 };
 
 const Task = ({ task }) => {
-  const [description, setDescription] = useState(task.description);
+
+  const [title, setTitle] = useState(task?.title);
+  const [description, setDescription] = useState(task?.description);
   const [editableDescription, setEditableDescription] = useState(false);
+  const [chronologicalOrder, setChronologicalOrder] = useState(false);
   const ctx = useContext(ProjectContext);
-  // for(const update of ctx.KPIUpdates)
-  // console.log("TASK ID: ", task.id, "KPI UDPDATE ID: ", update.task);
-  const updates = ctx.KPIUpdates.filter( (update) => update.task === task.id );
+
+  useEffect(() => {
+    setTitle(task?.title);
+  }, [task?.title]);
+  useEffect(() => {
+    setDescription(task?.description);
+  }, [task?.description]); // Removing this useEffect causes the task to inherit the description of the previous task on first render. Why?
+
+  const updates = ctx.KPIUpdates.filter( (update) => update.task === task?.id );
+
   const buttonAction = () => {
     setEditableDescription(!editableDescription);
-    if (!editableDescription) {
+    if (editableDescription) {
       // await axios.fetch
+      ctx.updateTaskDescription(task?.id, description);
     }
   };
+
   return (
     <>
-      <Divider />
-      <h1 className="prose text-5xl pl-10 mt-10">{task.title}</h1>
+      <Divider className="mt-10" />
+      <h1 className="prose text-5xl pl-10 mt-10">{title}</h1>
       <div className="pl-10">
         <h2 className="prose text-3xl p-10">Description</h2>
         <Textarea
           isReadOnly={!editableDescription}
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onValueChange={setDescription}
           className="max-w-2xl ml-10"
           endContent={
             <Button
@@ -77,10 +285,18 @@ const Task = ({ task }) => {
             </Button>
           }
         />
-        <h2 className="prose text-3xl p-10 flex items-center gap-5">KPI Updates<Button isIconOnly onPress={() => {}}><PlusIcon className="size-6" /></Button></h2>
-        
-        {updates && updates.map( (kpiupdate, index) => <KPIUpdate update={kpiupdate} key={index} /> )}
-        <div className="flex flex-row justify-center mt-10">
+        <h2 className="prose text-3xl p-10 flex items-center gap-5">
+          KPI Updates
+          <KPIUpdateButton task={task} />
+          <Button isIconOnly onPress={() => setChronologicalOrder(!chronologicalOrder)}>
+            <ArrowsUpDownIcon className="size-6" />
+          </Button>
+        </h2>
+        {updates &&
+          chronologicalOrder ? updates.map( (kpiupdate, index) => <KPIUpdate update={kpiupdate} key={index} /> ):
+          updates.slice().reverse().map( (kpiupdate, index) => <KPIUpdate update={kpiupdate} key={index} /> )
+        }
+        <div className="pl-10 mt-1">
           {updates?.length === 0 && <p className='prose text-xl'>No KPI updates yet. Get started by adding one.</p>}
         </div>
       </div>
@@ -93,7 +309,7 @@ const KPIUpdate = ({ update }) => {
   return (
     <>
       <Card className="max-w-2xl m-2 ml-10 p-5">
-        <h3 className="prose text-xl font-bold">{ctx.adjustedKPIs.find(kpi => kpi.id === update.kpi).indicator}</h3>
+        <h3 className="prose text-xl font-bold">{ctx.adjustedKPIs?.find(kpi => kpi.id === update.kpi)?.indicator}</h3>
         <span className="prose pt-2 flex items-center gap-6">
           <span className="prose flex items-center gap-3 text-xl">{update.initial}
           {update.final > update.initial ?

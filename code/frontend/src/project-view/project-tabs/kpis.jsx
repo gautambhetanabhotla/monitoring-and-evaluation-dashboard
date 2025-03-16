@@ -1,12 +1,15 @@
-import { useState, useEffect, useContext } from 'react';
+import { useContext, useState } from 'react';
 import {Card, CardHeader, CardBody, CardFooter} from "@heroui/card";
 import { Divider } from "@heroui/divider";
 import {Button} from "@heroui/button";
 import {Progress} from '@heroui/progress';
+import {Autocomplete, AutocompleteItem} from "@heroui/autocomplete";
+import {Chip} from "@heroui/chip";
+import {Select, SelectItem} from "@heroui/select";
 // import Markdown from "marked-react";
 import { PencilSquareIcon } from '@heroicons/react/24/solid';
 
-import { ProjectContext } from '../project-page.jsx';
+import { ProjectContext } from '../project-context.jsx';
 
 const KPI = ({ kpi }) => {
   const percentagecompletion = parseInt(100 * (
@@ -24,8 +27,10 @@ const KPI = ({ kpi }) => {
           <span className="prose text-xl font-bold">What does it track?</span>
           {kpi.what_it_tracks}
           <br />
-          {/* <span className="prose text-xl font-bold">Explanation</span>
-          <Markdown>{kpi.explanation}</Markdown> */}
+          <span className="mt-4 flex flex-row items-center gap-3">
+            <p className='prose text-xl font-bold'>Logframe level: </p>
+            <Chip color='default'>{kpi.logframe_level}</Chip>
+          </span>
         </CardBody>
         <Progress
           radius='none'
@@ -36,23 +41,23 @@ const KPI = ({ kpi }) => {
         <Divider />
         <CardFooter className="flex justify-center">
           <div className="grid grid-cols-5">
-            <div className="flex flex-col justify-center align-middle text-red-500">
+            <div className="flex flex-col justify-center align-middle text-red-500" aria-label={`Baseline: ${kpi.baseline}`}>
               <div>BASELINE</div>
-              <div className="text-4xl flex flex-row justify-center" aria-label={`Baseline: ${kpi.baseline}`}>{kpi.baseline}</div>
+              <div className="text-4xl flex flex-row justify-center">{kpi.baseline}</div>
             </div>
             <div className="flex flex-row justify-center align-middle">
               <Divider orientation="vertical" />
             </div>
-            <div className="flex flex-col justify-center align-middle text-blue-500">
+            <div className="flex flex-col justify-center align-middle text-blue-500" aria-label={`Current: ${kpi.current}`}>
               <div>CURRENT</div>
-              <div className="prose text-4xl flex flex-row justify-center" aria-label={`Current: ${kpi.current}`}>{kpi.current}</div>
+              <div className="prose text-4xl flex flex-row justify-center">{kpi.current}</div>
             </div>
             <div className="flex flex-row justify-center align-middle">
               <Divider orientation="vertical" className="flex flex-col justify-center align-middle" />
             </div>
-            <div className="flex flex-col justify-center align-middle text-green-500">
+            <div className="flex flex-col justify-center align-middle text-green-500" aria-label={`Target: ${kpi.target}`}>
               <div className="flex flex-row justify-center">TARGET</div>
-              <div className="text-4xl flex flex-row justify-center" aria-label={`Target: ${kpi.target}`}>{kpi.target}</div>
+              <div className="text-4xl flex flex-row justify-center">{kpi.target}</div>
             </div>
           </div>
         </CardFooter>
@@ -61,24 +66,71 @@ const KPI = ({ kpi }) => {
   );
 };
 
+const KPIsList = ({ kpis }) => {
+  return (
+    <>
+      <div className="grid xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1 md:mx-24 mt-7">
+        {kpis?.map((kpi, index) => {
+          return <KPI key={index} kpi={kpi} />;
+        })}
+      </div>
+      <div className="flex flex-row justify-center mt-10">
+        {kpis?.length === 0 && <p className='prose text-xl'>No KPIs yet. Get started by adding one.</p>}
+      </div>
+    </>
+  );
+};
+
 const KPIs = () => {
   const ctx = useContext(ProjectContext);
+  const logframeLevels = ['Goal', 'Outcome', 'Output', 'Activity'];
+  const [selectedLogframeLevels, setSelectedLogframeLevels] = useState(new Set(['Goal', 'Outcome', 'Output', 'Activity']));
+  const [searchQuery, setSearchQuery] = useState('');
   return (
     <>
       <div className="flex flex-row justify-center">
         <h1 className="prose text-5xl p-10">Key performance indexes (KPIs)</h1>
       </div>
-      <div className="grid xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 xs:grid-cols-1 md:mx-24">
-        {ctx.adjustedKPIs.map((kpi, index) => {
-          return <KPI key={index} kpi={kpi} />;
-        })}
+      <div className="flex flex-row flex-wrap justify-center items-center gap-3 px-10">
+        <Autocomplete
+          allowsCustomValue
+          inputValue={searchQuery}
+          onInputChange={setSearchQuery}
+          className="max-w-md"
+          defaultItems={ctx.adjustedKPIs}
+          label="KPI"
+          placeholder="Search for KPIs"
+        >
+          {(item) => <AutocompleteItem key={item.id}>{item.indicator}</AutocompleteItem>}
+        </Autocomplete>
+        <Select
+          label="Logframe levels" 
+          placeholder='Filter by logframe levels'
+          selectionMode="multiple"
+          classNames={{
+            base: "max-w-sm", // Controls the width of the entire component
+            trigger: "max-w-sm", // Controls the width of the trigger button
+            value: "mt-2"
+          }}
+          renderValue={(items) => (
+            <div className="flex flex-wrap gap-2">
+              {items.map((item) => (
+                <Chip key={item.key}>{item.textValue}</Chip>
+              ))}
+            </div>
+          )}
+          onSelectionChange={items => setSelectedLogframeLevels(items)}
+        >
+          {logframeLevels.map(level => (
+            <SelectItem key={level}>{level}</SelectItem>
+          ))}
+        </Select>
+        <Button size='lg' color='primary'>Add KPI</Button>
       </div>
-      <div className="flex flex-row justify-center mt-10">
-        {ctx.adjustedKPIs.length === 0 && <p className='prose text-xl'>No KPIs yet. Get started by adding one.</p>}
-      </div>
-      <div className="flex flex-row justify-center pt-10 pb-20">
-        <Button className='prose text-xl mb-15 p-10' color='primary' size='lg' aria-label="Add KPI">Add KPI</Button>
-      </div>
+      <KPIsList kpis={ctx.adjustedKPIs?.filter(kpi => {
+        return (selectedLogframeLevels.size == 0 || selectedLogframeLevels.has(kpi.logframe_level))
+        && kpi.indicator.toLowerCase().includes(searchQuery.toLowerCase());
+      })} />
     </>
   );
 };
