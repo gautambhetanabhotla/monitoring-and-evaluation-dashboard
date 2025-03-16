@@ -75,6 +75,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     setSelectedKpi(null);
     setCategory('');
     setKpiError('');
+
   };
 
   const handleDataLoaded = (newData, newColumns) => {
@@ -107,7 +108,6 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       }
     }
   }, [chartType, columns]);
-
   // KPI selection callback stores the entire KPI object.
   const handleKpiSelect = (kpi) => {
     setSelectedKpi(kpi);
