@@ -71,7 +71,7 @@ const FileUploader = ({ onDataLoaded }) => {
       
       if (fileExtension === 'csv') {
         processCSV(file);
-      } else if (['xlsx', 'xls'].includes(fileExtension)) {
+      } else if (['xlsx', 'xls' , 'ods'].includes(fileExtension)) {
         processExcel(file);
       }
     },
@@ -84,6 +84,7 @@ const FileUploader = ({ onDataLoaded }) => {
       'text/csv': ['.csv'],
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
       'application/vnd.ms-excel': ['.xls'],
+      'application/vnd.oasis.opendocument.spreadsheet': ['.ods'],
     },
     multiple: false,
     disabled: isProcessing,
@@ -96,7 +97,7 @@ const FileUploader = ({ onDataLoaded }) => {
       <p className="upload-text">
         {isDragActive ? 'Drop the file here' : isProcessing ? 'Processing file...' : 'Drag & drop a file here, or click to select'}
       </p>
-      <p className="upload-subtext">Supports CSV & Excel files (.csv, .xls, .xlsx)</p>
+      <p className="upload-subtext">Supports CSV & Excel(Sheet) files (.csv, .xls, .xlsx , .ods)</p>
       {isProcessing && <div className="processing-indicator"><div className="processing-bar"></div></div>}
     </div>
   );

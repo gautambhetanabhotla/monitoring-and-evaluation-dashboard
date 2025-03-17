@@ -122,7 +122,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   const handleKpiNext = async () => {
     if (selectedKpi && selectedKpi._id) {
       try {
-        const response = await fetch(`http://localhost:5000/api/visualisation/get-kpi-updates-as-data/${selectedKpi._id}`, { credentials: 'include' });
+        const response = await fetch(`/api/visualisation/get-kpi-updates-as-data/${selectedKpi._id}`, { credentials: 'include' });
         const resData = await response.json();
         if (resData.success) {
           setData(resData.data);
