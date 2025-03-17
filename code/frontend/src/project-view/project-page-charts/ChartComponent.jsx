@@ -38,7 +38,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/user/getUser`, { credentials: 'include' });
+        const response = await fetch(`/api/user/getUser`, { credentials: 'include' });
         const data = await response.json();
         if (data.success) {
           setUser(data.user);

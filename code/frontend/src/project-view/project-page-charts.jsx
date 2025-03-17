@@ -11,7 +11,7 @@ function Charts() {
   useEffect(() => {
     const fetchCharts = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/visualisation/get-visualisations/${project_id}`,
+        const response = await fetch(`/api/visualisation/get-visualisations/${project_id}`,
           {
             credentials: 'include',         }
         );
@@ -65,7 +65,7 @@ function Charts() {
 
   const onRemoveChart = (id) => {
     try {
-      fetch(`http://localhost:5000/api/visualisation/delete-visualisation/${id}`, {
+      fetch(`/api/visualisation/delete-visualisation/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -92,7 +92,7 @@ function Charts() {
       };
       // console.log(chartData.file);
       try {
-        const response= await fetch(`http://localhost:5000/api/visualisation/update-visualisation/${editingChartId}`, {
+        const response= await fetch(`/api/visualisation/update-visualisation/${editingChartId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ function Charts() {
       };
       // console.log(chartData);
       try {
-        const response= await fetch('http://localhost:5000/api/visualisation/save-visualisation', {
+        const response= await fetch('/api/visualisation/save-visualisation', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
