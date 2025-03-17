@@ -12,6 +12,7 @@ import LogFramework from './project-view/project-tabs/log-framework.jsx';
 import Login from './Login.jsx';
 import Admin from './Admin.jsx';
 import Field_Staff from './Field_Staff.jsx'; 
+import { ClientGallery } from './project-gallery/project-gallery-admin.jsx';
 
 const App = () => {
 
@@ -27,6 +28,7 @@ const App = () => {
         <Route path='/projects' element={<ProjectGallery />} />
         <Route path='/admin' element={<Admin/>}/>
         <Route path='/field-staff' element={<Field_Staff/>}/>
+        <Route path='/clients' element={<ClientGallery />} />
         <Route path='/:projectid' element={<ProjectPage />}>
           <Route index element={<Overview />} />
           <Route path='overview' element={<Overview />} />

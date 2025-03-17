@@ -21,16 +21,14 @@ const Login = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-
         credentials: "include"
-
       });
       const data = await response.json();
 
       if (data.success) {
         // Redirect based on user role
         if (data.role === "admin") {
-          navigate("/admin");
+          navigate("/clients");
         } else if (data.role === "field staff") {
           navigate("/field-staff");
         } else {
