@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 const getProjectsByClientId = async (clientId) => {
     try {
-        let url = "http://localhost:5011/api/projects/getProjects";
+        let url = "/api/projects/getProjects";
         if (clientId) {
             url += `?clientId=${clientId}`;
         }
@@ -49,7 +49,7 @@ const ProjectGallery = () => {
 
     const logout = async () => {
         try {
-            const response = await fetch("http://localhost:5011/api/auth/logout", {
+            const response = await fetch("/api/auth/logout", {
                 method: "POST",
                 credentials: "include"
             });
@@ -67,7 +67,6 @@ const ProjectGallery = () => {
 
     return (
         <div className="flex flex-col h-screen p-6">
-            {/* Tabs Section */}
             <div className="flex justify-between mb-6">
                 <div className="flex space-x-4">
                     <Button
@@ -94,19 +93,34 @@ const ProjectGallery = () => {
                     >
                         Your Projects in Numbers
                     </Button>
+                    {/* <Button
+                        className="text-xl font-bold py-2 px-4"
+                        onPress={() => navigate('/projects')}
+                        size="md"
+                        radius="large"
+                    >
+                        Go Back
+                    </Button> */}
                 </div>
-                {/* Right-align the logout button */}
-                <Button
-                    className="text-xl font-bold py-2 px-4 bg-amber-300 text-black"
-                    onPress={logout}
-                    size="md"
-                    radius="large"
-                >
-                    Logout
-                </Button>
+                <div className="flex space-x-4"> {/* Added container with horizontal spacing */}
+                    <Button
+                        className="text-xl font-bold py-2 px-4 bg-amber-300 text-black"
+                        size="md"
+                        radius="large"
+                    >
+                        Add Project
+                    </Button>
+                    <Button
+                        className="text-xl font-bold py-2 px-4 bg-amber-300 text-black"
+                        onPress={logout}
+                        size="md"
+                        radius="large"
+                    >
+                        Logout
+                    </Button>
+                </div>
             </div>
 
-            {/* Projects Tab */}
             {activeTab === "projects" && (
                 <div className="flex flex-col rounded-xl shadow-lg p-6 mb-6 overflow-y-auto h-[90%] border border-amber-300">
                     <h1 className="text-4xl font-bold mb-4 border-b border-amber-400 pb-2">
@@ -143,7 +157,6 @@ const ProjectGallery = () => {
                 </div>
             )}
 
-            {/* Visualization Tab */}
             {activeTab === "visualization" && (
                 <div className="flex flex-col rounded-xl shadow-lg p-6 h-[90%] border border-amber-300">
                     <h1 className="text-4xl font-bold mb-4 border-b border-amber-400 pb-2">

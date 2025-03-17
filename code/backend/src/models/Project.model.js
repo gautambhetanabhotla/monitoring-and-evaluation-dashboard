@@ -15,7 +15,7 @@ const projectSchema = new mongoose.Schema({
     end_date : {
         type: String,
         match: /^\d{4}-\d{2}-\d{2}$/, // Ensures YYYY-MM-DD format
-        required: [true, 'Start date is required']
+        required: [true, 'End date is required']
     },
     project_progress : {
         type : Number,

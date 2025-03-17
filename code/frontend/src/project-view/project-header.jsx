@@ -81,7 +81,7 @@ const Nav = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/user/getUser`, { credentials: 'include' });
+        const response = await fetch(`/api/user/getUser`, { credentials: 'include' });
         const data = await response.json();
         if (data.success) {
           setUser(data.user);
@@ -120,7 +120,7 @@ const Nav = () => {
         }}
       >
         <NavbarBrand>
-          <Link className='inline' to="/">
+          <Link className='inline' to="/projects">
             <HomeIcon className="size-6 inline" />
             <p className='prose inline pl-2'>Home</p>
           </Link>

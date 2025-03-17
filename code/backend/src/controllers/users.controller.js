@@ -17,7 +17,7 @@ export const getClients = async (req, res) => {
 export const addUser = async (req, res) => {
   const { username, email, password, role, phone_number } = req.body;
 
-  if (!username || !email || !password || !role || !phone_number) {
+  if (!username || !email || !phone_number) {
     return res
       .status(400)
       .json({ success: false, message: "Please enter all fields" });
@@ -25,9 +25,9 @@ export const addUser = async (req, res) => {
 
   const existingUser = await User.findOne({
     $or: [
-      { email: user.email },
-      { phone_number: user.phone_number },
-      { username: user.username },
+      { email: email },
+      { phone_number: phone_number },
+      { username: username },
     ],
   });
 
@@ -36,7 +36,6 @@ export const addUser = async (req, res) => {
       .status(400)
       .json({ success: false, message: "User already exists" });
   }
-
 
   const passwordHash = bcrypt.hashSync(password, 10);
 

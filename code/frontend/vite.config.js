@@ -3,6 +3,7 @@ import bodyParser from 'body-parser'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import bodyParser from 'body-parser'; 
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -15,7 +16,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5000/',
+        target: 'http://localhost:5011/',
         changeOrigin: true,
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq, req, res) => {

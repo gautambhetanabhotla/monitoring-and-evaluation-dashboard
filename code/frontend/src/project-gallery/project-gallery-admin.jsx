@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { useNavigate } from "react-router-dom";
+import { Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/modal";
+import { Input } from "@heroui/input";
+import { Alert } from "@heroui/alert";
 
 const getAllClients = async () => {
     try {
-        const response = await fetch("http://localhost:5011/api/user/clients", {
+        const response = await fetch("/api/user/clients", {
             method: 'GET',
             credentials: 'include'
         });
@@ -28,6 +31,18 @@ const getAllClients = async () => {
 export const ClientGallery = () => {
     const [clientList, setClientList] = useState([]);
     const navigate = useNavigate();
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [password, setPassword] = useState("");
+    const [showAlert, setShowAlert] = useState(false);
+
+    const resetFormFields = () => {
+        setUsername("");
+        setEmail("");
+        setPhoneNumber("");
+    };
 
     useEffect(() => {
         const fetchClients = async () => {
@@ -37,9 +52,15 @@ export const ClientGallery = () => {
         fetchClients();
     }, []);
 
+    useEffect(() => {
+        if (!isOpen) {
+            resetFormFields();
+        }
+    }, [isOpen]);
+
     const logout = async () => {
         try {
-            const response = await fetch("http://localhost:5011/api/auth/logout", {
+            const response = await fetch("/api/auth/logout", {
                 method: "POST",
                 credentials: "include"
             });
@@ -55,23 +76,149 @@ export const ClientGallery = () => {
         }
     };
 
+    const createClient = async () => {
+        try {
+            const length = Math.floor(Math.random() * (11 - 8 + 1)) + 8;
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let pwd = '';
+          
+            for (let i = 0; i < length; i++) {
+              const randomIndex = Math.floor(Math.random() * characters.length);
+              pwd += characters[randomIndex];
+            }
+            console.log(pwd);
+
+            const response = await fetch("/api/user/add", {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    username,
+                    email,
+                    password: pwd,
+                    role: 'client',
+                    phone_number: phoneNumber
+                })
+            });
+    
+            const data = await response.json();
+            if (data.success) {
+                const updatedClients = await getAllClients();
+                setClientList(updatedClients);
+
+                setPassword(`Generated password: ${pwd}`);
+                setShowAlert(true);
+                
+                setTimeout(() => {
+                    setShowAlert(false);
+                }, 7000);
+
+                resetFormFields();
+                onOpenChange(false);
+            } else {
+                console.error("Adding client failed:", data.message);
+            }
+        } catch (error) {
+            console.error("Error creating client:", error);
+        }
+    };
+
+    const handleOpenChange = (open) => {
+        if (!open) {
+            resetFormFields();
+        }
+        onOpenChange(open);
+    };
+
     return (
-        <div className="flex flex-col h-screen p-6">
-            {/* Header with title and logout button */}
+        <div className="flex flex-col min-h-screen p-6 relative z-10">
+            {showAlert && (
+                <Alert 
+                    className="mb-4 absolute"
+                    variant="solid"
+                    color="success"
+                    onClose={() => setShowPasswordAlert(false)}
+                >
+                    <div className="font-medium">Client created successfully!</div>
+                    <div>{password}</div>
+                    <div className="text-xs mt-2">This password will only be shown once. Please copy it now.</div>
+                </Alert>
+            )}
+
             <div className="flex justify-between mb-6 items-center">
                 <h2 className="text-3xl font-bold">Client List</h2>
-                <Button
-                    className="text-xl font-bold py-2 px-4 bg-amber-300 text-black"
-                    onPress={logout}
-                    size="md"
-                    radius="large"
-                >
-                    Logout
-                </Button>
+                <div className="flex space-x-4">
+                    <Button
+                        className="text-xl font-bold py-2 px-4 bg-amber-300 text-black"
+                        onPress={onOpen}
+                        size="md"
+                        radius="large"
+                    >
+                        Add Client
+                    </Button>
+                    <Button
+                        className="text-xl font-bold py-2 px-4 bg-amber-300 text-black"
+                        onPress={logout}
+                        size="md"
+                        radius="large"
+                    >
+                        Logout
+                    </Button>
+                </div>
+                <Modal isOpen={isOpen} onOpenChange={handleOpenChange} placement="center" size="md">
+                    <ModalContent>
+                        {() => (
+                            <>
+                                <ModalHeader className="flex flex-col gap-1">Add Client</ModalHeader>
+                                <ModalBody>
+                                <Input
+                                    isRequired
+                                    label="Username"
+                                    labelPlacement="outside"
+                                    placeholder="Enter username"
+                                    variant="bordered"
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                                <Input
+                                    isRequired
+                                    label="Email"
+                                    labelPlacement="outside"
+                                    placeholder="Enter email"
+                                    variant="bordered"
+                                    type="email"
+                                    errorMessage="Please enter a valid email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                                <Input
+                                    isRequired
+                                    label="Phone Number"
+                                    labelPlacement="outside"
+                                    placeholder="Enter phone number"
+                                    variant="bordered"
+                                    type="tel"
+                                    maxLength="10"
+                                    errorMessage="Please enter a valid phone number"
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                />
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button color="primary" onPress={createClient}>
+                                        Add
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
             </div>
 
-            {/* Client cards stacked vertically with full width */}
-            <div className="flex flex-col space-y-4 overflow-y-auto">
+            <div className="flex flex-col space-y-4">
                 {clientList.length === 0 ? (
                     <p className="text-xl text-gray-500">No clients found.</p>
                 ) : (
@@ -80,10 +227,10 @@ export const ClientGallery = () => {
                             key={client._id}
                             isPressable
                             onPress={() => navigate(`/projects?clientId=${client._id}`)}
-                            className="border border-amber-400 p-4 rounded-lg shadow-md w-full"
+                            className="border border-amber-400 rounded-lg shadow-md w-full"
                         >
-                            <CardBody>
-                                <h3 className="font-medium">Username: {client.username}</h3>
+                            <CardBody className="p-6">
+                                <h3 className="font-medium text-lg mb-2">Username: {client.username}</h3>
                                 <p>Email: {client.email}</p>
                             </CardBody>
                         </Card>
