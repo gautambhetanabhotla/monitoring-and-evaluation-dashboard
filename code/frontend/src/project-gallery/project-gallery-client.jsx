@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const getProjectsByClientId = async () => {
+const getProjectsByClientId = async (clientId) => {
     try {
-        const response = await fetch("http://localhost:5000/api/projects/getProjects", {
+        let url = "http://localhost:5011/api/projects/getProjects";
+        if (clientId) {
+            url += `?clientId=${clientId}`;
+        }
+        const response = await fetch(url, {
             method: 'GET',
             credentials: 'include'
         });
@@ -30,18 +34,22 @@ const ProjectGallery = () => {
     const [activeTab, setActiveTab] = useState("projects");
     const [clientProjects, setClientProjects] = useState([]);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const queryParams = new URLSearchParams(location.search);
+    const clientId = queryParams.get('clientId');
 
     useEffect(() => {
         const fetchProjects = async () => {
-            const projects = await getProjectsByClientId();
+            const projects = await getProjectsByClientId(clientId);
             setClientProjects(projects);
         };
         fetchProjects();
-    }, []);
+    }, [clientId]);
 
     const logout = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/auth/logout", {
+            const response = await fetch("http://localhost:5011/api/auth/logout", {
                 method: "POST",
                 credentials: "include"
             });

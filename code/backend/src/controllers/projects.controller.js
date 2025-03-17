@@ -3,7 +3,10 @@ import User from '../models/User.model.js';
 import Project from '../models/Project.model.js';
 
 export const getProjectsByClientId = async (req, res) => {
-    const clientId = req.session.userId;
+    let clientId = req.query.clientId;
+    if (!clientId) {
+        clientId = req.session.user.id;
+    }
 
     try {
         if (!mongoose.Types.ObjectId.isValid(clientId)) {
@@ -16,8 +19,8 @@ export const getProjectsByClientId = async (req, res) => {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        if(user.role !== 'client') {
-            return res.status(400).json({ success: false, message: 'User is not a client' });
+        if(user.role === 'field staff') {
+            return res.status(400).json({ success: false, message: 'User is not authorized to view this page' });
         }
 
         if (!user.assigned_projects || user.assigned_projects.length === 0) {
