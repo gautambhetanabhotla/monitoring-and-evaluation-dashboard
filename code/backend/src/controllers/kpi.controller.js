@@ -5,9 +5,10 @@ import mongoose from "mongoose";
 export const createKpi = async (req, res) => {
     const {project_id, indicator, what_it_tracks, 
         logframe_level, explanation, baseline, target} = req.body;
+    console.log(req.body);
     
     if (!project_id || !indicator || !what_it_tracks || 
-        !logframe_level || !explanation || !baseline || !target) {
+        !logframe_level || baseline == null || target == null) {
         return res.status(400).json({ success: false, message: "Please give values for all the fields" });
     }
 
@@ -16,9 +17,9 @@ export const createKpi = async (req, res) => {
 
     try {
         const newKpi = await kpi.save();
-        return res.status(201).json({message : "KPI saved successfully",newKpi});
+        return res.status(201).json({success : true, message : "KPI saved successfully",id : newKpi._id});
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({success : false, message: error.message });
     }
 };
 
@@ -44,9 +45,6 @@ export const getKpisByProject = async (req, res) => {
         }
 
         const kpis = await Kpi.find({ project_id });
-        if(kpis.length === 0){
-            return res.status(400).json({ success : false , message: "No KPIs found for this project" });
-        }1
 
         return res.status(200).json({success : true, message : `KPIs fetched successfully`, data : kpis});
     } catch (error) {
@@ -55,19 +53,23 @@ export const getKpisByProject = async (req, res) => {
 };
 
 export const updateKpi = async (req, res) => {
-    const {kpi_id} = req.params;
-    const {task_id,initial,final,updated_at,note,updated_by} = req.body;
+    // const {kpi_id} = req.params;
+    const {kpi_id, task_id,initial,final,updated_at,note} = req.body;
+    const updated_by = req.session.userId;
+    console.dir({
+        kpi_id, task_id,initial,final,updated_at,note,updated_by
+    })
 
-    if(!task_id || !initial || !final || !updated_at || !updated_by){
+    if(!task_id || initial == null || final == null || !updated_at || !updated_by){
         return res.status(400).json({ success: false, message: "Please give values for all the fields" });
     }
 
     try {
         const kpiUpdate = new KpiUpdate({task_id,kpi_id,initial,final,updated_at,note,updated_by});
         const newKpiUpdate = await kpiUpdate.save();
-        return res.status(201).json({message : "KPI update saved successfully",newKpiUpdate});
+        return res.status(201).json({success : true, message : "KPI update saved successfully", id: newKpiUpdate._id, updatedby: newKpiUpdate.updated_by});
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({success : false, message: error.message });
     }
 };
 
@@ -144,3 +146,22 @@ export const getKpiUpdatesAsData = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
+
+export const getKpiUpdatesbyProject = async (req, res) => {
+    const { project_id } = req.params;
+    try {
+        if(!mongoose.Types.ObjectId.isValid(project_id)){
+            return res.status(400).json({ success : false , message: "Invalid project ID" });
+        }
+
+    const kpiUpdates = await KpiUpdate.find({ project_id });
+
+    if(kpiUpdates.length === 0){
+        return res.status(400).json({ success : false , message: "No KPI updates found for this project" });
+    }
+
+    return res.status(200).json({success : true, message : `KPI updates fetched successfully`, data : kpiUpdates});
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};

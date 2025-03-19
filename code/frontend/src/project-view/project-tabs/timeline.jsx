@@ -7,13 +7,14 @@ import {Autocomplete, AutocompleteItem} from "@heroui/autocomplete";
 import {Select, SelectItem} from "@heroui/select";
 // import {Chip} from "@heroui/chip";
 import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
-import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure} from "@heroui/modal";
+import {Modal, ModalContent, useDisclosure} from "@heroui/modal";
 import {Form} from "@heroui/form";
 import {Input} from "@heroui/input";
 import {NumberInput} from "@heroui/number-input";
 import {Spacer} from "@heroui/spacer";
 
 import { useState, useContext, useEffect } from 'react';
+import axios from 'axios';
 
 import { ProjectContext } from "../project-context.jsx";
 
@@ -33,16 +34,33 @@ const AddTaskButton = () => {
     <>
       <Popover showArrow>
         <PopoverTrigger>
-          <Button size='lg' color='primary' startContent={<PlusIcon className="size-6" />}>Add task</Button>
+          <Button
+            size='lg'
+            color='primary'
+            startContent={<PlusIcon className="size-6" />}
+          >
+            Add task
+          </Button>
         </PopoverTrigger>
         <PopoverContent>
           <Form
             onSubmit={(e) => {
               e.preventDefault();
               // console.log("submitting " + title + " " + description);
-              // await axios.fetch
-              ctx.addTask(title, description);
-            }}  
+              axios.post('/api/task/create', {
+                project_id: ctx.project.id,
+                title: title,
+                description: description,
+              })
+              .then(res => {
+                if (!res.data.success) return;
+                console.dir(res.data);
+                ctx.addTask(res.data.id, title, description);
+              })
+              .catch(err => {
+                console.error("Axios request failed:", err.response?.data?.message || err.message);
+              });
+            }}
           >
             <Spacer />
             <Input
@@ -70,39 +88,57 @@ const AddTaskButton = () => {
 const KPIUpdateButton = ({ task }) => {
 
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
+  const [loading, setLoading] = useState(false);
 
   const ctx = useContext(ProjectContext);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedKPIid, setSelectedKPIid] = useState(null);
-  const [finalValue, setFinalValue] = useState(null);
-  const [finalValueErrors, setFinalValueErrors] = useState([]);
-  const [note, setNote] = useState('');
+  const [finalValue, setFinalValue] = useState(""); // Initialize as empty string
+  const [note, setNote] = useState("");
   const initialValue = ctx.adjustedKPIs?.find(kpi => kpi.id === selectedKPIid)?.current;
 
   const handleKPIselectionChange = (id) => {
     setSelectedKPIid(id);
-    setSearchQuery(ctx.adjustedKPIs?.find(kpi => kpi.id === id)?.indicator);
+    setSearchQuery(ctx.adjustedKPIs?.find(kpi => kpi.id === id)?.indicator || "");
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("SUBMITTING");
-    console.log(finalValue);
-    if(!finalValue) {
-      setFinalValueErrors([...finalValueErrors, "Final value is required."]);
-      console.log("SFSDFSFDFSDFSDFSDF");
-    }
+    setLoading(true);
+    // console.log("SUBMITTING");
+    // console.log(finalValue);
     const update = {
-      id: `kpi${ctx.KPIUpdates.length + 1}`,
+      // id: `kpi${ctx.KPIUpdates.length + 1}`,
       task: task.id,
       kpi: selectedKPIid,
+      note: note,
       initial: initialValue,
       final: finalValue,
       date: new Date(),
-      updatedby: "You",
     };
-    ctx.updateKPI(update);
-    onClose();
+    axios.put(`/api/kpi/update/${selectedKPIid}`, {
+      task_id: task.id,
+      kpi_id: selectedKPIid,
+      initial: initialValue,
+      final: finalValue,
+      updated_at: new Date(),
+      note: note,
+    })
+    .then(res => {
+      console.dir(res);
+      ctx.updateKPI({
+        ...update,
+        id: res.data.id,
+        updatedby: res.data.updatedby
+      });
+      setLoading(false);
+      onClose();
+    })
+    .catch(err => {
+      console.error("Axios request failed:", err.response?.data?.message || err.message);
+      setLoading(false);
+      onClose();
+    });
   };
 
   return (
@@ -122,6 +158,7 @@ const KPIUpdateButton = ({ task }) => {
             <Spacer />
             <Autocomplete
               // autoFocus
+              isRequired
               inputValue={searchQuery}
               onInputChange={setSearchQuery}
               selectedKey={selectedKPIid}
@@ -134,14 +171,7 @@ const KPIUpdateButton = ({ task }) => {
               {(item) => <AutocompleteItem key={item.id}>{item.indicator}</AutocompleteItem>}
             </Autocomplete>
             <NumberInput
-              errorMessage={() => (
-                <ul>
-                  {finalValueErrors.map((error, i) => (
-                    <li key={i}>{error}</li>
-                  ))}
-                </ul>
-              )}
-              isInvalid={finalValueErrors.length > 0}
+              isInvalid={finalValue == null}
               label="Final value"
               isRequired
               value={finalValue}
@@ -153,12 +183,11 @@ const KPIUpdateButton = ({ task }) => {
               onValueChange={setNote}
             />
             <Spacer />
-            <Button color='primary' type="submit" startContent={<CheckIcon className="size-6" />}>Update</Button>
+            <Button isLoading={loading} color='primary' type="submit" startContent={<CheckIcon className="size-6" />}>Update</Button>
             <Spacer />
           </Form>
         </ModalContent>
       </Modal>
-          
     </>
   );
 };
@@ -252,7 +281,7 @@ const Task = ({ task }) => {
     setDescription(task?.description);
   }, [task?.description]); // Removing this useEffect causes the task to inherit the description of the previous task on first render. Why?
 
-  const updates = ctx.KPIUpdates.filter( (update) => update.task === task?.id );
+  const updates = ctx.KPIUpdates.filter(update => update.task === task?.id );
 
   const buttonAction = () => {
     setEditableDescription(!editableDescription);

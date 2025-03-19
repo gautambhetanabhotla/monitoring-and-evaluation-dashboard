@@ -1,7 +1,7 @@
 [
     {
         "id": "kpi1",
-        "project": "p1",
+        "project_id": "p1",
         "indicator": "Employment rate of trained youth",
         "what_it_tracks": "How many youth get jobs",
         "logframe_level": "Goal",
@@ -11,7 +11,7 @@
       },
       {
         "id": "kpi2",
-        "project": "p1",
+        "project_id": "p1",
         "indicator": "Increase in average income of trainees",
         "what_it_tracks": "Growth in earnings",
         "logframe_level": "Goal",
@@ -21,7 +21,7 @@
       },
       {
         "id": "kpi3",
-        "project": "p1",
+        "project_id": "p1",
         "indicator": "Percentage of trainees certified",
         "what_it_tracks": "How many trained youth secure employment/self-employment opportunities",
         "logframe_level": "Outcome",
@@ -31,7 +31,7 @@
       },
       {
         "id": "kpi4",
-        "project": "p1",
+        "project_id": "p1",
         "indicator": "Percentage of trained youth employed within 6 months",
         "what_it_tracks": "How many certified trainees demonstrate improved technical skills",
         "logframe_level": "Outcome",
@@ -41,7 +41,7 @@
       },
       {
         "id": "kpi5",
-        "project": "p1",
+        "project_id": "p1",
         "indicator": "Number of youth trained",
         "what_it_tracks": "How many were trained",
         "logframe_level": "Output",
@@ -51,7 +51,7 @@
       },
       {
         "id": "kpi6",
-        "project": "p1",
+        "project_id": "p1",
         "indicator": "Number of youth completing the course",
         "what_it_tracks": "How many finished the course",
         "logframe_level": "Output",
@@ -61,7 +61,7 @@
       },
       {
         "id": "kpi7",
-        "project": "p1",
+        "project_id": "p1",
         "indicator": "Practical training sessions",
         "what_it_tracks": "Hands-on electrician training",
         "logframe_level": "Activity",
@@ -71,7 +71,7 @@
       },
       {
         "id": "kpi8",
-        "project": "p1",
+        "project_id": "p1",
         "indicator": "Industry exposure visits",
         "what_it_tracks": "Visits to workplaces",
         "logframe_level": "Activity",
@@ -81,7 +81,7 @@
       },
       {
         "id": "kpi9",
-        "project": "p1",
+        "project_id": "p1",
         "indicator": "Budget utilization",
         "what_it_tracks": "How money is spent across activities",
         "logframe_level": "Activity",

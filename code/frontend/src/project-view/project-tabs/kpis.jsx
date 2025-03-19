@@ -6,7 +6,13 @@ import {Progress} from '@heroui/progress';
 import {Autocomplete, AutocompleteItem} from "@heroui/autocomplete";
 import {Chip} from "@heroui/chip";
 import {Select, SelectItem} from "@heroui/select";
-// import Markdown from "marked-react";
+import {Modal, ModalContent, useDisclosure} from "@heroui/modal";
+import {Input, Textarea} from "@heroui/input";
+import {NumberInput} from "@heroui/number-input";
+import {Form} from "@heroui/form";
+
+import axios from 'axios';
+
 import { PencilSquareIcon } from '@heroicons/react/24/solid';
 
 import { ProjectContext } from '../project-context.jsx';
@@ -81,6 +87,95 @@ const KPIsList = ({ kpis }) => {
   );
 };
 
+const AddKPIButton = () => {
+
+  const ctx = useContext(ProjectContext);
+  const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
+  const [loading, setLoading] = useState(false);
+
+  const [logFrameLevel, setLogFrameLevel] = useState(new Set(['']));
+  const [title, setTitle] = useState('');
+  const [whatItTracks, setWhatItTracks] = useState('');
+  const [explanation, setExplanation] = useState('');
+  const [baseline, setBaseline] = useState(0);
+  const [target, setTarget] = useState(0);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const kpi = {
+      project_id: ctx.project.id,
+      indicator: title,
+      what_it_tracks: whatItTracks,
+      logframe_level: Array.from(logFrameLevel)[0],
+      explanation: explanation,
+      baseline: baseline,
+      target: target,
+    };
+    axios.post(`/api/kpi/create`, kpi)
+    .then(res => {
+      if(!res.data.success) return;
+      console.dir(res);
+      ctx.addKPI({...kpi, id: res.data.id});
+      setLoading(false);
+      onClose();
+    });
+  };
+
+  const handleLogFrameLevelChange = (set) => {
+    setLogFrameLevel(set);
+  };
+
+  return (
+    <>
+      <Button
+        size='lg'
+        color='primary'
+        onPress={onOpen}
+      >
+        Add KPI
+      </Button>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        isDismissable={false}
+        isKeyboardDismissDisabled={false}
+        hideCloseButton={false}
+        className='p-9'
+        size='xl'
+      >
+        <ModalContent>
+          <Form onSubmit={handleSubmit}>
+            <Input isRequired label='Title' value={title} onValueChange={setTitle} />
+            <Input isRequired label='What does it track?' value={whatItTracks} onValueChange={setWhatItTracks} />
+            <Select
+              isRequired
+              label='Logframe level'
+              selectedKeys={logFrameLevel}
+              onSelectionChange={handleLogFrameLevelChange}
+              selectionMode='single'
+            >
+              <SelectItem key='Goal'>Goal</SelectItem>
+              <SelectItem key='Outcome'>Outcome</SelectItem>
+              <SelectItem key='Output'>Output</SelectItem>
+              <SelectItem key='Activity'>Activity</SelectItem>
+            </Select>
+            <Textarea label='Explanation' value={explanation} onValueChange={setExplanation} />
+            <div className='flex flex-row gap-2 mt-5'>
+            <NumberInput isRequired label='Baseline' value={baseline} onValueChange={setBaseline} />
+            <NumberInput isRequired label='Target' value={target} onValueChange={setTarget} />
+            </div>
+            <div className='flex flex-row gap-2 mt-5'>
+              <Button color='primary' size='lg' type='submit' isLoading={loading}>Submit</Button>
+              <Button color='danger' size='lg' onPress={onClose}>Close</Button>
+            </div>
+          </Form>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+};
+
 const KPIs = () => {
   const ctx = useContext(ProjectContext);
   const logframeLevels = ['Goal', 'Outcome', 'Output', 'Activity'];
@@ -125,7 +220,7 @@ const KPIs = () => {
             <SelectItem key={level}>{level}</SelectItem>
           ))}
         </Select>
-        <Button size='lg' color='primary'>Add KPI</Button>
+        <AddKPIButton />
       </div>
       <KPIsList kpis={ctx.adjustedKPIs?.filter(kpi => {
         return (selectedLogframeLevels.size == 0 || selectedLogframeLevels.has(kpi.logframe_level))

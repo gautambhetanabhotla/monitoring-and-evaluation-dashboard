@@ -3,9 +3,9 @@ import User from '../models/User.model.js';
 import Project from '../models/Project.model.js';
 
 export const getProjectsByClientId = async (req, res) => {
-    let clientId = req.query.clientId;
+    let clientId = req.query.userId;
     if (!clientId) {
-        clientId = req.session.user.id;
+        clientId = req.session.userId;
     }
 
     try {
@@ -70,7 +70,7 @@ export const addProjectToClient = async (req, res) => {
         user.assigned_projects.push(newProject._id);
         await user.save();
 
-        return res.status(201).json({ success: true, message: `Project created successfully under ${user.username}` });
+        return res.status(201).json({ success: true, message: `Project created successfully under ${user.username}`,id : newProject._id });
     } catch (error) {
         console.error('Error assigning project to user:', error);
         return res.status(500).json({ success: false, message: `Internal server error :`,error });

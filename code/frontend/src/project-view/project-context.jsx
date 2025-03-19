@@ -11,11 +11,20 @@ const ProjectContextProvider = ({ children }) => {
   const [adjustedKPIs, setAdjustedKPIs] = useState([]);
 
   useEffect(() => {
-    fetch('/kpis.json')
-    .then(response => response.json())
-    .then(data => setKPIs(data))
-    .catch(error => console.error("Error fetching KPIs" + error));
-  }, []);
+    if(!project?.id) return;
+    fetch(`/api/kpi/getKpis/${project?.id}`)
+    .then(response => {console.dir(response); return response.json();})
+    .then(data => {
+      if(data.success) {
+        for (const element of data.data) {
+          element.id = element._id;
+        }
+        setKPIs(data.data);
+        console.dir(data);
+      }
+    })
+    .catch(error => console.error("Error fetching KPIs - " + error));
+  }, [project?.id]);
 
   useEffect(() => {
     const updatedKPIs = KPIs.map(KPI => {
@@ -31,19 +40,29 @@ const ProjectContextProvider = ({ children }) => {
   }, [KPIs, KPIUpdates]);
 
   useEffect(() => {
-    fetch('/kpiupdates.json')
-    .then(response => response.json())
-    .then(data => {
-      for (const update of data) {
-        const d = update.date;
-        const date = new Date(d);
-        update.date = date;
-      }
-      setKPIUpdates(data);
-      // console.dir(data);
-    })
-    .catch(error => console.error("Error fetching KPI updates" + error));
-  }, []);
+    if(!project?.id || !KPIs) return;
+    for (const kpi of KPIs) {
+      fetch(`/api/kpi/getKpiUpdates/${kpi?.id}`)
+      .then(response => response.json())
+      .then(data => {
+        // console.dir(data);
+        if(!data.success) return;
+        for (const update of data.data) {
+          update.id = update._id;
+          update.date = update.updated_at;
+          update.kpi = update.kpi_id;
+          update.task = update.task_id;
+          update.updatedby = update.updated_by;
+          const d = update.date;
+          const date = new Date(d);
+          update.date = date;
+        }
+        setKPIUpdates(data.data);
+        console.dir(data.data);
+      })
+      .catch(error => console.error("Error fetching KPI updates" + error));
+    }
+  }, [project?.id, KPIs]);
 
   useEffect(() => {
     fetch('/project.json')
@@ -60,11 +79,23 @@ const ProjectContextProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    fetch('/tasks.json')
+    if(!project?.id) return;
+    fetch(`/api/task/getTasks/${project?.id}`)
     .then(response => response.json())
-    .then(data => setTasks(data))
+    .then(data => {
+      if(!data.data) return;
+      setTasks(data.data.map(element => {
+        return {
+          id: element._id,
+          project_id: element.project_id,
+          title: element.title,
+          description: element.description,
+        };
+      }));
+      console.dir(data);
+    })
     .catch(error => console.error("Error fetching tasks" + error));
-  }, []);
+  }, [project?.id]);
   
   const updateKPI = (update) => {
     setKPIUpdates([...KPIUpdates, update]);
@@ -80,15 +111,19 @@ const ProjectContextProvider = ({ children }) => {
     setTasks(updatedTasks);
   });
 
-  const addTask = (title, description) => {
+  const addTask = (id, title, description) => {
     const newTask = {
-      id: `t${tasks.length + 1}`,
+      id: id,
       project: project.id,
       title: title,
       description: description,
     };
     setTasks([...tasks, newTask]);
     // console.dir([...tasks, newTask]);
+  };
+
+  const addKPI = (kpi) => {
+    setKPIs([...KPIs, kpi]);
   };
 
   return (
@@ -99,14 +134,15 @@ const ProjectContextProvider = ({ children }) => {
               successStories,
               setSuccessStories,
               KPIUpdates,
-              setKPIUpdates,
+              // setKPIUpdates,
               tasks,
-              setTasks,
+              // setTasks,
               adjustedKPIs,
-              setKPIs,
+              // setKPIs,
               updateKPI,
               updateTaskDescription,
               addTask,
+              addKPI
       }}
     >
       {children}

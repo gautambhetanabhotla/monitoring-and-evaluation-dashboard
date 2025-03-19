@@ -1,16 +1,18 @@
 import Task from "../models/Task.model.js";
+import mongoose from "mongoose";
 
 export const createTask = async (req, res) => {
+    console.log(req.body);
     const { project_id, description, title } = req.body;
-    if (!project_id || !description || !title) {
-        return res.status(400).json({ success: false, message: "Please give values for all the fields" });
+    if (!project_id || !title) {
+        return res.status(400).json({ success: false, message: "Project ID and title are required" });
     }
     const task = new Task({ project_id, description, title }); 
     try {
         const newTask = await task.save();
-        return res.status(201).json({message : "Task saved successfully",newTask});
+        return res.status(201).json({success : true, message : "Task saved successfully",id :newTask._id});
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({success : false, message: error.message });
     }
 };
 
@@ -21,10 +23,6 @@ export const getTasksByProject = async (req, res) => {
             return res.status(400).json({ success : false , message: "Invalid project ID" });
         }
         const tasks = await Task.find({ project_id });
-
-        if(tasks.length === 0){
-            return res.status(400).json({ success : false , message: "No tasks found for this project" });
-        }
 
         return res.status(200).json({success : true, message : `Tasks fetched successfully`, data : tasks});
     } catch (error) {

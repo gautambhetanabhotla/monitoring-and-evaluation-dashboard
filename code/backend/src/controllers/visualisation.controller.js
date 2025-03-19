@@ -10,8 +10,6 @@ export const createVisualisation = async (req, res) => {
         return res.status(400).json({ success:false, message: "Please give values for all the fields" });
     }
 
-    // console.log(req.body);
-
     const visualisation = new Visualisation({
         project_id,
         file,
