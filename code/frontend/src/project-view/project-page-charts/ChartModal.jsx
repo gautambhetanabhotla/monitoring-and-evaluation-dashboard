@@ -452,7 +452,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                 )}
 
                 <div className="form-buttons flex gap-4">
-                  <button className="btn btn-secondary px-4 py-2 rounded" onClick={() => setStep(1)}>
+                  <button className="btn btn-secondary px-4 py-2 rounded" onClick={() => setStep(0)}>
                     Back to Upload
                   </button>
                   <button onClick={handleSave} disabled={!canSave} className="btn btn-primary px-4 py-2 rounded">
