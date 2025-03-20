@@ -109,6 +109,7 @@ const KPIUpdateButton = ({ task }) => {
     // console.log(finalValue);
     const update = {
       // id: `kpi${ctx.KPIUpdates.length + 1}`,
+      project: ctx.project.id,
       task: task.id,
       kpi: selectedKPIid,
       note: note,
@@ -117,6 +118,7 @@ const KPIUpdateButton = ({ task }) => {
       date: new Date(),
     };
     axios.put(`/api/kpi/update/${selectedKPIid}`, {
+      project_id: ctx.project.id,
       task_id: task.id,
       kpi_id: selectedKPIid,
       initial: initialValue,
@@ -125,6 +127,7 @@ const KPIUpdateButton = ({ task }) => {
       note: note,
     })
     .then(res => {
+      console.log(ctx.project.id);
       console.dir(res);
       ctx.updateKPI({
         ...update,
@@ -281,7 +284,18 @@ const Task = ({ task }) => {
     setDescription(task?.description);
   }, [task?.description]); // Removing this useEffect causes the task to inherit the description of the previous task on first render. Why?
 
-  const updates = ctx.KPIUpdates.filter(update => update.task === task?.id );
+  // const updates = ctx.KPIUpdates.filter(update => update.task === task?.id );
+  const [updates, setUpdates] = useState([]);
+  useEffect(() => {
+    console.dir(ctx.KPIUpdates.filter(update => {
+      console.dir(update);
+      return update.task === task?.id;
+    }));
+    setUpdates(ctx.KPIUpdates.filter(update => update.task === task?.id ));
+    console.log(`updates for task ${task?.title}: ${updates.length}`);
+  }, [ctx.KPIUpdates, task?.id, task?.title, updates.length]);
+  
+  // console.dir(updates);
 
   const buttonAction = () => {
     setEditableDescription(!editableDescription);

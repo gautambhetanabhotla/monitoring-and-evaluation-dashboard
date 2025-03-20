@@ -1,14 +1,19 @@
 import { createContext, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 const ProjectContext = createContext();
 
 const ProjectContextProvider = ({ children }) => {
+
   const [project, setProject] = useState({});
   const [successStories, setSuccessStories] = useState([]);
   const [KPIUpdates, setKPIUpdates] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [KPIs, setKPIs] = useState([]);
   const [adjustedKPIs, setAdjustedKPIs] = useState([]);
+
+  const location = useLocation();
 
   useEffect(() => {
     if(!project?.id) return;
@@ -40,24 +45,25 @@ const ProjectContextProvider = ({ children }) => {
   }, [KPIs, KPIUpdates]);
 
   useEffect(() => {
-    if(!project?.id || !KPIs) return;
+    if(!project?.id || !KPIs || KPIs.length === 0) return;
     for (const kpi of KPIs) {
       fetch(`/api/kpi/getKpiUpdates/${kpi?.id}`)
       .then(response => response.json())
       .then(data => {
-        // console.dir(data);
-        if(!data.success) return;
+        console.dir(data);
+        if(!data.success || !data.data) return;
         for (const update of data.data) {
           update.id = update._id;
           update.date = update.updated_at;
           update.kpi = update.kpi_id;
           update.task = update.task_id;
           update.updatedby = update.updated_by;
+          update.project = update.project_id;
           const d = update.date;
           const date = new Date(d);
           update.date = date;
         }
-        setKPIUpdates(data.data);
+        setKPIUpdates(KPIUpdates => [...KPIUpdates, ...data.data]);
         console.dir(data.data);
       })
       .catch(error => console.error("Error fetching KPI updates" + error));
@@ -65,11 +71,26 @@ const ProjectContextProvider = ({ children }) => {
   }, [project?.id, KPIs]);
 
   useEffect(() => {
-    fetch('/project.json')
-    .then(response => response.json())
-    .then(data => setProject(data))
-    .catch(error => console.error("Error fetching project" + error));
-  }, []);
+    // fetch('/project.json')
+    // .then(response => response.json())
+    // .then(data => setProject(data))
+    // .catch(error => console.error("Error fetching project" + error));
+    // console.dir(location.pathname.split('/'));
+    const project_id = location.pathname.split('/')[1];
+    console.log(project_id);
+    axios.get(`/api/projects/get/${project_id}`)
+    .then(response => {
+      console.dir(response);
+      if(response.data.success) {
+        const proj = response.data.project;
+        proj.start = proj.start_date;
+        proj.end = proj.end_date;
+        proj.progress = proj.project_progress;
+        proj.id = proj._id;
+        setProject(proj);
+      }
+    });
+  }, [location.pathname]);
 
   useEffect(() => {
     fetch('/success-stories.json')
@@ -126,6 +147,12 @@ const ProjectContextProvider = ({ children }) => {
     setKPIs([...KPIs, kpi]);
   };
 
+  const editKPI = (targetKPI) => {
+    console.dir(targetKPI);
+    console.dir(KPIs.map(KPI => KPI.id === targetKPI.id ? targetKPI : KPI));
+    setKPIs(KPIs.map(KPI => KPI.id === targetKPI.id ? targetKPI : KPI));
+  };
+
   return (
     <ProjectContext.Provider
       value={{
@@ -140,6 +167,7 @@ const ProjectContextProvider = ({ children }) => {
               adjustedKPIs,
               // setKPIs,
               updateKPI,
+              editKPI,
               updateTaskDescription,
               addTask,
               addKPI

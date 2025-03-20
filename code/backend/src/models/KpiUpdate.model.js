@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const KpiUpdateSchema = new mongoose.Schema({
+    project_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project',
+        required: [true, 'Project is required'],
+    },
     task_id : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'Task',

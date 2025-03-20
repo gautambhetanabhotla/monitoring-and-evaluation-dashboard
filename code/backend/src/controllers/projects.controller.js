@@ -2,6 +2,18 @@ import mongoose from 'mongoose';
 import User from '../models/User.model.js'; 
 import Project from '../models/Project.model.js';
 
+export const getProjectById = async (req, res) => {
+    const { projectId } = req.params;
+    // console.log("REQUEST RECIEVS");
+    try {
+        const proj = await Project.findById(projectId);
+        res.status(200).json({success: true, project: proj});
+    } catch (error) {
+        console.error('Error fetching project:', error);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
 export const getProjectsByClientId = async (req, res) => {
     let clientId = req.query.userId;
     if (!clientId) {
