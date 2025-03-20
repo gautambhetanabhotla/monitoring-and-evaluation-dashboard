@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { X } from 'lucide-react';
 import FileUploader from './FileUploader';
 import { Bar, Line, Pie, Scatter } from 'react-chartjs-2';
@@ -20,6 +21,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   const [category, setCategory] = useState('');
   // New state variable for KPI errors.
   const [kpiError, setKpiError] = useState('');
+  const { projectid } = useParams();
 
   const chartColors = {
     backgroundColor: [
@@ -324,7 +326,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
           {step === 3 && (
             <div>
               <KpiList
-                projectId="67cae012ae068409d0b8fda3"
+                projectId={projectid}
                 onSelectKpi={handleKpiSelect}
                 selectedKpiId={selectedKpi ? selectedKpi._id : null}
               />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import Canvas from './project-page-charts/Canvas';
 import ChartModal from './project-page-charts/ChartModal';
 
@@ -6,12 +7,13 @@ function Charts() {
   const [charts, setCharts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingChartId, setEditingChartId] = useState(null);
-  const project_id = "67cae012ae068409d0b8fda3";
+  // const project_id = "67cae012ae068409d0b8fda3";
+  const { projectid } = useParams();
 
   useEffect(() => {
     const fetchCharts = async () => {
       try {
-        const response = await fetch(`/api/visualisation/get-visualisations/${project_id}`,
+        const response = await fetch(`/api/visualisation/get-visualisations/${projectid}`,
           {
             credentials: 'include',         }
         );
@@ -80,7 +82,7 @@ function Charts() {
       console.log(editingChartId);
       setCharts(charts.map((chart) => (chart.id === editingChartId ? chartConfig : chart)));
       const chartData = {
-        project_id: project_id,
+        project_id: projectid,
         title : chartConfig.title,
         file: JSON.stringify(chartConfig.data),
         type: chartConfig.type,
@@ -111,7 +113,7 @@ function Charts() {
     } else {
       setCharts([...charts, chartConfig]);
       const chartData = {
-        project_id: project_id,
+        project_id: projectid,
         title : chartConfig.title,
         file: JSON.stringify(chartConfig.data),
         type: chartConfig.type,

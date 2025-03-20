@@ -37,6 +37,10 @@ const KpiList = ({ projectId, onSelectKpi, selectedKpiId }) => {
     return <div className="p-4 text-center text-red-500">{error}</div>;
   }
 
+  if (kpis.length === 0) {
+    return <div className="p-4 text-center text-red-500">No KPIs found</div>;
+  }
+
   return (
     <div className="p-4">
       <h3 className="text-lg font-medium mb-4 text-gray-100">Select KPI</h3>
@@ -45,19 +49,18 @@ const KpiList = ({ projectId, onSelectKpi, selectedKpiId }) => {
           const isSelected = kpi._id === selectedKpiId;
           return (
             <li
-            key={kpi._id}
-            onClick={() => onSelectKpi(kpi)}
-            // Add tabIndex to ensure focus is possible for accessibility if needed
-            tabIndex={0}
-            className={`cursor-pointer border p-2 rounded text-white
+              key={kpi._id}
+              onClick={() => onSelectKpi(kpi)}
+              tabIndex={0}
+              className={`cursor-pointer border p-2 rounded text-white
                 focus:outline-none focus:ring-0 active:ring-0
                 ${
-                isSelected
+                  isSelected
                     ? 'bg-blue-600 border-blue-600'
                     : 'bg-gray-800 border-gray-500 hover:bg-gray-600'
                 }`}
             >
-            <span className="font-semibold">{kpi.indicator}</span>
+              <span className="font-semibold">{kpi.indicator}</span>
             </li>
           );
         })}
