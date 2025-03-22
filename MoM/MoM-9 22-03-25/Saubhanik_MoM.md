@@ -1,4 +1,3 @@
-# 6th Client Meet
 - Demo Video was pitted against a black background, which is why, it was not visible on screen, due to the dark theme. This was one aspect where we lost one mark in R1 presentation, where the client was asked to grade.
 - UI light mode is required, which we will design in R2.
 - Client asked us what we would do in R2. What are the new features in R2 that we are going to implement? Viswas stated that we would implement more tabs in the Project Page.
