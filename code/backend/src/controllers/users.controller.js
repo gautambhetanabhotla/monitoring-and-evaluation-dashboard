@@ -136,3 +136,27 @@ export const updateUser = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const updatePassword = async (req, res) => {
+  const { id } = req.params;
+  const { pwd } = req.body;
+  
+  try {
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const passwordHash = bcrypt.hashSync(pwd, 10);
+    user.passwordHash = passwordHash;
+
+    const updatedUser = await user.save();
+    return res.status(200).json({ success: true, user: updatedUser });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};

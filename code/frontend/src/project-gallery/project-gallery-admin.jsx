@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardHeader, CardBody } from "@heroui/card";
+import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { useNavigate } from "react-router-dom";
 import { Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/modal";
@@ -26,7 +26,7 @@ const getAllClients = async () => {
         console.error("Error fetching clients:", error);
         return [];
     }
-}
+};
 
 export const ClientGallery = () => {
     const [clientList, setClientList] = useState([]);
@@ -48,7 +48,7 @@ export const ClientGallery = () => {
         const fetchClients = async () => {
             const clients = await getAllClients();
             setClientList(clients);
-        }
+        };
         fetchClients();
     }, []);
 
@@ -83,10 +83,9 @@ export const ClientGallery = () => {
             let pwd = '';
           
             for (let i = 0; i < length; i++) {
-              const randomIndex = Math.floor(Math.random() * characters.length);
-              pwd += characters[randomIndex];
+                const randomIndex = Math.floor(Math.random() * characters.length);
+                pwd += characters[randomIndex];
             }
-            console.log(pwd);
 
             const response = await fetch("/api/user/add", {
                 method: 'POST',
@@ -113,6 +112,7 @@ export const ClientGallery = () => {
                 
                 setTimeout(() => {
                     setShowAlert(false);
+                    setPassword("");
                 }, 7000);
 
                 resetFormFields();
@@ -133,18 +133,20 @@ export const ClientGallery = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen p-6 relative z-10">
+        <div className="flex flex-col min-h-screen p-6 relative">
             {showAlert && (
-                <Alert 
-                    className="mb-4 absolute"
-                    variant="solid"
-                    color="success"
-                    onClose={() => setShowPasswordAlert(false)}
-                >
-                    <div className="font-medium">Client created successfully!</div>
-                    <div>{password}</div>
-                    <div className="text-xs mt-2">This password will only be shown once. Please copy it now.</div>
-                </Alert>
+                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+                    <Alert 
+                        className="max-w-md"
+                        variant="faded"
+                        color="success"
+                        onClose={() => setShowAlert(false)}
+                    >
+                        <div className="font-medium">Client user account created successfully!</div>
+                        <div>{password}</div>
+                        <div className="text-xs mt-2">This password will only be shown once. Please copy it now.</div>
+                    </Alert>
+                </div>
             )}
 
             <div className="flex justify-between mb-6 items-center">
@@ -230,7 +232,7 @@ export const ClientGallery = () => {
                             className="border border-amber-400 rounded-lg shadow-md w-full"
                         >
                             <CardBody className="p-6">
-                                <h3 className="font-medium text-lg mb-2">Username: {client.username}</h3>
+                                <h3 className="font-medium text-xl mb-2">Username: {client.username}</h3>
                                 <p>Email: {client.email}</p>
                             </CardBody>
                         </Card>
@@ -239,4 +241,4 @@ export const ClientGallery = () => {
             </div>
         </div>
     );
-}
+};

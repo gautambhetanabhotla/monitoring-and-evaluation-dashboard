@@ -3,7 +3,7 @@ import User from '../models/User.model.js';
 import Project from '../models/Project.model.js';
 
 export const getProjectsByClientId = async (req, res) => {
-    let clientId = req.query.userId;
+    let clientId = req.query.clientId;
     if (!clientId) {
         clientId = req.session.userId;
     }
@@ -49,11 +49,11 @@ export const addProjectToClient = async (req, res) => {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        if(user.role !== 'client') {
-            return res.status(400).json({ success: false, message: 'User is not a client' });
+        if (user.role !== 'client') {
+            return res.status(400).json({ success: false, message: 'User cannot have projects' });
         }
 
-        if(!name || !start_date || !end_date || !project_progress || !description) {
+        if(!name || !start_date || !end_date || !description) {
             return res.status(400).json({ success: false, message: 'Please enter all fields' });
         }
 

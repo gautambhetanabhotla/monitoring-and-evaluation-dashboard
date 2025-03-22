@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/modal";
+import { Input, Textarea } from "@heroui/input";
+import { Alert } from "@heroui/alert";
 
 const getProjectsByClientId = async (clientId) => {
     try {
@@ -39,6 +42,22 @@ const ProjectGallery = () => {
     const queryParams = new URLSearchParams(location.search);
     const clientId = queryParams.get('clientId');
 
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    const [name, setName] = useState("");
+    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+    const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+    const [description, setDescription] = useState("");
+
+    const [password, setPassword] = useState("");
+    const [showAlert, setShowAlert] = useState(false);
+
+    const resetFormFields = () => {
+        setName("");
+        setStartDate(new Date().toISOString().split('T')[0]);
+        setEndDate(new Date().toISOString().split('T')[0]);
+        setDescription("");
+    };
+
     useEffect(() => {
         const fetchProjects = async () => {
             const projects = await getProjectsByClientId(clientId);
@@ -46,6 +65,12 @@ const ProjectGallery = () => {
         };
         fetchProjects();
     }, [clientId]);
+
+    useEffect(() => {
+        if (!isOpen) {
+            resetFormFields();
+        }
+    }, [isOpen]);
 
     const logout = async () => {
         try {
@@ -65,8 +90,101 @@ const ProjectGallery = () => {
         }
     };
 
+    const createProject = async () => {
+        try {
+            const response = await fetch(`/api/projects/addProject/${clientId}`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    name,
+                    start_date: startDate,
+                    end_date: endDate,
+                    project_progress: 0,
+                    description
+                })
+            });
+    
+            const data = await response.json();
+            if (data.success) {
+                const updatedProjects = await getProjectsByClientId(clientId);
+                setClientProjects(updatedProjects);
+
+                resetFormFields();
+                onOpenChange(false);
+            } else {
+                console.error("Adding project failed:", data.message);
+            }
+        } catch (error) {
+            console.error("Error creating project:", error);
+        }
+    };
+
+    const handleOpenChange = (open) => {
+        if (!open) {
+            resetFormFields();
+        }
+        onOpenChange(open);
+    };
+
+    const generatePassword = async () => {
+        try {
+            const length = Math.floor(Math.random() * (11 - 8 + 1)) + 8;
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let pwd = '';
+          
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * characters.length);
+                pwd += characters[randomIndex];
+            }
+
+            const response = await fetch(`/api/user/updatepwd/${clientId}`, {
+                method: 'PATCH',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    pwd
+                })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                setPassword(`New password: ${pwd}`);
+                setShowAlert(true);
+                
+                setTimeout(() => {
+                    setShowAlert(false);
+                    setPassword("");
+                }, 7000);
+            } else {
+                console.error("Updating password failed:", data.message);
+            }
+        } catch (error) {
+            console.error("Error generating password:", error);
+        }
+    };
+
     return (
-        <div className="flex flex-col h-screen p-6">
+        <div className="flex flex-col h-screen p-6 relative">
+            {showAlert && (
+                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+                    <Alert 
+                        className="max-w-md"
+                        variant="faded"
+                        color="success"
+                        onClose={() => setShowAlert(false)}
+                    >
+                        <div className="font-medium">Password updated successfully!</div>
+                        <div>{password}</div>
+                        <div className="text-xs mt-2">This password will only be shown once. Please copy it now.</div>
+                    </Alert>
+                </div>
+            )}
+
             <div className="flex justify-between mb-6">
                 <div className="flex space-x-4">
                     <Button
@@ -102,14 +220,28 @@ const ProjectGallery = () => {
                         Go Back
                     </Button> */}
                 </div>
-                <div className="flex space-x-4"> {/* Added container with horizontal spacing */}
-                    <Button
-                        className="text-xl font-bold py-2 px-4 bg-amber-300 text-black"
-                        size="md"
-                        radius="large"
-                    >
-                        Add Project
-                    </Button>
+                
+                <div className="flex space-x-4"> 
+                    {clientId && (
+                        <>
+                        <Button
+                            className="text-xl font-bold py-2 px-4 bg-amber-300 text-black"
+                            size="md"
+                            radius="large"
+                            onPress={generatePassword}
+                        >
+                            Update Password
+                        </Button>
+                        <Button
+                            className="text-xl font-bold py-2 px-4 bg-amber-300 text-black"
+                            size="md"
+                            radius="large"
+                            onPress={onOpen}
+                        >
+                            Add Project
+                        </Button>
+                        </>
+                    )}
                     <Button
                         className="text-xl font-bold py-2 px-4 bg-amber-300 text-black"
                         onPress={logout}
@@ -118,6 +250,67 @@ const ProjectGallery = () => {
                     >
                         Logout
                     </Button>
+
+                    <Modal isOpen={isOpen} onOpenChange={handleOpenChange} placement="center" size="md">
+                        <ModalContent>
+                            {() => (
+                                <>
+                                    <ModalHeader className="flex flex-col gap-1">Add Project</ModalHeader>
+                                    <ModalBody>
+                                    <Input
+                                        isRequired
+                                        label="Project Name"
+                                        labelPlacement="outside"
+                                        placeholder="Enter project name"
+                                        variant="bordered"
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                    />
+                                    <Input
+                                        isRequired
+                                        label="Start Date"
+                                        labelPlacement="outside"
+                                        placeholder="Enter start date"
+                                        variant="bordered"
+                                        type="date"
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)}
+                                    />
+                                    <Input
+                                        isRequired
+                                        label="End Date"
+                                        labelPlacement="outside"
+                                        placeholder="Enter end date"
+                                        variant="bordered"
+                                        type="date"
+                                        value={endDate}
+                                        onChange={(e) => setEndDate(e.target.value)}
+                                        min={startDate}
+                                    />
+                                    <Textarea
+                                        isRequired
+                                        label="Project Description"
+                                        labelPlacement="outside"
+                                        placeholder="Describe the project here, in 500 characters"
+                                        variant="bordered"
+                                        maxLength={500}
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        minRows={3}
+                                        maxRows={5}
+                                        className="max-h-40 overflow-y-auto"
+                                    />
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <Button color="primary" onPress={createProject}>
+                                            Add
+                                        </Button>
+                                    </ModalFooter>
+                                </>
+                            )}
+                        </ModalContent>
+                    </Modal>
                 </div>
             </div>
 
