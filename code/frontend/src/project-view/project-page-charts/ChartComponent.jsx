@@ -30,9 +30,7 @@ ChartJS.register(
 
 const ChartComponent = ({ chart, onEdit, onRemove }) => {
   const [user, setUser] = useState(null);
-  // Ref to access the chart instance
   const chartRef = useRef(null);
-  // State to track hidden segments (by index)
   const [hiddenSegments, setHiddenSegments] = useState({});
 
   useEffect(() => {
@@ -198,7 +196,6 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
             }
           : { display: false },
     },
-    // Add scales for non-pie charts
     ...(type !== 'pie' && {
       scales: {
         x: {
@@ -220,20 +217,14 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
       },
     }),
   };
-    
-  // Handler to toggle segment visibility when a legend item is clicked.
   const handleLegendClick = (index) => {
     if (chartRef.current) {
-      // Toggle the visibility of the data at the given index.
       chartRef.current.toggleDataVisibility(index);
       chartRef.current.update();
-      // Update local state to reflect the hidden state.
       setHiddenSegments((prev) => ({ ...prev, [index]: !prev[index] }));
     }
   };
 
-  // Render a custom, interactive legend for pie charts.
-  // Clicking a legend item toggles its slice visibility, and the label gets a strike-through when hidden.
   const renderCustomLegend = () => {
     if (type !== 'pie') return null;
     const dataset = chartData.datasets[0];
@@ -282,7 +273,6 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
     );
   };
 
-  // Render the chart. For pie charts, pass the ref for interactive legend functionality.
   const renderChart = () => {
     switch (type) {
       case 'bar':

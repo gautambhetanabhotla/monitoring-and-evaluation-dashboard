@@ -1,6 +1,6 @@
 export default {
     testEnvironment: 'jsdom',
-    setupFilesAfterEnv: ['<rootDir>/src/setupTests.mjs'],
+    setupFilesAfterEnv: ['<rootDir>/tests/jest.setup.js'],
     moduleNameMapper: {
         '/\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     },

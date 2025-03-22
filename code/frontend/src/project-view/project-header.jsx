@@ -1,5 +1,7 @@
 import { useContext, useState, useEffect, useRef } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
 import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu, NavbarMenuItem } from "@heroui/navbar";
 import { Card } from "@heroui/card";
@@ -63,7 +65,6 @@ const ProjectHeader = () => {
           </Chip>
         </div>
       </div>
-      {/* <Nav /> */}
     </>
   );
 };
@@ -74,6 +75,7 @@ const Nav = () => {
   if (!(['overview', 'charts', 'kpis', 'timeline', 'success-stories', 'log-framework'].includes(tabname))) {
     tabname = 'overview';
   }
+  const navigate = useNavigate();
   // const [selectedTab, setSelectedTab] = useState(tabname);
   const navbarRef = useRef(null);
 
@@ -94,6 +96,20 @@ const Nav = () => {
     };
     fetchUserDetails();
   }, []);
+
+  const logout = () => {
+    axios.post('/api/auth/logout')
+    .then((response) => {
+      if (response.data.success) {
+        navigate('/');
+      } else {
+        console.error('Error logging out:', response.data.message);
+      }
+    })
+    .catch((error) => {
+      console.error('Error logging out:', error);
+    });
+  };
 
   return (
     <>
@@ -157,7 +173,7 @@ const Nav = () => {
                     <p className="prose text-md mt-1 mr-5 text-white">{user?.email}</p>
                     <Chip color={user?.role === 'admin' ? 'danger' : (user?.role === 'client' ? 'primary' : 'secondary')}>{user?.role}</Chip>
                   </span>
-                  <Button>Logout</Button>
+                  <Button onPress={logout}>Logout</Button>
                 </div>
               </PopoverContent>
             </Popover>

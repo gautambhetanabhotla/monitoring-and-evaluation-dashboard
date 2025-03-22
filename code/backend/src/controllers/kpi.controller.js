@@ -36,6 +36,20 @@ export const deleteKpi = async (req, res) => {
     }
 };
 
+export const editKpi = async (req, res) => {
+    const { id } = req.params;
+    const { project_id, indicator, what_it_tracks, logframe_level, explanation, baseline, target } = req.body;
+    if (!indicator || !what_it_tracks || !logframe_level || baseline == null || target == null) {
+        return res.status(400).json({ success: false, message: "Please give values for all the fields" });
+    }
+    try {
+        const updatedKpi = await Kpi.findByIdAndUpdate(id, { project_id, indicator, what_it_tracks, logframe_level, explanation, baseline, target }, { new: true });
+        return res.status(200).json({ success: true, message: "KPI updated successfully", data: updatedKpi });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+
 export const getKpisByProject = async (req, res) => {
     const { project_id } = req.params;
 
@@ -53,11 +67,11 @@ export const getKpisByProject = async (req, res) => {
 };
 
 export const updateKpi = async (req, res) => {
-    // const {kpi_id} = req.params;
-    const {kpi_id, task_id,initial,final,updated_at,note} = req.body;
+    const {kpi_id} = req.params;
+    const {project_id, task_id,initial,final,updated_at,note} = req.body;
     const updated_by = req.session.userId;
     console.dir({
-        kpi_id, task_id,initial,final,updated_at,note,updated_by
+        project_id, kpi_id, task_id,initial,final,updated_at,note,updated_by
     })
 
     if(!task_id || initial == null || final == null || !updated_at || !updated_by){
@@ -65,7 +79,7 @@ export const updateKpi = async (req, res) => {
     }
 
     try {
-        const kpiUpdate = new KpiUpdate({task_id,kpi_id,initial,final,updated_at,note,updated_by});
+        const kpiUpdate = new KpiUpdate({project_id,task_id,kpi_id,initial,final,updated_at,note,updated_by});
         const newKpiUpdate = await kpiUpdate.save();
         return res.status(201).json({success : true, message : "KPI update saved successfully", id: newKpiUpdate._id, updatedby: newKpiUpdate.updated_by});
     } catch (error) {
@@ -84,7 +98,7 @@ export const getKpiUpdatesbyKpi = async (req, res) => {
     const kpiUpdates = await KpiUpdate.find({ kpi_id });
 
     if(kpiUpdates.length === 0){
-        return res.status(400).json({ success : false , message: "No KPI updates found for this KPI" });
+        return res.status(200).json({ success : true , message: "No KPI updates found for this KPI" });
     }
 
     return res.status(200).json({success : true, message : `KPI updates fetched successfully`, data : kpiUpdates});
@@ -136,7 +150,7 @@ export const getKpiUpdatesAsData = async (req, res) => {
         const kpiUpdates = await KpiUpdate.find({ kpi_id });
 
         if(kpiUpdates.length === 0){
-            return res.status(400).json({ success : false , message: "No KPI updates found for this KPI" });
+            return res.status(200).json({ success : false , message: "No KPI updates found for this KPI" });
         }
 
         const data = kpiUpdates.map(kpiUpdate => ({ DateTime : kpiUpdate.updated_at, Value : kpiUpdate.final }));
@@ -157,7 +171,7 @@ export const getKpiUpdatesbyProject = async (req, res) => {
     const kpiUpdates = await KpiUpdate.find({ project_id });
 
     if(kpiUpdates.length === 0){
-        return res.status(400).json({ success : false , message: "No KPI updates found for this project" });
+        return res.status(200).json({ success : true , message: "No KPI updates found for this project" });
     }
 
     return res.status(200).json({success : true, message : `KPI updates fetched successfully`, data : kpiUpdates});

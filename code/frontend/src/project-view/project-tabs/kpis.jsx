@@ -17,6 +17,100 @@ import { PencilSquareIcon } from '@heroicons/react/24/solid';
 
 import { ProjectContext } from '../project-context.jsx';
 
+const EditKPIButton = ({ kpi }) => {
+
+  const ctx = useContext(ProjectContext);
+  const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
+  const [loading, setLoading] = useState(false);
+
+  const [logFrameLevel, setLogFrameLevel] = useState(new Set([kpi.logframe_level]));
+  const [title, setTitle] = useState(kpi.indicator);
+  const [whatItTracks, setWhatItTracks] = useState(kpi.what_it_tracks);
+  const [explanation, setExplanation] = useState(kpi.explanation);
+  const [baseline, setBaseline] = useState(kpi.baseline);
+  const [target, setTarget] = useState(kpi.target);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    axios.put(`/api/kpi/edit/${kpi.id}`, {
+      id: kpi.id,
+      project_id: ctx.project.id,
+      indicator: title,
+      what_it_tracks: whatItTracks,
+      logframe_level: Array.from(logFrameLevel)[0],
+      explanation: explanation,
+      baseline: baseline,
+      target: target,
+    })
+    .then(res => {
+      if(!res.data.success) return;
+      console.dir(res);
+      ctx.editKPI({
+        id: res.data.data._id,
+        project_id: ctx.project.id,
+        indicator: title,
+        what_it_tracks: whatItTracks,
+        logframe_level: Array.from(logFrameLevel)[0],
+        explanation: explanation,
+        baseline: baseline,
+        target: target,
+      });
+      setLoading(false);
+      onClose();
+    });
+  };
+
+  const handleLogFrameLevelChange = (set) => {
+    setLogFrameLevel(set);
+  };
+
+  return (
+    <>
+      <div className='absolute right-5 top-5'>
+        <Button onPress={onOpen} isIconOnly><PencilSquareIcon className='size-6'/></Button>
+      </div>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        isDismissable={false}
+        isKeyboardDismissDisabled={false}
+        hideCloseButton={false}
+        className='p-9'
+        size='xl'
+      >
+        <ModalContent>
+          <Form onSubmit={handleSubmit}>
+            <Input isRequired label='Title' value={title} onValueChange={setTitle} />
+            <Input isRequired label='What does it track?' value={whatItTracks} onValueChange={setWhatItTracks} />
+            <Select
+              isRequired
+              label='Logframe level'
+              selectedKeys={logFrameLevel}
+              onSelectionChange={handleLogFrameLevelChange}
+              selectionMode='single'
+            >
+              <SelectItem key='Goal'>Goal</SelectItem>
+              <SelectItem key='Outcome'>Outcome</SelectItem>
+              <SelectItem key='Output'>Output</SelectItem>
+              <SelectItem key='Activity'>Activity</SelectItem>
+            </Select>
+            <Textarea label='Explanation' value={explanation} onValueChange={setExplanation} />
+            <div className='flex flex-row gap-2 mt-5'>
+            <NumberInput isRequired label='Baseline' value={baseline} onValueChange={setBaseline} />
+            <NumberInput isRequired label='Target' value={target} onValueChange={setTarget} />
+            </div>
+            <div className='flex flex-row gap-2 mt-5'>
+              <Button color='primary' size='lg' type='submit' isLoading={loading}>Submit</Button>
+              <Button color='default' variant='bordered' size='lg' onPress={onClose}>Close</Button>
+            </div>
+          </Form>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+};
+
 const KPI = ({ kpi }) => {
   const percentagecompletion = parseInt(100 * (
     (parseFloat(kpi.current) - parseFloat(kpi.baseline))
@@ -26,7 +120,7 @@ const KPI = ({ kpi }) => {
       <Card className="m-3 z-0">
         <CardHeader className="relative">
           <span className="prose text-2xl font-bold py-5 px-2 z-0 pr-16">{kpi.indicator}</span>
-          <Button isIconOnly className="absolute right-5 top-5" aria-label="Edit KPI"><PencilSquareIcon className="size-6" /></Button>
+          <EditKPIButton kpi={kpi} aria-label="Edit KPI" />
         </CardHeader>
         <Divider />
         <CardBody className="px-5 py-6">
