@@ -15,11 +15,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   const [categoryField, setCategoryField] = useState('');
   const [valueField, setValueField] = useState('');
   const [title, setTitle] = useState('');
-  // Store the entire selected KPI object.
   const [selectedKpi, setSelectedKpi] = useState(null);
-  // Indicates whether the chart is based on a file or KPI.
   const [category, setCategory] = useState('');
-  // New state variable for KPI errors.
   const [kpiError, setKpiError] = useState('');
   const { projectid } = useParams();
 
@@ -55,7 +52,6 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         setYAxis(editingChart.yAxis || '');
       }
       setTitle(editingChart.title);
-      // If editing, assume a KPI was previously selected.
       setSelectedKpi({ _id: editingChart.kpi_id });
       setCategory(editingChart.category || '');
       setStep(2);
@@ -110,17 +106,11 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     }
   }, [chartType, columns]);
 
-  // KPI selection callback stores the entire KPI object.
   const handleKpiSelect = (kpi) => {
     setSelectedKpi(kpi);
-    // Clear any previous error when a new KPI is selected.
     setKpiError('');
   };
 
-  // When user clicks "Next" from KPI selection,
-  // send a request with the selected KPI’s _id to the backend,
-  // store the returned data, set columns to ["DateTime", "Value"],
-  // and update the title with the KPI's indicator.
   const handleKpiNext = async () => {
     if (selectedKpi && selectedKpi._id) {
       try {
@@ -149,7 +139,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       data,
       columns,
       title: title || `${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart`,
-      category, // "file" or "KPI"
+      category,
       kpi_id: selectedKpi ? selectedKpi._id : null,
     };
 
@@ -225,7 +215,6 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         display: false,
       },
     },
-    // Add scales for non-pie charts
     ...(chartType !== 'pie' && {
       scales: {
         x: {

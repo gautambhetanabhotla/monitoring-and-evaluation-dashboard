@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ChartComponent from './ChartComponent';
 import { PlusCircle } from 'lucide-react';
 
+
 const Canvas = ({ charts = [], onAddChart, onEditChart, onRemoveChart }) => {
   const chartsArray = Array.isArray(charts) ? charts : [];
   const [user, setUser] = useState(null);

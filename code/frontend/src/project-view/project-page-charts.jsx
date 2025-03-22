@@ -7,7 +7,6 @@ function Charts() {
   const [charts, setCharts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingChartId, setEditingChartId] = useState(null);
-  // const project_id = "67cae012ae068409d0b8fda3";
   const { projectid } = useParams();
 
   useEffect(() => {
@@ -18,7 +17,6 @@ function Charts() {
             credentials: 'include',         }
         );
         const results = await response.json();
-        // console.log(results);
         if (results.success && Array.isArray(results.data)) {
           const formattedCharts = results.data.map(item => {
             try {
@@ -92,7 +90,6 @@ function Charts() {
         category: chartConfig.category,
         kpi_id: chartConfig.kpi_id
       };
-      // console.log(chartData.file);
       try {
         const response= await fetch(`/api/visualisation/update-visualisation/${editingChartId}`, {
           method: 'PUT',
@@ -123,7 +120,6 @@ function Charts() {
         category: chartConfig.category,
         kpi_id: chartConfig.kpi_id
       };
-      // console.log(chartData);
       try {
         const response= await fetch('/api/visualisation/save-visualisation', {
           method: 'POST',

@@ -12,7 +12,7 @@ const KpiList = ({ projectId, onSelectKpi, selectedKpiId }) => {
         const response = await fetch(`/api/visualisation/get-KpibyProject/${projectId}`, { credentials: 'include' });
         const result = await response.json();
         if (result.success) {
-          setKpis(result.data); // Assuming KPI array is returned in data.data
+          setKpis(result.data);
         } else {
           setError(result.message || 'Error fetching KPIs');
         }
