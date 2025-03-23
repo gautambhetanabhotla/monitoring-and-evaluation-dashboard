@@ -1,5 +1,6 @@
 import User from "../models/User.model.js";
 import bcrypt from "bcryptjs";
+import mongoose from "mongoose";
 
 export const getClients = async (req, res) => {
   try {
@@ -87,6 +88,10 @@ export const getUserDetails = async (req, res) => {
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
 
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ success: false, message: "Invalid user ID" });
+  }
+
   try {
     const user = await User.findByIdAndDelete(id);
 
@@ -140,6 +145,14 @@ export const updateUser = async (req, res) => {
 export const updatePassword = async (req, res) => {
   const { id } = req.params;
   const { pwd } = req.body;
+
+  if(!pwd) {
+    return res.status(400).json({ success: false, message: "Please enter all fields" });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ success: false, message: "Invalid user ID" });
+  }
   
   try {
     const user = await User.findById(id);
