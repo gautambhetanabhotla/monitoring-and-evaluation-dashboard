@@ -5,6 +5,10 @@ import Project from '../models/Project.model.js';
 export const getProjectById = async (req, res) => {
     const { projectId } = req.params;
     // console.log("REQUEST RECIEVS");
+    if(!mongoose.Types.ObjectId.isValid(projectId)) {
+        return res.status(400).json({ success: false, message: 'Invalid project ID' });
+    }
+
     try {
         const proj = await Project.findById(projectId);
         res.status(200).json({success: true, project: proj});

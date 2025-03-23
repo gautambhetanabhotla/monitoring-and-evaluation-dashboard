@@ -1,5 +1,6 @@
 import Kpi from "../models/Kpi.model.js";
 import KpiUpdate from "../models/KpiUpdate.model.js";
+import User from "../models/User.model.js";
 import mongoose from "mongoose";
 
 export const createKpi = async (req, res) => {
@@ -89,24 +90,39 @@ export const updateKpi = async (req, res) => {
 
 export const getKpiUpdatesbyKpi = async (req, res) => {
     const { kpi_id } = req.params;
-
+  
     try {
-        if(!mongoose.Types.ObjectId.isValid(kpi_id)){
-            return res.status(400).json({ success : false , message: "Invalid KPI ID" });
-        }
-
-    const kpiUpdates = await KpiUpdate.find({ kpi_id });
-
-    if(kpiUpdates.length === 0){
-        return res.status(200).json({ success : true , message: "No KPI updates found for this KPI" });
-    }
-
-    return res.status(200).json({success : true, message : `KPI updates fetched successfully`, data : kpiUpdates});
+      // Validate KPI ID
+      if (!mongoose.Types.ObjectId.isValid(kpi_id)) {
+        return res.status(400).json({ success: false, message: "Invalid KPI ID" });
+      }
+  
+      // Find KPI updates by KPI ID and return plain JavaScript objects
+      const kpiUpdates = await KpiUpdate.find({ kpi_id }).lean();
+  
+      if (kpiUpdates.length === 0) {
+        return res.status(200).json({ success: true, message: "No KPI updates found for this KPI" });
+      }
+  
+      // Fetch the updated_by user details concurrently and update the field with the username
+      await Promise.all(
+        kpiUpdates.map(async (update) => {
+          const updatedBy = await User.findById(update.updated_by).lean();
+          update.updated_by = updatedBy ? updatedBy.username : "Unknown";
+        })
+      );
+  
+      console.log(kpiUpdates);
+      return res.status(200).json({
+        success: true,
+        message: "KPI updates fetched successfully",
+        data: kpiUpdates,
+      });
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+      return res.status(500).json({ success: false, message: error.message });
     }
-};
-
+  };
+  
 export const getLatestKpiUpdate = async (req, res) => {
     const { kpi_id } = req.params;
 

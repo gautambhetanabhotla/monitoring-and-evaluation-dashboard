@@ -12,5 +12,7 @@ export default {
     moduleFileExtensions: ['js', 'jsx', 'mjs'],
     testEnvironmentOptions: {
         customExportConditions: ['node', 'node-addons'],
-    }
+    },
+    testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/',
+    ],
 };

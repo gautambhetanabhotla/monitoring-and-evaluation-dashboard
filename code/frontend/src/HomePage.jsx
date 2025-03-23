@@ -18,7 +18,7 @@ const HomePage = () => {
           // Determine redirection path based on role
           const { role } = data.user;
           if (role === 'admin') {
-            setRedirectPath('/admin');
+            setRedirectPath('/clients');
           } else if (role === 'field staff') {
             setRedirectPath('/field-staff');
           } else if (role === 'client') {
