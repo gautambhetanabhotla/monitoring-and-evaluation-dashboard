@@ -141,6 +141,14 @@ jest.mock('@heroui/spacer', () => ({
   Spacer: () => <div style={{ margin: '10px 0' }} />
 }));
 
+jest.mock('@heroui/progress', () => ({
+  Progress: () => <div />
+}));
+
+jest.mock('@heroui/chip', () => ({
+  Chip: () => <div />
+}));
+
 // Mock the heroicons
 jest.mock('@heroicons/react/24/outline', () => ({
   PencilSquareIcon: () => <span data-testid="pencil-icon">✏️</span>,
@@ -314,6 +322,23 @@ const renderKPIs = (overrides = {}) => {
                 "updatedby": "Gautam Bhetanabhotla"
             }
           ],
+          project: {
+            "id": "67cadfd3ae068409d0b8fd96",
+            "name": "Example project 1",
+            "description": "This is a description of the project.",
+            "location": "Hyderabad, India",
+            "start": "2023-10-05T14:48:00.000Z",
+            "end": "2024-10-05T14:48:00.000Z",
+            "thrust_areas": [
+                "Education",
+                "Health",
+                "Environment"
+            ],
+            "funding_partner": "XYZ Foundation",
+            "client": "ABC Trust"
+          },
+          updateKPI: jest.fn(),
+          addKPI: jest.fn(),
           ...overrides
         }}
       >
