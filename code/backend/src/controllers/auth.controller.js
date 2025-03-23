@@ -3,7 +3,7 @@ import User from '../models/User.model.js';
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
-
+  
   if (!email || !password) {
     return res
       .status(400)

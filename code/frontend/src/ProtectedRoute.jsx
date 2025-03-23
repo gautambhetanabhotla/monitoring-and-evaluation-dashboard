@@ -1,4 +1,3 @@
-// frontend/components/ProtectedRoute.jsx
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
@@ -13,11 +12,13 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
           credentials: "include",
         });
         const data = await res.json();
+        console.log(typeof data);
+        console.log("data in protected route: "+data.user.id+"\n\n\n\n\n\n\n\n\n\n");
         if (data.success) {
           setUser(data.user);
         }
       } catch (error) {
-        console.error("Error fetching user", error);
+        console.error("Error fetching user:", error);
       } finally {
         setLoading(false);
       }
@@ -36,7 +37,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/unauthorized" replace />;
   }
 
-  return children;
+  return <>{children}</>; 
 };
 
 export default ProtectedRoute;

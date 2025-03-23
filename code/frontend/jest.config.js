@@ -12,5 +12,5 @@ export default {
     moduleFileExtensions: ['js', 'jsx', 'mjs'],
     testEnvironmentOptions: {
         customExportConditions: ['node', 'node-addons'],
-    }
+    },
 };
