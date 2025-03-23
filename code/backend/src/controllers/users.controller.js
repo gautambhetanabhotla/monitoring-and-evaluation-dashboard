@@ -64,7 +64,12 @@ export const getUserDetails = async (req, res) => {
     return res.status(401).json({ success: false, message: "Not authenticated" });
   }
   try {
-    const user = await User.findById(req.session.userId).select("-passwordHash");
+    let userId = req.query.clientId;
+    if (!userId) {
+      userId = req.session.userId;
+    }
+
+    const user = await User.findById(userId).select("-passwordHash");
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
