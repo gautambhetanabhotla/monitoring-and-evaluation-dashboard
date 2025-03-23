@@ -13,6 +13,4 @@ export default {
     testEnvironmentOptions: {
         customExportConditions: ['node', 'node-addons'],
     },
-    testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/',
-    ],
 };
