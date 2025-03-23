@@ -1,4 +1,6 @@
 import '@testing-library/jest-dom';
+import { TextEncoder, TextDecoder } from 'util';
+
 HTMLCanvasElement.prototype.getContext = () => {
     return {
       fillRect: () => {},
@@ -27,4 +29,7 @@ HTMLCanvasElement.prototype.getContext = () => {
       clip: () => {},
     };
   };
+
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
   

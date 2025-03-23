@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, waitFor, screen } from '@testing-library/react';
-import ChartModal from '../src/project-view/project-page-charts/ChartModal.jsx';
+import ChartModal from '../../src/project-view/project-page-charts/ChartModal.jsx';
 import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('react-chartjs-2', () => ({

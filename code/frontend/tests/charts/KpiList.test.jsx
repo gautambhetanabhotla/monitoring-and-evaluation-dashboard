@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, waitFor, screen, fireEvent } from '@testing-library/react';
-import KpiList from '../src/project-view/project-page-charts/KpiList.jsx';
+import KpiList from '../../src/project-view/project-page-charts/KpiList.jsx';
 import '@testing-library/jest-dom';
 
 beforeEach(() => {
