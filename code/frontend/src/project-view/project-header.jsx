@@ -79,6 +79,9 @@ const Nav = () => {
   // const [selectedTab, setSelectedTab] = useState(tabname);
   const navbarRef = useRef(null);
 
+  const queryParams = new URLSearchParams(location.search);
+  const clientId = queryParams.get('clientId');
+
   const [user, setUser] = useState(null);
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -136,7 +139,7 @@ const Nav = () => {
         }}
       >
         <NavbarBrand>
-          <Link className='inline' to="/projects">
+          <Link className='inline' to={user?.role === 'client' ? '/projects' : `/projects?clientId=${clientId}`}>
             <HomeIcon className="size-6 inline" />
             <p className='prose inline pl-2'>Home</p>
           </Link>

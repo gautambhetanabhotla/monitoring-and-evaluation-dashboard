@@ -133,111 +133,118 @@ export const ClientGallery = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen p-6 relative">
+        <div className="flex flex-col h-screen">
             {showAlert && (
-                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+                <div className="fixed top-4 right-4 z-50">
                     <Alert 
                         className="max-w-md"
-                        variant="faded"
+                        variant="solid"
                         color="success"
                         onClose={() => setShowAlert(false)}
                     >
-                        <div className="font-medium">Client user account created successfully!</div>
-                        <div>{password}</div>
-                        <div className="text-xs mt-2">This password will only be shown once. Please copy it now.</div>
+                        <div className="font-medium text-sm">Client user account created successfully!</div>
+                        <div className="text-sm">{password}</div>
+                        <div className="text-xs mt-1">This password will only be shown once. Please copy it now.</div>
                     </Alert>
                 </div>
             )}
 
-            <div className="flex justify-between mb-6 items-center">
-                <h2 className="text-3xl font-bold">Client List</h2>
-                <div className="flex space-x-4">
-                    <Button
-                        className="text-xl font-bold py-2 px-4 bg-amber-300 text-black"
-                        onPress={onOpen}
-                        size="md"
-                        radius="large"
-                    >
-                        Add Client
-                    </Button>
-                    <Button
-                        className="text-xl font-bold py-2 px-4 bg-amber-300 text-black"
-                        onPress={logout}
-                        size="md"
-                        radius="large"
-                    >
-                        Logout
-                    </Button>
+            <div className="flex-none p-6 z-10 border-b border-cyan-800">
+                <div className="flex justify-between items-center">
+                    <h2 className="text-4xl font-bold">Client List</h2>
+                    <div className="flex space-x-4">
+                        <Button
+                            className="text-xl font-bold py-2 px-4 text-black"
+                            onPress={onOpen}
+                            size="md"
+                            radius="large"
+                            color="primary"
+                        >
+                            Add Client
+                        </Button>
+                        <Button
+                            className="text-xl font-bold py-2 px-4 text-black"
+                            onPress={logout}
+                            size="md"
+                            radius="large"
+                            color="primary"
+                        >
+                            Logout
+                        </Button>
+                    </div>
+
+                    <Modal isOpen={isOpen} onOpenChange={handleOpenChange} placement="center" size="md">
+                        <ModalContent>
+                            {() => (
+                                <>
+                                    <ModalHeader className="flex flex-col gap-1">Add Client</ModalHeader>
+                                    <ModalBody>
+                                    <Input
+                                        isRequired
+                                        label="Username"
+                                        labelPlacement="outside"
+                                        placeholder="Enter username"
+                                        variant="bordered"
+                                        type="text"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                    />
+                                    <Input
+                                        isRequired
+                                        label="Email"
+                                        labelPlacement="outside"
+                                        placeholder="Enter email"
+                                        variant="bordered"
+                                        type="email"
+                                        errorMessage="Please enter a valid email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
+                                    <Input
+                                        isRequired
+                                        label="Phone Number"
+                                        labelPlacement="outside"
+                                        placeholder="Enter phone number"
+                                        variant="bordered"
+                                        type="tel"
+                                        maxLength="10"
+                                        errorMessage="Please enter a valid phone number"
+                                        value={phoneNumber}
+                                        onChange={(e) => setPhoneNumber(e.target.value)}
+                                    />
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <Button color="primary" onPress={createClient}>
+                                            Add
+                                        </Button>
+                                    </ModalFooter>
+                                </>
+                            )}
+                        </ModalContent>
+                    </Modal>
                 </div>
-                <Modal isOpen={isOpen} onOpenChange={handleOpenChange} placement="center" size="md">
-                    <ModalContent>
-                        {() => (
-                            <>
-                                <ModalHeader className="flex flex-col gap-1">Add Client</ModalHeader>
-                                <ModalBody>
-                                <Input
-                                    isRequired
-                                    label="Username"
-                                    labelPlacement="outside"
-                                    placeholder="Enter username"
-                                    variant="bordered"
-                                    type="text"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                />
-                                <Input
-                                    isRequired
-                                    label="Email"
-                                    labelPlacement="outside"
-                                    placeholder="Enter email"
-                                    variant="bordered"
-                                    type="email"
-                                    errorMessage="Please enter a valid email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                                <Input
-                                    isRequired
-                                    label="Phone Number"
-                                    labelPlacement="outside"
-                                    placeholder="Enter phone number"
-                                    variant="bordered"
-                                    type="tel"
-                                    maxLength="10"
-                                    errorMessage="Please enter a valid phone number"
-                                    value={phoneNumber}
-                                    onChange={(e) => setPhoneNumber(e.target.value)}
-                                />
-                                </ModalBody>
-                                <ModalFooter>
-                                    <Button color="primary" onPress={createClient}>
-                                        Add
-                                    </Button>
-                                </ModalFooter>
-                            </>
-                        )}
-                    </ModalContent>
-                </Modal>
             </div>
 
-            <div className="flex flex-col space-y-4">
-                {clientList.length === 0 ? (
-                    <p className="text-xl text-gray-500">No clients found.</p>
-                ) : (
-                    clientList.map((client) => (
-                        <Card
-                            key={client._id}
-                            isPressable
-                            onPress={() => navigate(`/projects?clientId=${client._id}`)}
-                            className="border border-amber-400 rounded-lg shadow-md w-full"
-                        >
-                            <CardBody className="p-6">
-                                <h3 className="font-medium text-xl mb-2">Username: {client.username}</h3>
-                                <p>Email: {client.email}</p>
-                            </CardBody>
-                        </Card>
-                    ))
-                )}
+            <div className="flex-grow overflow-y-auto p-6 pt-4">
+                <div className="flex flex-col space-y-4">
+                    {clientList.length === 0 ? (
+                        <p className="text-xl text-gray-500">No clients found.</p>
+                    ) : (
+                        clientList.map((client) => (
+                            <Card
+                                key={client._id}
+                                isPressable
+                                onPress={() => navigate(`/projects?clientId=${client._id}`)}
+                                className="border rounded-lg shadow-md w-full border-cyan-800"
+                            >
+                                <CardBody className="p-6">
+                                    <h3 className="font-medium text-xl mb-2">Username: {client.username}</h3>
+                                    <p>Email: {client.email}</p>
+                                </CardBody>
+                            </Card>
+                        ))
+                    )}
+                </div>
             </div>
         </div>
     );
