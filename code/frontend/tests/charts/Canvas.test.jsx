@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, waitFor, screen, fireEvent } from '@testing-library/react';
-import Canvas from '../src/project-view/project-page-charts/Canvas.jsx';
+import Canvas from '../../src/project-view/project-page-charts/Canvas.jsx';
 import '@testing-library/jest-dom';
 
 jest.mock('react-chartjs-2', () => ({

@@ -325,3 +325,4 @@ const KPIs = () => {
 };
 
 export default KPIs;
+export { EditKPIButton, KPI, KPIsList, AddKPIButton };

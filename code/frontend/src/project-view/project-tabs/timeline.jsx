@@ -32,7 +32,7 @@ const AddTaskButton = () => {
   const ctx = useContext(ProjectContext);
   return (
     <>
-      <Popover showArrow>
+      <Popover showArrow data-testid="add-task-button">
         <PopoverTrigger>
           <Button
             size='lg'
@@ -146,7 +146,7 @@ const KPIUpdateButton = ({ task }) => {
 
   return (
     <>
-      <Button onPress={onOpen} isIconOnly>
+      <Button data-testid="kpi-update-button" onPress={onOpen} isIconOnly>
         <PlusIcon className="size-6" />
       </Button>
       <Modal
@@ -308,7 +308,7 @@ const Task = ({ task }) => {
   return (
     <>
       <Divider className="mt-10" />
-      <h1 className="prose text-5xl pl-10 mt-10">{title}</h1>
+      <h1 data-testid="task" className="prose text-5xl pl-10 mt-10">{title}</h1>
       <div className="pl-10">
         <h2 className="prose text-3xl p-10">Description</h2>
         <Textarea
@@ -352,7 +352,7 @@ const KPIUpdate = ({ update }) => {
   return (
     <>
       <Card className="max-w-2xl m-2 ml-10 p-5">
-        <h3 className="prose text-xl font-bold">{ctx.adjustedKPIs?.find(kpi => kpi.id === update.kpi)?.indicator}</h3>
+        <h3 data-testid="kpi-update" className="prose text-xl font-bold">{ctx.adjustedKPIs?.find(kpi => kpi.id === update.kpi)?.indicator}</h3>
         <span className="prose pt-2 flex items-center gap-6">
           <span className="prose flex items-center gap-3 text-xl">{update.initial}
           {update.final > update.initial ?
@@ -369,3 +369,4 @@ const KPIUpdate = ({ update }) => {
 };
 
 export default Timeline;
+export { Task, KPIUpdate, AddTaskButton, KPIUpdateButton };

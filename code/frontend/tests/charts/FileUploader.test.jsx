@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, waitFor, screen, act } from '@testing-library/react';
-import FileUploader from '../src/project-view/project-page-charts/FileUploader.jsx';
+import FileUploader from '../../src/project-view/project-page-charts/FileUploader.jsx';
 import '@testing-library/jest-dom';
 
 let capturedOnDrop;
