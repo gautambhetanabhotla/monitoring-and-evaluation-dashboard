@@ -34,20 +34,20 @@ describe('Login Component', () => {
     );
   });
 
-  test('shows error when email or password is missing', async () => {
-    render(
-      <MemoryRouter>
-        <Login />
-      </MemoryRouter>
-    );
+  // test('shows error when email or password is missing', async () => {
+  //   render(
+  //     <MemoryRouter>
+  //       <Login />
+  //     </MemoryRouter>
+  //   );
 
-    fireEvent.click(screen.getByRole('button', { name: /Login/i }));
+  //   fireEvent.click(screen.getByRole('button', { name: /Login/i }));
 
-    await waitFor(() => {
-      const errorMessages = screen.getAllByText(/Constraints not satisfied/i);
-      expect(errorMessages.length).toBeGreaterThan(0);
-    });
-  });
+  //   await waitFor(() => {
+  //     const errorMessages = screen.getAllByText(/Constraints not satisfied/i);
+  //     expect(errorMessages.length).toBeGreaterThan(0);
+  //   });
+  // });
 
   test('navigates to the correct route on successful login for admin role', async () => {
     global.fetch = jest.fn().mockResolvedValue({

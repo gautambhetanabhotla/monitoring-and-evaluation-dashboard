@@ -32,11 +32,12 @@ const AddTaskButton = () => {
   const ctx = useContext(ProjectContext);
   return (
     <>
-      <Popover showArrow data-testid="add-task-button">
+      <Popover showArrow>
         <PopoverTrigger>
           <Button
             size='lg'
             color='primary'
+            data-testid="add-task-button"
             startContent={<PlusIcon className="size-6" />}
           >
             Add task
@@ -54,7 +55,7 @@ const AddTaskButton = () => {
               })
               .then(res => {
                 if (!res.data.success) return;
-                console.dir(res.data);
+                // console.dir(res.data);
                 ctx.addTask(res.data.id, title, description);
               })
               .catch(err => {
@@ -127,8 +128,8 @@ const KPIUpdateButton = ({ task }) => {
       note: note,
     })
     .then(res => {
-      console.log(ctx.project.id);
-      console.dir(res);
+      // console.log(ctx.project.id);
+      // console.dir(res);
       ctx.updateKPI({
         ...update,
         id: res.data.id,
@@ -287,12 +288,12 @@ const Task = ({ task }) => {
   // const updates = ctx.KPIUpdates.filter(update => update.task === task?.id );
   const [updates, setUpdates] = useState([]);
   useEffect(() => {
-    console.dir(ctx.KPIUpdates.filter(update => {
-      console.dir(update);
-      return update.task === task?.id;
-    }));
+    // console.dir(ctx.KPIUpdates.filter(update => {
+    //   // console.dir(update);
+    //   return update.task === task?.id;
+    // }));
     setUpdates(ctx.KPIUpdates.filter(update => update.task === task?.id ));
-    console.log(`updates for task ${task?.title}: ${updates.length}`);
+    // console.log(`updates for task ${task?.title}: ${updates.length}`);
   }, [ctx.KPIUpdates, task?.id, task?.title, updates.length]);
   
   // console.dir(updates);

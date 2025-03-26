@@ -278,7 +278,7 @@ const KPIs = () => {
   return (
     <>
       <div className="flex flex-row justify-center">
-        <h1 className="prose text-5xl p-10">Key performance indexes (KPIs)</h1>
+        <h1 className="prose text-5xl p-10">Key performance indicators (KPIs)</h1>
       </div>
       <div className="flex flex-row flex-wrap justify-center items-center gap-3 px-10">
         <Autocomplete
