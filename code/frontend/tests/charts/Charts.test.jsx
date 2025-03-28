@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, waitFor, screen } from '@testing-library/react';
-import Charts from '../src/project-view/project-page-charts.jsx';
+import Charts from '../../src/project-view/project-page-charts.jsx';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 global.fetch = jest.fn(() =>

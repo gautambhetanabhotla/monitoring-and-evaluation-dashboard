@@ -28,7 +28,7 @@ const ProjectHeader = () => {
   return (
     <>
       <div className="mt-15 pt-15 grid grid-cols-1 p-5">
-        <Card className='my-5'>
+        <Card className='my-5' data-testid="project-title">
           <div className="md:col-span-2 drop-shadow-white">
             <article
               className="prose text-7xl font-bold pt-14 pl-10 pr-10 pb-16 drop-shadow-[0_35px_35px_rgba(255, 255, 255, 0.781)]"

@@ -1,5 +1,5 @@
-import {Avatar, AvatarGroup, AvatarIcon} from "@heroui/avatar";
-import {Card, CardHeader, CardBody, CardFooter} from "@heroui/card";
+// import {Avatar, AvatarGroup, AvatarIcon} from "@heroui/avatar";
+// import {Card, CardHeader, CardBody, CardFooter} from "@heroui/card";
 
 const SuccessStories = () => {
   return (

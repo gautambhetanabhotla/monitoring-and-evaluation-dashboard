@@ -39,4 +39,10 @@ export const PlusIcon = createIconMock('PlusIcon');
 export const EllipsisVerticalIcon = createIconMock('EllipsisVerticalIcon');
 export const MagnifyingGlassIcon = createIconMock('MagnifyingGlassIcon');
 export const BellIcon = createIconMock('BellIcon');
+export const PencilSquareIcon = createIconMock('PencilSquareIcon');
+export const CheckCircleIcon = createIconMock('CheckCircleIcon');
+export const ArrowTrendingDownIcon = createIconMock('ArrowTrendingDownIcon');
+export const ArrowTrendingUpIcon = createIconMock('ArrowTrendingUpIcon');
+export const CheckIcon = createIconMock('CheckIcon');
+export const ArrowsUpDownIcon = createIconMock('ArrowsUpDownIcon');
 

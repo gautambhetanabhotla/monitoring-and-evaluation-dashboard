@@ -33,8 +33,10 @@ export default [
         plugins: {
             jest: jest,
         },
-        env: {
-            'jest/globals': true,
+        languageOptions: {
+            globals: {
+                ...globals.jest,
+            },
         },
         rules: {
             ...jest.configs.recommended.rules,

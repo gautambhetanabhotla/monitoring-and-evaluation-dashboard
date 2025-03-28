@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, waitFor, screen } from '@testing-library/react';
-import ChartComponent from '../src/project-view/project-page-charts/ChartComponent.jsx';
+import ChartComponent from '../../src/project-view/project-page-charts/ChartComponent.jsx';
 import '@testing-library/jest-dom';
 
 jest.mock('react-chartjs-2', () => ({
