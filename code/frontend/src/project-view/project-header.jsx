@@ -146,22 +146,22 @@ const Nav = () => {
         </NavbarBrand>
         <NavbarContent className="hidden md:flex">
           <NavbarItem isActive={tabname !== "charts" && tabname !== "kpis" && tabname !== "timeline" && tabname !== "success-stories" && tabname !== "log-framework"}>
-            <Link to="overview">Overview</Link>
+            <Link to={user?.role === 'client' ? 'overview' : `overview?clientId=${clientId}`}>Overview</Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "charts"}>
-            <Link to="charts">Charts</Link>
+            <Link to={user?.role === 'client' ? 'charts' : `charts?clientId=${clientId}`}>Charts</Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "kpis"}>
-            <Link to="kpis">KPIs</Link>
+            <Link to={user?.role === 'client' ? 'kpis' : `kpis?clientId=${clientId}`}>KPIs</Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "timeline"}>
-            <Link to="timeline">Timeline</Link>
+            <Link to={user?.role === 'client' ? 'timeline' : `timeline?clientId=${clientId}`}>Timeline</Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "success-stories"}>
-            <Link to="success-stories">Success stories</Link>
+            <Link to={user?.role === 'client' ? 'success-stories' : `success-stories?clientId=${clientId}`}>Success stories</Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "log-framework"}>
-            <Link to="log-framework">Log framework</Link>
+            <Link to={user?.role === 'client' ? 'log-framework' : `log-framework?clientId=${clientId}`}>Log framework</Link>
           </NavbarItem>
         </NavbarContent>
         <NavbarContent justify='end'>
@@ -185,22 +185,22 @@ const Nav = () => {
         <NavbarMenuToggle />
         <NavbarMenu portalContainer={navbarRef.current}>
           <NavbarMenuItem>
-            <Link to="overview">Overview</Link>
+            <Link to={user?.role === 'client' ? 'overview' : `overview?clientId=${clientId}`}>Overview</Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to="charts">Charts</Link>
+            <Link to={user?.role === 'client' ? 'charts' : `charts?clientId=${clientId}`}>Charts</Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to="kpis">KPIs</Link>
+            <Link to={user?.role === 'client' ? 'kpis' : `kpis?clientId=${clientId}`}>KPIs</Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to="timeline">Timeline</Link>
+            <Link to={user?.role === 'client' ? 'timeline' : `timeline?clientId=${clientId}`}>Timeline</Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to="success-stories">Success stories</Link>
+            <Link to={user?.role === 'client' ? 'success-stories' : `success-stories?clientId=${clientId}`}>Success stories</Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to="log-framework">Log framework</Link>
+            <Link to={user?.role === 'client' ? 'log-framework' : `log-framework?clientId=${clientId}`}>Log framework</Link>
           </NavbarMenuItem>
         </NavbarMenu>
       </Navbar>
