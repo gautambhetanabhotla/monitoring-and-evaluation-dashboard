@@ -15,6 +15,7 @@ const ProjectContextProvider = ({ children }) => {
 
   const location = useLocation();
 
+  // KPIs
   useEffect(() => {
     if(!project?.id) return;
     fetch(`/api/kpi/getKpis/${project?.id}`)
@@ -31,6 +32,7 @@ const ProjectContextProvider = ({ children }) => {
     .catch(error => console.error("Error fetching KPIs - " + error));
   }, [project?.id]);
 
+  // Adjusted KPIs
   useEffect(() => {
     const updatedKPIs = KPIs.map(KPI => {
       const updatesOfKPI = KPIUpdates
@@ -44,13 +46,14 @@ const ProjectContextProvider = ({ children }) => {
     setAdjustedKPIs(updatedKPIs);
   }, [KPIs, KPIUpdates]);
 
+  // KPI Updates
   useEffect(() => {
     if(!project?.id || !KPIs || KPIs.length === 0) return;
     for (const kpi of KPIs) {
       fetch(`/api/kpi/getKpiUpdates/${kpi?.id}`)
       .then(response => response.json())
       .then(data => {
-        console.dir(data);
+        // console.dir(data);
         if(!data.success || !data.data) return;
         for (const update of data.data) {
           update.id = update._id;
@@ -64,12 +67,13 @@ const ProjectContextProvider = ({ children }) => {
           update.date = date;
         }
         setKPIUpdates(KPIUpdates => [...KPIUpdates, ...data.data]);
-        console.dir(data.data);
+        // console.dir(data.data);
       })
       .catch(error => console.error("Error fetching KPI updates" + error));
     }
   }, [project?.id, KPIs]);
 
+  // Project
   useEffect(() => {
     // fetch('/project.json')
     // .then(response => response.json())
@@ -77,10 +81,10 @@ const ProjectContextProvider = ({ children }) => {
     // .catch(error => console.error("Error fetching project" + error));
     // console.dir(location.pathname.split('/'));
     const project_id = location.pathname.split('/')[1];
-    console.log(project_id);
+    // console.log(project_id);
     axios.get(`/api/projects/get/${project_id}`)
     .then(response => {
-      console.dir(response);
+      // console.dir(response);
       if(response.data.success) {
         const proj = response.data.project;
         proj.start = proj.start_date;
@@ -92,6 +96,7 @@ const ProjectContextProvider = ({ children }) => {
     });
   }, [location.pathname]);
 
+  // Success stories
   useEffect(() => {
     fetch('/success-stories.json')
     .then(response => response.json())
@@ -99,6 +104,7 @@ const ProjectContextProvider = ({ children }) => {
     .catch(error => console.error("Error fetching success stories" + error));
   }, []);
 
+  // Tasks
   useEffect(() => {
     if(!project?.id) return;
     fetch(`/api/task/getTasks/${project?.id}`)
@@ -113,7 +119,7 @@ const ProjectContextProvider = ({ children }) => {
           description: element.description,
         };
       }));
-      console.dir(data);
+      // console.dir(data);
     })
     .catch(error => console.error("Error fetching tasks" + error));
   }, [project?.id]);
@@ -156,21 +162,21 @@ const ProjectContextProvider = ({ children }) => {
   return (
     <ProjectContext.Provider
       value={{
-              project,
-              setProject,
-              successStories,
-              setSuccessStories,
-              KPIUpdates,
-              // setKPIUpdates,
-              tasks,
-              // setTasks,
-              adjustedKPIs,
-              // setKPIs,
-              updateKPI,
-              editKPI,
-              updateTaskDescription,
-              addTask,
-              addKPI
+        project,
+        setProject,
+        successStories,
+        setSuccessStories,
+        KPIUpdates,
+        // setKPIUpdates,
+        tasks,
+        // setTasks,
+        adjustedKPIs,
+        // setKPIs,
+        updateKPI,
+        editKPI,
+        updateTaskDescription,
+        addTask,
+        addKPI
       }}
     >
       {children}
