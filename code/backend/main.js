@@ -1,3 +1,5 @@
+import https from 'https';
+import fs from 'fs';
 import express from 'express';
 import dotenv from 'dotenv';
 import session from 'express-session';
@@ -10,6 +12,7 @@ import kpiRouter from './src/routes/kpi.routes.js';
 import taskRouter from './src/routes/task.routes.js';
 import cors from 'cors';
 import connectDB from './src/config/connectDB.js';
+import process from 'process';
 
 dotenv.config();
 connectDB(); // Connect to MongoDB
@@ -22,6 +25,7 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
 // Session Configuration
 app.use(
@@ -34,14 +38,20 @@ app.use(
             collectionName: 'sessions',
         }),
         cookie: {
-            secure: false,
+            secure: true,
             httpOnly: true,
             sameSite: 'strict',
-            // Make session expiry time infinite
-            maxAge: 60*60 * 1000, // 1-hour session expiry
         },
     })
 );
+
+app.get('/', (_, res) => {
+    res.status(200).sendFile('index.html', { root: './public' });
+});
+
+app.get('/:anything', (_, res) => {
+    res.status(200).sendFile('index.html', { root: './public' });
+});
 
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
@@ -50,10 +60,15 @@ app.use('/api/visualisation', visualisationRouter);
 app.use('/api/kpi', kpiRouter);
 app.use('/api/task', taskRouter);
 
-app.use((req, res) => {
-    res.status(404).json({ message: "Route not found" });
-});
-
 const PORT = process.env.PORT || 5011;
 
-app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));
+// Load SSL certificate and private key
+const sslOptions = {
+    key: fs.readFileSync('./certs/key.pem'),
+    cert: fs.readFileSync('./certs/cert.pem'),
+};
+
+// Create HTTPS server
+https.createServer(sslOptions, app).listen(PORT, () => {
+    console.log(`HTTPS Server is running on https://0.0.0.0:${PORT}`);
+});

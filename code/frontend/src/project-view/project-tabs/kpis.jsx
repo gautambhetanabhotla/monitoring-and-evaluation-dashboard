@@ -10,6 +10,8 @@ import {Modal, ModalContent, useDisclosure} from "@heroui/modal";
 import {Input, Textarea} from "@heroui/input";
 import {NumberInput} from "@heroui/number-input";
 import {Form} from "@heroui/form";
+import {RadioGroup, Radio} from "@heroui/radio";
+import {Spacer} from '@heroui/spacer';
 
 import axios from 'axios';
 
@@ -23,7 +25,7 @@ const EditKPIButton = ({ kpi }) => {
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const [loading, setLoading] = useState(false);
 
-  const [logFrameLevel, setLogFrameLevel] = useState(new Set([kpi.logframe_level]));
+  const [logFrameLevel, setLogFrameLevel] = useState(kpi.logframe_level);
   const [title, setTitle] = useState(kpi.indicator);
   const [whatItTracks, setWhatItTracks] = useState(kpi.what_it_tracks);
   const [explanation, setExplanation] = useState(kpi.explanation);
@@ -38,7 +40,7 @@ const EditKPIButton = ({ kpi }) => {
       project_id: ctx.project.id,
       indicator: title,
       what_it_tracks: whatItTracks,
-      logframe_level: Array.from(logFrameLevel)[0],
+      logframe_level: logFrameLevel,
       explanation: explanation,
       baseline: baseline,
       target: target,
@@ -51,7 +53,7 @@ const EditKPIButton = ({ kpi }) => {
         project_id: ctx.project.id,
         indicator: title,
         what_it_tracks: whatItTracks,
-        logframe_level: Array.from(logFrameLevel)[0],
+        logframe_level: logFrameLevel,
         explanation: explanation,
         baseline: baseline,
         target: target,
@@ -61,9 +63,9 @@ const EditKPIButton = ({ kpi }) => {
     });
   };
 
-  const handleLogFrameLevelChange = (set) => {
-    setLogFrameLevel(set);
-  };
+  // const handleLogFrameLevelChange = (set) => {
+  //   setLogFrameLevel(set);
+  // };
 
   return (
     <>
@@ -75,7 +77,7 @@ const EditKPIButton = ({ kpi }) => {
         onOpenChange={onOpenChange}
         isDismissable={false}
         isKeyboardDismissDisabled={false}
-        hideCloseButton={false}
+        hideCloseButton={true}
         className='p-9'
         size='xl'
       >
@@ -83,7 +85,7 @@ const EditKPIButton = ({ kpi }) => {
           <Form onSubmit={handleSubmit}>
             <Input isRequired label='Title' value={title} onValueChange={setTitle} />
             <Input isRequired label='What does it track?' value={whatItTracks} onValueChange={setWhatItTracks} />
-            <Select
+            {/* <Select
               isRequired
               label='Logframe level'
               selectedKeys={logFrameLevel}
@@ -94,7 +96,21 @@ const EditKPIButton = ({ kpi }) => {
               <SelectItem key='Outcome'>Outcome</SelectItem>
               <SelectItem key='Output'>Output</SelectItem>
               <SelectItem key='Activity'>Activity</SelectItem>
-            </Select>
+            </Select> */}
+            <Spacer />
+            <RadioGroup
+              isRequired
+              label='Logframe level'
+              orientation='horizontal'
+              value={logFrameLevel}
+              onValueChange={setLogFrameLevel}
+            >
+              <Radio value='Goal'>Goal</Radio>
+              <Radio value='Outcome'>Outcome</Radio>
+              <Radio value='Output'>Output</Radio>
+              <Radio value='Activity'>Activity</Radio>
+            </RadioGroup>
+            <Spacer />
             <Textarea label='Explanation' value={explanation} onValueChange={setExplanation} />
             <div className='flex flex-row gap-2 mt-5'>
             <NumberInput isRequired label='Baseline' value={baseline} onValueChange={setBaseline} />
@@ -187,7 +203,7 @@ const AddKPIButton = () => {
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
   const [loading, setLoading] = useState(false);
 
-  const [logFrameLevel, setLogFrameLevel] = useState(new Set(['']));
+  const [logFrameLevel, setLogFrameLevel] = useState('');
   const [title, setTitle] = useState('');
   const [whatItTracks, setWhatItTracks] = useState('');
   const [explanation, setExplanation] = useState('');
@@ -201,7 +217,7 @@ const AddKPIButton = () => {
       project_id: ctx.project.id,
       indicator: title,
       what_it_tracks: whatItTracks,
-      logframe_level: Array.from(logFrameLevel)[0],
+      logframe_level: logFrameLevel,
       explanation: explanation,
       baseline: baseline,
       target: target,
@@ -216,9 +232,20 @@ const AddKPIButton = () => {
     });
   };
 
-  const handleLogFrameLevelChange = (set) => {
-    setLogFrameLevel(set);
+  const handleCloseModal = () => {
+    onClose();
+    setTitle('');
+    setWhatItTracks('');
+    setLogFrameLevel('');
+    setExplanation('');
+    setBaseline(0);
+    setTarget(0);
+    setLoading(false);
   };
+
+  // const handleLogFrameLevelChange = (set) => {
+  //   setLogFrameLevel(set);
+  // };
 
   return (
     <>
@@ -234,7 +261,7 @@ const AddKPIButton = () => {
         onOpenChange={onOpenChange}
         isDismissable={false}
         isKeyboardDismissDisabled={false}
-        hideCloseButton={false}
+        hideCloseButton={true}
         className='p-9'
         size='xl'
       >
@@ -242,7 +269,7 @@ const AddKPIButton = () => {
           <Form onSubmit={handleSubmit}>
             <Input isRequired label='Title' value={title} onValueChange={setTitle} />
             <Input isRequired label='What does it track?' value={whatItTracks} onValueChange={setWhatItTracks} />
-            <Select
+            {/* <Select
               isRequired
               label='Logframe level'
               selectedKeys={logFrameLevel}
@@ -253,7 +280,21 @@ const AddKPIButton = () => {
               <SelectItem key='Outcome'>Outcome</SelectItem>
               <SelectItem key='Output'>Output</SelectItem>
               <SelectItem key='Activity'>Activity</SelectItem>
-            </Select>
+            </Select> */}
+            <Spacer />
+            <RadioGroup
+              isRequired
+              label='Logframe level'
+              orientation='horizontal'
+              value={logFrameLevel}
+              onValueChange={setLogFrameLevel}
+            >
+              <Radio value='Goal'>Goal</Radio>
+              <Radio value='Outcome'>Outcome</Radio>
+              <Radio value='Output'>Output</Radio>
+              <Radio value='Activity'>Activity</Radio>
+            </RadioGroup>
+            <Spacer />
             <Textarea label='Explanation' value={explanation} onValueChange={setExplanation} />
             <div className='flex flex-row gap-2 mt-5'>
             <NumberInput isRequired label='Baseline' value={baseline} onValueChange={setBaseline} />
@@ -261,7 +302,7 @@ const AddKPIButton = () => {
             </div>
             <div className='flex flex-row gap-2 mt-5'>
               <Button color='primary' size='lg' type='submit' isLoading={loading}>Submit</Button>
-              <Button color='danger' size='lg' onPress={onClose}>Close</Button>
+              <Button variant='bordered' size='lg' onPress={handleCloseModal}>Close</Button>
             </div>
           </Form>
         </ModalContent>

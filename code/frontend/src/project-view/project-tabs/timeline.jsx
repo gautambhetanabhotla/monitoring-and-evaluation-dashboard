@@ -30,9 +30,11 @@ const AddTaskButton = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const ctx = useContext(ProjectContext);
+  const [loading, setLoading] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   return (
     <>
-      <Popover showArrow>
+      <Popover showArrow isOpen={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <PopoverTrigger>
           <Button
             size='lg'
@@ -47,6 +49,7 @@ const AddTaskButton = () => {
           <Form
             onSubmit={(e) => {
               e.preventDefault();
+              setLoading(true);
               // console.log("submitting " + title + " " + description);
               axios.post('/api/task/create', {
                 project_id: ctx.project.id,
@@ -55,11 +58,17 @@ const AddTaskButton = () => {
               })
               .then(res => {
                 if (!res.data.success) return;
-                // console.dir(res.data);
+                console.dir(res.data);
                 ctx.addTask(res.data.id, title, description);
+                setIsPopoverOpen(false);
+                setTitle('');
+                setDescription('');
+                setLoading(false);
               })
               .catch(err => {
                 console.error("Axios request failed:", err.response?.data?.message || err.message);
+                setLoading(false);
+                setIsPopoverOpen(false);
               });
             }}
           >
@@ -77,7 +86,14 @@ const AddTaskButton = () => {
               onValueChange={setDescription}
             />
             <Spacer />
-            <Button color='primary' type="submit" startContent={<PlusIcon className="size-6" />}>Add</Button>
+            <Button
+              color='primary'
+              type="submit"
+              startContent={<PlusIcon className="size-6" />}
+              isLoading={loading}
+            >
+              Add
+            </Button>
             <Spacer />
           </Form>
         </PopoverContent>
