@@ -6,7 +6,7 @@ export const getProjectById = async (req, res) => {
     const { projectId } = req.params;
     // console.log("REQUEST RECIEVS");
     if(!mongoose.Types.ObjectId.isValid(projectId)) {
-        return res.status(400).json({ success: false, message: 'Invalid project ID' });
+        return res.status(404).json({ success: false, message: 'Invalid project ID' });
     }
 
     try {

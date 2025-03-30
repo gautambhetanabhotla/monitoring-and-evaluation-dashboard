@@ -23,8 +23,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: `http://localhost:${port}/`,
+        target: `https://localhost:${port}/`,
         changeOrigin: true,
+        secure: false,
         configure: (proxy) => {
           proxy.on('proxyReq', (_, req, res) => {
             bodyParser.json()(req, res, () => {

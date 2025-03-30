@@ -4,6 +4,7 @@ import session from 'express-session';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
+import process from 'process';
 
 import projectRouter from '../routes/project.routes.js';
 import authRouter from '../routes/auth.routes.js';
@@ -116,11 +117,11 @@ describe('Project Routes (Real Database)', () => {
       expect(res.body.project).toHaveProperty('_id', testProject._id.toString());
     });
 
-    test('Should return 400 if an invalid projectId format is provided', async () => {
+    test('Should return 4004 if an invalid projectId format is provided', async () => {
       await loginAs(agent, clientUser.email, clientPassword);
 
       const res = await agent.get(`/api/projects/get/invalidId`);
-      expect(res.statusCode).toBe(400);
+      expect(res.statusCode).toBe(404);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe('Invalid project ID');
     });
