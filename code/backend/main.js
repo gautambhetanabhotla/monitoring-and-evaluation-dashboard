@@ -10,6 +10,7 @@ import kpiRouter from './src/routes/kpi.routes.js';
 import taskRouter from './src/routes/task.routes.js';
 import cors from 'cors';
 import connectDB from './src/config/connectDB.js';
+import process from 'process';
 
 dotenv.config();
 connectDB(); // Connect to MongoDB

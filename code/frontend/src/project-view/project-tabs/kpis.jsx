@@ -217,7 +217,7 @@ const AddKPIButton = () => {
       project_id: ctx.project.id,
       indicator: title,
       what_it_tracks: whatItTracks,
-      logframe_level: Array.from(logFrameLevel)[0],
+      logframe_level: logFrameLevel,
       explanation: explanation,
       baseline: baseline,
       target: target,
