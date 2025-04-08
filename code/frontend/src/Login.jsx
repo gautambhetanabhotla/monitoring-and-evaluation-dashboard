@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
+import { AuthContext } from "./AuthContext.jsx"; // Adjust the import path as necessary
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,29 +21,18 @@ const Login = () => {
     }
     setError("");
 
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-        credentials: "include",
-      });
-      const data = await response.json();
-
-      if (data.success) {
-        if (data.role === "admin") {
-          navigate("/clients");
-        } else if (data.role === "field staff") {
-          navigate("/field-staff");
-        } else {
-          navigate("/projects");
-        }
+    const result = await login(email, password);
+    
+    if (result.success) {
+      if (result.user.role === "admin") {
+        navigate("/clients");
+      } else if (result.user.role === "field staff") {
+        navigate("/field-staff");
       } else {
-        setError(data.message || "Login failed");
+        navigate("/projects");
       }
-    } catch (error) {
-      setError("An error occurred during login");
-      console.error("Login error:", error);
+    } else {
+      setError(result.message || "Login failed");
     }
   };
 

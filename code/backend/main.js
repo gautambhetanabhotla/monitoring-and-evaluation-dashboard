@@ -38,9 +38,8 @@ app.use(
             collectionName: 'sessions',
         }),
         cookie: {
-            secure: true,
-            httpOnly: true,
-            sameSite: 'strict',
+            secure: false,
+            httpOnly: false
         },
     })
 );

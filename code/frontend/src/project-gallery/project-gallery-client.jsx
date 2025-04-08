@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Card, CardHeader, CardBody } from "@heroui/card";
 import { Button, ButtonGroup } from "@heroui/button";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -7,6 +7,7 @@ import { Input, Textarea } from "@heroui/input";
 import { Alert } from "@heroui/alert";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { ChevronLeft, PieChart, LayoutGrid, MoreVertical } from "lucide-react";
+import { AuthContext } from "../AuthContext";
 
 const getProjectsByClientId = async (clientId) => {
     try {
@@ -64,6 +65,7 @@ const ProjectGallery = () => {
     const [clientProjects, setClientProjects] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
+    const { logout } = useContext(AuthContext);
 
     const queryParams = new URLSearchParams(location.search);
     const clientId = queryParams.get('clientId');
@@ -103,24 +105,6 @@ const ProjectGallery = () => {
             resetFormFields();
         }
     }, [isOpen]);
-
-    const logout = async () => {
-        try {
-            const response = await fetch("/api/auth/logout", {
-                method: "POST",
-                credentials: "include"
-            });
-    
-            const data = await response.json();
-            if (data.success) {
-                navigate("/"); 
-            } else {
-                console.error("Logout failed:", data.message);
-            }
-        } catch (error) {
-            console.error("Error logging out:", error);
-        }
-    };
 
     const createProject = async () => {
         try {

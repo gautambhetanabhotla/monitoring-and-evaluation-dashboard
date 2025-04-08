@@ -1,31 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
+import { AuthContext } from "./AuthContext.jsx"; // Adjust the import path as necessary
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("/api/auth/me", {
-          credentials: "include",
-        });
-        const data = await res.json();
-        console.log(typeof data);
-        console.log("data in protected route: "+data.user.id+"\n\n\n\n\n\n\n\n\n\n");
-        if (data.success) {
-          setUser(data.user);
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
+  const { user, loading } = useContext(AuthContext);
 
   if (loading) return <div>Loading...</div>;
 

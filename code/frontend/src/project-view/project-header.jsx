@@ -1,6 +1,5 @@
 import { useContext, useState, useEffect, useRef } from 'react';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu, NavbarMenuItem } from "@heroui/navbar";
@@ -13,6 +12,7 @@ import { MapPinIcon, CurrencyRupeeIcon, CalendarDateRangeIcon, UserIcon, LinkIco
 // import '../index.css';
 
 import { ProjectContext, ProjectContextProvider } from './project-context.jsx';
+import { AuthContext } from '../AuthContext';
 
 const ProjectHeader = () => {
 
@@ -75,21 +75,21 @@ const Nav = () => {
   if (!(['overview', 'charts', 'kpis', 'timeline', 'success-stories', 'log-framework'].includes(tabname))) {
     tabname = 'overview';
   }
-  const navigate = useNavigate();
   // const [selectedTab, setSelectedTab] = useState(tabname);
   const navbarRef = useRef(null);
+  const { user, logout } = useContext(AuthContext);
 
   const queryParams = new URLSearchParams(location.search);
   const clientId = queryParams.get('clientId');
 
-  const [user, setUser] = useState(null);
+  const [clientDetails, setClientDetails] = useState(null);
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
         const response = await fetch(`/api/user/getUser`, { credentials: 'include' });
         const data = await response.json();
         if (data.success) {
-          setUser(data.user);
+          setClientDetails(data.user);
         } else {
           alert(data.message);
         }
@@ -99,20 +99,6 @@ const Nav = () => {
     };
     fetchUserDetails();
   }, []);
-
-  const logout = () => {
-    axios.post('/api/auth/logout')
-    .then((response) => {
-      if (response.data.success) {
-        navigate('/');
-      } else {
-        console.error('Error logging out:', response.data.message);
-      }
-    })
-    .catch((error) => {
-      console.error('Error logging out:', error);
-    });
-  };
 
   return (
     <>
@@ -139,29 +125,29 @@ const Nav = () => {
         }}
       >
         <NavbarBrand>
-          <Link className='inline' to={user?.role === 'client' ? '/projects' : `/projects?clientId=${clientId}`}>
+          <Link className='inline' to={clientDetails?.role === 'client' ? '/projects' : `/projects?clientId=${clientId}`}>
             <HomeIcon className="size-6 inline" />
             <p className='prose inline pl-2'>Home</p>
           </Link>
         </NavbarBrand>
         <NavbarContent className="hidden md:flex">
           <NavbarItem isActive={tabname !== "charts" && tabname !== "kpis" && tabname !== "timeline" && tabname !== "success-stories" && tabname !== "log-framework"}>
-            <Link to={user?.role === 'client' ? 'overview' : `overview?clientId=${clientId}`}>Overview</Link>
+            <Link to={clientDetails?.role === 'client' ? 'overview' : `overview?clientId=${clientId}`}>Overview</Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "charts"}>
-            <Link to={user?.role === 'client' ? 'charts' : `charts?clientId=${clientId}`}>Charts</Link>
+            <Link to={clientDetails?.role === 'client' ? 'charts' : `charts?clientId=${clientId}`}>Charts</Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "kpis"}>
-            <Link to={user?.role === 'client' ? 'kpis' : `kpis?clientId=${clientId}`}>KPIs</Link>
+            <Link to={clientDetails?.role === 'client' ? 'kpis' : `kpis?clientId=${clientId}`}>KPIs</Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "timeline"}>
-            <Link to={user?.role === 'client' ? 'timeline' : `timeline?clientId=${clientId}`}>Timeline</Link>
+            <Link to={clientDetails?.role === 'client' ? 'timeline' : `timeline?clientId=${clientId}`}>Timeline</Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "success-stories"}>
-            <Link to={user?.role === 'client' ? 'success-stories' : `success-stories?clientId=${clientId}`}>Success stories</Link>
+            <Link to={clientDetails?.role === 'client' ? 'success-stories' : `success-stories?clientId=${clientId}`}>Success stories</Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "log-framework"}>
-            <Link to={user?.role === 'client' ? 'log-framework' : `log-framework?clientId=${clientId}`}>Log framework</Link>
+            <Link to={clientDetails?.role === 'client' ? 'log-framework' : `log-framework?clientId=${clientId}`}>Log framework</Link>
           </NavbarItem>
         </NavbarContent>
         <NavbarContent justify='end'>
@@ -185,22 +171,22 @@ const Nav = () => {
         <NavbarMenuToggle />
         <NavbarMenu portalContainer={navbarRef.current}>
           <NavbarMenuItem>
-            <Link to={user?.role === 'client' ? 'overview' : `overview?clientId=${clientId}`}>Overview</Link>
+            <Link to={clientDetails?.role === 'client' ? 'overview' : `overview?clientId=${clientId}`}>Overview</Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to={user?.role === 'client' ? 'charts' : `charts?clientId=${clientId}`}>Charts</Link>
+            <Link to={clientDetails?.role === 'client' ? 'charts' : `charts?clientId=${clientId}`}>Charts</Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to={user?.role === 'client' ? 'kpis' : `kpis?clientId=${clientId}`}>KPIs</Link>
+            <Link to={clientDetails?.role === 'client' ? 'kpis' : `kpis?clientId=${clientId}`}>KPIs</Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to={user?.role === 'client' ? 'timeline' : `timeline?clientId=${clientId}`}>Timeline</Link>
+            <Link to={clientDetails?.role === 'client' ? 'timeline' : `timeline?clientId=${clientId}`}>Timeline</Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to={user?.role === 'client' ? 'success-stories' : `success-stories?clientId=${clientId}`}>Success stories</Link>
+            <Link to={clientDetails?.role === 'client' ? 'success-stories' : `success-stories?clientId=${clientId}`}>Success stories</Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to={user?.role === 'client' ? 'log-framework' : `log-framework?clientId=${clientId}`}>Log framework</Link>
+            <Link to={clientDetails?.role === 'client' ? 'log-framework' : `log-framework?clientId=${clientId}`}>Log framework</Link>
           </NavbarMenuItem>
         </NavbarMenu>
       </Navbar>

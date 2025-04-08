@@ -32,7 +32,12 @@ export const login = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "User logged in successfully",
-      role: user.role, // You can still return the role in the response if needed.
+      user: {
+        id: user._id,
+        role: user.role,
+        email: user.email,
+        name: user.username,
+      }// You can still return the role in the response if needed.
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -40,30 +45,40 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  try {
+  if (req.session) {
     req.session.destroy((err) => {
       if (err) {
-        return res
-          .status(500)
-          .json({ success: false, message: "Logout failed" });
+        return res.status(500).json({ 
+          success: false, 
+          message: "Logout failed" 
+        });
       }
-      res.clearCookie("connect.sid"); // Remove session cookie
-      return res
-        .status(200)
-        .json({ success: true, message: "User logged out successfully" });
+      res.clearCookie("connect.sid");
+      return res.status(200).json({ 
+        success: true, 
+        message: "Logged out successfully" 
+      });
     });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+  } else {
+    return res.status(200).json({ 
+      success: true, 
+      message: "Already logged out" 
+    });
   }
 };
 
 export const getCurrentUser = async (req, res) => {
-    if(!req.session.userId){
-      return res.status(401).json({ success: false, message: "Not authenticated" });
-    }
-    try{
+    try {
+      if (!req.session || !req.session.userId) {
+        return res.status(401).json({ 
+          success: false, 
+          message: "No active session found" 
+        });
+      }
+
       const user = await User.findById(req.session.userId).select("-passwordHash");
       if (!user) {
+        req.session.destroy();
         return res.status(404).json({ success: false, message: "User Not Found"});
       }
       return res.status(200).json({

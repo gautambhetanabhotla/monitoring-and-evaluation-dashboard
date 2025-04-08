@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { useNavigate } from "react-router-dom";
 import { Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/modal";
 import { Input } from "@heroui/input";
 import { Alert } from "@heroui/alert";
+import { AuthContext } from "../AuthContext";
 
 const getAllClients = async () => {
     try {
@@ -37,6 +38,7 @@ export const ClientGallery = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [password, setPassword] = useState("");
     const [showAlert, setShowAlert] = useState(false);
+    const { logout } = useContext(AuthContext);
 
     const resetFormFields = () => {
         setUsername("");
@@ -57,24 +59,6 @@ export const ClientGallery = () => {
             resetFormFields();
         }
     }, [isOpen]);
-
-    const logout = async () => {
-        try {
-            const response = await fetch("/api/auth/logout", {
-                method: "POST",
-                credentials: "include"
-            });
-    
-            const data = await response.json();
-            if (data.success) {
-                navigate("/"); 
-            } else {
-                console.error("Logout failed:", data.message);
-            }
-        } catch (error) {
-            console.error("Error logging out:", error);
-        }
-    };
 
     const createClient = async () => {
         try {
