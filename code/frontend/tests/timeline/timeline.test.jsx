@@ -9,7 +9,7 @@ import {
   CheckIcon 
 } from '@heroicons/react/24/outline';
 
-import Timeline, { Task, KPIUpdate, AddTaskButton, KPIUpdateButton } from '../../src/project-view/project-tabs/timeline.jsx';
+import Timeline, { Task, KPIUpdate, AddTaskButton, KPIUpdateButton } from '../../src/project-view/project-tabs/timeline/timeline.jsx';
 import { ProjectContext } from '../../src/project-view/project-context.jsx';
 
 // jest.mock('@heroui/divider', () => ({

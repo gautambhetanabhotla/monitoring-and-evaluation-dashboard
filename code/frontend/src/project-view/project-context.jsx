@@ -12,6 +12,7 @@ const ProjectContextProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
   const [KPIs, setKPIs] = useState([]);
   const [adjustedKPIs, setAdjustedKPIs] = useState([]);
+  const [documents, setDocuments] = useState([]);
 
   const location = useLocation();
 
@@ -123,6 +124,17 @@ const ProjectContextProvider = ({ children }) => {
     })
     .catch(error => console.error("Error fetching tasks" + error));
   }, [project?.id]);
+
+  // Documents
+  useEffect(() => {
+    if(!project?.id) return;
+    fetch('/documents.json')
+    .then(res => res.json())
+    .then(data => {
+      // console.dir(data);
+      setDocuments(data);
+    });
+  }, [project?.id]);
   
   const updateKPI = (update) => {
     setKPIUpdates([...KPIUpdates, update]);
@@ -176,7 +188,8 @@ const ProjectContextProvider = ({ children }) => {
         editKPI,
         updateTaskDescription,
         addTask,
-        addKPI
+        addKPI,
+        documents
       }}
     >
       {children}
