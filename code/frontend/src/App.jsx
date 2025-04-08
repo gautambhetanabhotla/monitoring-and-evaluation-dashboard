@@ -15,6 +15,8 @@ import Field_Staff from './Field_Staff.jsx';
 import { ClientGallery } from './project-gallery/project-gallery-admin.jsx';
 import Unauthorized from './Unauthorized';  
 import HomePage from './HomePage';
+import { AuthProvider } from './AuthContext.jsx';
+
 const App = () => {
   useEffect(() => {
     document.querySelector("body")?.classList.add("dark", "text-foreground", "bg-background");
@@ -22,6 +24,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
+      <AuthProvider>
       <Routes>
         {/* Public Routes */}
         <Route path='/' element={<HomePage />} />
@@ -47,7 +50,7 @@ const App = () => {
         } />
 
         <Route path='/clients' element={
-          <ProtectedRoute allowedRoles={["admin", "client"]}>
+          <ProtectedRoute allowedRoles={["admin"]}>
             <ClientGallery />
           </ProtectedRoute>
         } />
@@ -66,6 +69,7 @@ const App = () => {
           <Route path='log-framework' element={<LogFramework />} />
         </Route>
       </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 };
