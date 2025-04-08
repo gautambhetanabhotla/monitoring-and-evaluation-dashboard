@@ -7,7 +7,7 @@ import ProjectGallery from './project-gallery/project-gallery-client.jsx';
 import Overview from './project-view/project-tabs/overview.jsx';
 import Charts from './project-view/project-page-charts.jsx';
 import KPIs from './project-view/project-tabs/kpis.jsx';
-import Timeline from './project-view/project-tabs/timeline.jsx';
+import Timeline from './project-view/project-tabs/timeline/timeline.jsx';
 import SuccessStories from './project-view/project-tabs/success-stories.jsx';
 import LogFramework from './project-view/project-tabs/log-framework.jsx';
 import Admin from './Admin.jsx';
@@ -19,7 +19,7 @@ import { AuthProvider } from './AuthContext.jsx';
 
 const App = () => {
   useEffect(() => {
-    document.querySelector("body")?.classList.add("dark", "text-foreground", "bg-background");
+    document.querySelector("body")?.classList.add("light", "text-foreground", "bg-background");
   }, []);
 
   return (
