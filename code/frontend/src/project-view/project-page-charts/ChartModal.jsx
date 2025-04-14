@@ -219,18 +219,18 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       scales: {
         x: {
           ticks: {
-            color: '#ffffff',
+            color: '#000000',
           },
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)',
+            color: 'rgba(0, 0, 0, 0.1)',
           },
         },
         y: {
           ticks: {
-            color: '#ffffff',
+            color: '#000000',
           },
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)',
+            color: 'rgba(0, 0, 0, 0.1)',
           },
         },
       },
