@@ -1,30 +1,24 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import mime from 'mime-types';
-import exifParser from 'exif-parser';
+import { exiftool } from 'exiftool-vendored';
 import process from 'process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const updateDocumentJson = (filePath) => {
+const updateDocumentJson = async (filePath) => {
     const documentsPath = path.join(__dirname, 'public', 'documents.json');
-
-    // Read the file metadata
-    const mimeType = mime.lookup(filePath) || 'application/octet-stream';
-    const fileName = path.basename(filePath);
 
     // Read the binary data of the file
     const binaryData = fs.readFileSync(filePath);
 
-    // Parse EXIF metadata
-    let exifData = {};
+    // Extract metadata using exiftool
+    let metadata = {};
     try {
-        const parser = exifParser.create(binaryData);
-        exifData = parser.parse().tags;
+        metadata = await exiftool.read(filePath);
     } catch (error) {
-        console.error('Failed to parse EXIF metadata:', error.message);
+        console.error('Failed to extract metadata using exiftool:', error.message);
     }
 
     // Read the existing documents.json
@@ -34,11 +28,7 @@ const updateDocumentJson = (filePath) => {
     const doc = {
         project: "67cadfd3ae068409d0b8fd96"
     };
-    doc.metadata = {
-        'MIME Type': mimeType,
-        'File Name': fileName,
-        ...exifData,
-    };
+    doc.metadata = metadata;
     doc.data = binaryData.toString('base64'); // Store binary data as Base64
     documents.push(doc);
 
@@ -52,4 +42,8 @@ if (!filePath) {
     process.exit(1);
 }
 
-updateDocumentJson(filePath);
+updateDocumentJson(filePath).then(() => {
+    console.log('Metadata extraction complete.');
+}).catch((error) => {
+    console.error('An error occurred:', error.message);
+});

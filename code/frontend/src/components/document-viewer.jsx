@@ -1,4 +1,4 @@
-import { useState, useEffect, cloneElement } from "react";
+import { useState, cloneElement } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -6,24 +6,29 @@ import "react-pdf/dist/Page/TextLayer.css";
 import { Modal, ModalContent, useDisclosure } from "@heroui/modal";
 import { Button } from "@heroui/button";
 import { Card } from "@heroui/card";
-// import { Spacer } from "@heroui/spacer";
+import { Spacer } from "@heroui/spacer";
 import { Chip } from "@heroui/chip";
 
 import {
   DocumentTextIcon,
   PhotoIcon,
   DocumentIcon,
+  MagnifyingGlassPlusIcon,
+  MagnifyingGlassMinusIcon,
+  ArrowUturnRightIcon,
+  ArrowUturnLeftIcon,
+  ArrowPathIcon
 } from "@heroicons/react/24/outline";
 
 const DocumentCard = ({ document, onPress }) => {
   return (
     <>
-      <Card isPressable onPress={onPress} className="m-3">
-        <div className="flex flex-row h-auto">
+      <Card isPressable onPress={onPress}>
+        <div className="flex flex-row flex-wrap h-auto">
           <div className="flex items-center justify-center bg-blue-500 p-5">
-            {document.metadata["MIME Type"] === "application/pdf" ? (
+            {document.metadata["MIMEType"] === "application/pdf" ? (
               <DocumentTextIcon className="h-20 text-white" />
-            ) : document.metadata["MIME Type"].split("/")[0] === "image" ? (
+            ) : document.metadata["MIMEType"].split("/")[0] === "image" ? (
               <PhotoIcon className="w-6 h-6 text-white" />
             ) : (
               <DocumentIcon className="w-6 h-6 text-white" />
@@ -33,10 +38,10 @@ const DocumentCard = ({ document, onPress }) => {
             <span className="flex flex-row gap-3">
               <h1 className="prose text-lg font-semibold text-gray-900">
                 {document.metadata.Title ||
-                  document.metadata["File Name"] ||
+                  document.metadata["FileName"] ||
                   "Unnamed document"}
               </h1>
-              <Chip>{document.metadata["MIME Type"].split("/")[1]}</Chip>
+              <Chip>{document.metadata["FileType"]}</Chip>
             </span>
           </div>
         </div>
@@ -65,14 +70,33 @@ const PDFViewer = ({ document }) => {
       <div>
         {pdfData && (
           <>
-            <div className="flex justify-between items-center mb-4">
-              <Button onPress={zoomOut} disabled={scale <= 0.5}>
-                Zoom Out
+            <div className="flex flex-row gap-2 justify-start items-center mb-4">
+              <Button isIconOnly onPress={zoomOut} isDisabled={scale <= 0.5} >
+                <MagnifyingGlassMinusIcon className="h-5 w-5" />
               </Button>
-              <p>Zoom: {Math.round(scale * 100)}%</p>
-              <Button onPress={zoomIn} disabled={scale >= 3.0}>
-                Zoom In
+              <Button isIconOnly onPress={zoomReset}>
+                <ArrowPathIcon className="h-5 w-5" />
               </Button>
+              <Button isIconOnly onPress={zoomIn} isDisabled={scale >= 3.0} >
+                <MagnifyingGlassPlusIcon className="h-5 w-5" />
+              </Button>
+              <p className="prose">Zoom: {Math.round(scale * 100)}%</p>
+              <Spacer x={1} />
+              <Button
+                isIconOnly
+                isDisabled={pageNumber <= 1}
+                onPress={() => setPageNumber(pageNumber - 1)}
+              >
+                <ArrowUturnLeftIcon className="h-5 w-5" />
+              </Button>
+              <Button
+                isIconOnly
+                isDisabled={pageNumber >= numPages}
+                onPress={() => setPageNumber(pageNumber + 1)}
+              >
+                <ArrowUturnRightIcon className="h-5 w-5" />
+              </Button>
+              <p className="prose">Page {pageNumber} of {numPages}</p>
             </div>
             <Document
               file={pdfData}
@@ -81,21 +105,8 @@ const PDFViewer = ({ document }) => {
             >
               <Page pageNumber={pageNumber} scale={scale} />
             </Document>
-            <p>
-              Page {pageNumber} of {numPages}
-            </p>
-            <Button
-              disabled={pageNumber <= 1}
-              onPress={() => setPageNumber(pageNumber - 1)}
-            >
-              Previous
-            </Button>
-            <Button
-              disabled={pageNumber >= numPages}
-              onPress={() => setPageNumber(pageNumber + 1)}
-            >
-              Next
-            </Button>
+            
+            
           </>
         )}
       </div>
