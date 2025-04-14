@@ -46,8 +46,7 @@ const visualisationSchema = new mongoose.Schema({
         required : [true, 'X Component is required']
     },
     component_2 : {
-        type : String,
-        trim : true,
+        type : Array,
         required : [true, 'Y Component is required']
     },  
     columns : {
@@ -56,7 +55,7 @@ const visualisationSchema = new mongoose.Schema({
     },
    colors: {
         type: Object,
-        required: [true, 'Colors are required'],
+        // required: [true, 'Colors are required'],
         backgroundColor: {
             type: [String],
             required: true

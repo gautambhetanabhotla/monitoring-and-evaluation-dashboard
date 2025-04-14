@@ -79,9 +79,9 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
       labels: data.map((item) => item[categoryField]?.toString() || ''),
       datasets: [
         {
-          label: valueField || 'Value',
+          label: valueField[0] || 'Value',
           data: data.map((item) => {
-            const value = Number(item[valueField]);
+            const value = Number(item[valueField[0]]);
             return isNaN(value) ? 0 : value;
           }),
           backgroundColor: [
@@ -106,10 +106,10 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
     chartData = {
       datasets: [
         {
-          label: `${xAxis} vs ${yAxis}`,
+          label: `${xAxis} vs ${yAxis[0]}`,
           data: data.map((item) => ({
             x: Number(item[xAxis]) || 0,
-            y: Number(item[yAxis]) || 0,
+            y: Number(item[yAxis[0]]) || 0,
           })),
           backgroundColor: colors?.backgroundColor?.[0] || 'rgba(54, 162, 235, 1)',
           borderColor:     colors?.borderColor?.[0]     || 'rgba(54, 162, 235, 1)',
@@ -121,8 +121,8 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
       labels: data.map((item) => item[xAxis]?.toString() || ''),
       datasets: [
         {
-          label: yAxis,
-          data: data.map((item) => Number(item[yAxis]) || 0),
+          label: yAxis[0],
+          data: data.map((item) => Number(item[yAxis[0]]) || 0),
           backgroundColor: colors?.backgroundColor?.[0] || 'rgba(54, 162, 235, 1)',
           borderColor: colors?.borderColor?.[0] || 'rgba(54, 162, 235, 1)',
           borderWidth: 1,

@@ -11,9 +11,9 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   const [columns, setColumns] = useState([]);
   const [chartType, setChartType] = useState('bar');
   const [xAxis, setXAxis] = useState('');
-  const [yAxis, setYAxis] = useState('');
+  const [yAxis, setYAxis] = useState(['']);
   const [categoryField, setCategoryField] = useState('');
-  const [valueField, setValueField] = useState('');
+  const [valueField, setValueField] = useState(['']);
   const [title, setTitle] = useState('');
   const [selectedKpi, setSelectedKpi] = useState(null);
   const [selectedColor, setSelectedColor] = useState('#3b82f6');
@@ -68,9 +68,9 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     setColumns([]);
     setChartType('bar');
     setXAxis('');
-    setYAxis('');
+    setYAxis(['']);
     setCategoryField('');
-    setValueField('');
+    setValueField(['']);
     setTitle('');
     setSelectedKpi(null);
     setSelectedColor('#3b82f6');
@@ -89,10 +89,10 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     if (newColumns.length >= 2) {
       if (chartType === 'pie') {
         setCategoryField(newColumns[0]);
-        setValueField(newColumns[1]);
+        setValueField(newColumns.slice(1));
       } else {
         setXAxis(newColumns[0]);
-        setYAxis(newColumns[1]);
+        setYAxis(newColumns.slice(1));
       }
     }
   };
@@ -101,10 +101,10 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     if (columns.length >= 2) {
       if (chartType === 'pie') {
         if (!categoryField) setCategoryField(xAxis || columns[0]);
-        if (!valueField) setValueField(yAxis || columns[1]);
+        if (!valueField) setValueField(yAxis || columns.slice(1));
       } else {
         if (!xAxis) setXAxis(categoryField || columns[0]);
-        if (!yAxis) setYAxis(valueField || columns[1]);
+        if (!yAxis) setYAxis(valueField || columns.slice(1));
       }
     }
   }, [chartType, columns]);
@@ -169,7 +169,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         labels: data.map((item) => item[categoryField]?.toString() || ''),
         datasets: [
           {
-            data: data.map((item) => Number(item[valueField]) || 0),
+            data: data.map((item) => Number(item[valueField[0]]) || 0),
             backgroundColor: chartColors.backgroundColor,
             borderColor: chartColors.borderColor,
             borderWidth: 1,
@@ -180,10 +180,10 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       return {
         datasets: [
           {
-            label: `${xAxis} vs ${yAxis}`,
+            label: `${xAxis} vs ${yAxis[0]}`,
             data: data.map((item) => ({
               x: Number(item[xAxis]) || 0,
-              y: Number(item[yAxis]) || 0,
+              y: Number(item[yAxis[0]]) || 0,
             })),
             backgroundColor: selectedColor,
             borderColor: selectedColor,
@@ -195,8 +195,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         labels: data.map((item) => item[xAxis]?.toString() || ''),
         datasets: [
           {
-            label: yAxis,
-            data: data.map((item) => Number(item[yAxis]) || 0),
+            label: yAxis[0],
+            data: data.map((item) => Number(item[yAxis[0]]) || 0),
             backgroundColor: selectedColor,
             borderColor:    selectedColor,
             borderWidth: 1,
@@ -401,8 +401,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                       <div className="flex-1">
                         <label className="form-label block mb-1">Y-Axis (Value)</label>
                         <select
-                          value={yAxis}
-                          onChange={(e) => setYAxis(e.target.value)}
+                          value={yAxis[0]}
+                          onChange={(e) => setYAxis([e.target.value])}
                           className="form-select w-full border rounded px-3 py-2"
                         >
                           <option value="">Select Y-Axis</option>
@@ -445,8 +445,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                     <div className="form-group mb-4">
                       <label className="form-label block mb-1">Value Field (Sizes)</label>
                       <select
-                        value={valueField}
-                        onChange={(e) => setValueField(e.target.value)}
+                        value={valueField[0]}
+                        onChange={(e) => setValueField([e.target.value])}
                         className="form-select w-full border rounded px-3 py-2"
                       >
                         <option value="">Select Value Field</option>

@@ -19,7 +19,7 @@ export const createVisualisation = async (req, res) => {
         height = 0
     } = req.body;
 
-    if (!project_id || !title || !type || !component_1 || !component_2 || !columns || !category || !colors) {
+    if (!project_id || !title || !type || !component_1 || !component_2 || !columns || !category) {
         return res.status(400).json({ success: false, message: "Please give values for all the fields" });
     }
 
@@ -140,7 +140,7 @@ export const updateVisualisation = async (req, res) => {
     } = req.body;
 
     // Validate required fields for all visualisations
-    if (!title || !type || !component_1 || !component_2 || !columns || !category || !colors) {
+    if (!title || !type || !component_1 || !component_2 || !columns || !category) {
         return res.status(400).json({ success: false, message: "Please give values for all the fields" });
     }
 
