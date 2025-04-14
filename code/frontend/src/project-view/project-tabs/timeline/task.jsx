@@ -11,6 +11,8 @@ import {PencilSquareIcon, CheckCircleIcon, ArrowsUpDownIcon, PlusIcon, CheckIcon
 
 import {useContext, useEffect, useState} from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 
 import axios from "axios";
 
@@ -213,11 +215,12 @@ const KPIUpdateButton = ({ task }) => {
 };
 
 const DocumentViewer = ({ document }) => {
-  pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-  const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
+  pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+  const {isOpen, onOpen, onOpenChange} = useDisclosure();
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [pdfData, setPdfData] = useState(document.data);
+  const [scale, setScale] = useState(1.0);
 
   useEffect(() => {
     if (document?.data) {
@@ -230,6 +233,9 @@ const DocumentViewer = ({ document }) => {
     setNumPages(numPages);
   }
 
+  const zoomIn = () => setScale((prevScale) => Math.min(prevScale + 0.2, 3.0)); // Max zoom level: 3.0
+  const zoomOut = () => setScale((prevScale) => Math.max(prevScale - 0.2, 0.5)); // Min zoom level: 0.5
+
   return (
     <>
       <Button
@@ -237,20 +243,30 @@ const DocumentViewer = ({ document }) => {
         onPress={onOpen}
         className="ml-5"
       >
-        {document.metadata.Title}
+        {document.metadata.Title || document.metadata['File Name'] || "Unnamed document"}
       </Button>
       <Modal
+        size="5xl"
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        isDismissable={false}
         hideCloseButton={false}
+        scrollBehavior="outside"
       >
-        <ModalContent>
+        <ModalContent className="p-7 m-10">
           <div>
             {pdfData && (
               <>
-                <Document file={pdfData} onLoadSuccess={onDocumentLoadSuccess}>
-                  <Page pageNumber={pageNumber} />
+                <div className="flex justify-between items-center mb-4">
+                  <Button onPress={zoomOut} disabled={scale <= 0.5}>
+                    Zoom Out
+                  </Button>
+                  <p>Zoom: {Math.round(scale * 100)}%</p>
+                  <Button onPress={zoomIn} disabled={scale >= 3.0}>
+                    Zoom In
+                  </Button>
+                </div>
+                <Document file={pdfData} onLoadSuccess={onDocumentLoadSuccess} className='overflow-scroll'>
+                  <Page pageNumber={pageNumber} scale={scale} />
                 </Document>
                 <p>
                   Page {pageNumber} of {numPages}
