@@ -16,6 +16,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   const [valueField, setValueField] = useState('');
   const [title, setTitle] = useState('');
   const [selectedKpi, setSelectedKpi] = useState(null);
+  const [selectedColor, setSelectedColor] = useState('#3b82f6');
   const [category, setCategory] = useState('');
   const [kpiError, setKpiError] = useState('');
   const { projectid } = useParams();
@@ -50,6 +51,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       } else {
         setXAxis(editingChart.xAxis || '');
         setYAxis(editingChart.yAxis || '');
+        setSelectedColor(editingChart.colors?.backgroundColor[0] || '#3b82f6');
       }
       setTitle(editingChart.title);
       setSelectedKpi({ _id: editingChart.kpi_id });
@@ -71,6 +73,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     setValueField('');
     setTitle('');
     setSelectedKpi(null);
+    setSelectedColor('#3b82f6');
     setCategory('');
     setKpiError('');
   };
@@ -149,6 +152,10 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     } else {
       chartConfig.xAxis = xAxis;
       chartConfig.yAxis = yAxis;
+      chartConfig.colors={
+        backgroundColor: [selectedColor],
+        borderColor: [selectedColor],
+      };
     }
 
     onSave(chartConfig);
@@ -178,8 +185,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
               x: Number(item[xAxis]) || 0,
               y: Number(item[yAxis]) || 0,
             })),
-            backgroundColor: chartColors.backgroundColor[0],
-            borderColor: chartColors.borderColor[0],
+            backgroundColor: selectedColor,
+            borderColor: selectedColor,
           },
         ],
       };
@@ -190,8 +197,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
           {
             label: yAxis,
             data: data.map((item) => Number(item[yAxis]) || 0),
-            backgroundColor: chartType === 'line' ? chartColors.backgroundColor[0] : chartColors.backgroundColor,
-            borderColor: chartType === 'line' ? chartColors.borderColor[0] : chartColors.borderColor,
+            backgroundColor: selectedColor,
+            borderColor:    selectedColor,
             borderWidth: 1,
           },
         ],
@@ -390,21 +397,32 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                       </select>
                     </div>
 
-                    <div className="form-group mb-4">
-                      <label className="form-label block mb-1">Y-Axis (Value)</label>
-                      <select
-                        value={yAxis}
-                        onChange={(e) => setYAxis(e.target.value)}
-                        className="form-select w-full border rounded px-3 py-2"
-                      >
-                        <option value="">Select Y-Axis</option>
-                        {columns.map((column) => (
-                          <option key={column} value={column}>
-                            {column}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <div className="form-group mb-4 flex items-center space-x-4">
+                      <div className="flex-1">
+                        <label className="form-label block mb-1">Y-Axis (Value)</label>
+                        <select
+                          value={yAxis}
+                          onChange={(e) => setYAxis(e.target.value)}
+                          className="form-select w-full border rounded px-3 py-2"
+                        >
+                          <option value="">Select Y-Axis</option>
+                          {columns.map((column) => (
+                            <option key={column} value={column}>
+                              {column}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex flex-col items-start">
+                        <label className="form-label block mb-1">Color</label>
+                        <input
+                          type="color"
+                          value={selectedColor}
+                          onChange={(e) => setSelectedColor(e.target.value)}
+                          className="w-8 h-8 p-0 border-0"
+                        />
+                      </div>
+                  </div>
                   </>
                 ) : (
                   <>

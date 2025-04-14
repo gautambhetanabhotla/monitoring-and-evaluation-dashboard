@@ -51,7 +51,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
   }, []);
 
   if (!chart) return null;
-  const { type, data, xAxis, yAxis, categoryField, valueField, title } = chart;
+  const { type, data, xAxis, yAxis, categoryField, valueField, title,colors } = chart;
 
   let chartData;
   if (!Array.isArray(data) || data.length === 0) {
@@ -111,7 +111,8 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
             x: Number(item[xAxis]) || 0,
             y: Number(item[yAxis]) || 0,
           })),
-          backgroundColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: colors?.backgroundColor?.[0] || 'rgba(54, 162, 235, 1)',
+          borderColor:     colors?.borderColor?.[0]     || 'rgba(54, 162, 235, 1)',
         },
       ],
     };
@@ -122,26 +123,8 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
         {
           label: yAxis,
           data: data.map((item) => Number(item[yAxis]) || 0),
-          backgroundColor:
-            type === 'line'
-              ? 'rgba(54, 162, 235, 1)'
-              : [
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(255, 99, 132, 1)',
-                  'rgba(255, 206, 86, 1)',
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(153, 102, 255, 1)',
-                ],
-          borderColor:
-            type === 'line'
-              ? 'rgba(54, 162, 235, 1)'
-              : [
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(255, 99, 132, 1)',
-                  'rgba(255, 206, 86, 1)',
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(153, 102, 255, 1)',
-                ],
+          backgroundColor: colors?.backgroundColor?.[0] || 'rgba(54, 162, 235, 1)',
+          borderColor: colors?.borderColor?.[0] || 'rgba(54, 162, 235, 1)',
           borderWidth: 1,
         },
       ],
