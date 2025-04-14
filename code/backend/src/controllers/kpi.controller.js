@@ -169,7 +169,18 @@ export const getKpiUpdatesAsData = async (req, res) => {
             return res.status(200).json({ success : false , message: "No KPI updates found for this KPI" });
         }
 
-        const data = kpiUpdates.map(kpiUpdate => ({ DateTime : kpiUpdate.updated_at, Value : kpiUpdate.final }));
+        const data = kpiUpdates.map(kpiUpdate => ({
+            DateTime: kpiUpdate.updated_at.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+            }),
+            Value: kpiUpdate.final
+        }));
+        
 
         return res.status(200).json({success : true, message : `KPI updates fetched successfully`, data : data});
     } catch (error) {
