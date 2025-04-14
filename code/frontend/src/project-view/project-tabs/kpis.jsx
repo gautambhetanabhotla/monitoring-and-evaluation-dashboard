@@ -222,7 +222,9 @@ const AddKPIButton = () => {
       baseline: baseline,
       target: target,
     };
-    axios.post(`/api/kpi/create`, kpi)
+    axios.post(`/api/kpi/create`, kpi, {
+      withCredentials: true
+    })
     .then(res => {
       if(!res.data.success) return;
       console.dir(res);

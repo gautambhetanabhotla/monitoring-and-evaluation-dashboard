@@ -2,6 +2,7 @@
 import User from '../models/User.model.js';
 
 export const requireAuth = (req, res, next) => {
+  console.log("requireAuth : ",req.session);
   if (req.session && req.session.userId) {
     return next();
   }
@@ -10,8 +11,9 @@ export const requireAuth = (req, res, next) => {
 
 export const requireRole = (roles) => {
   return async (req, res, next) => {
+    console.log("requireRole : "+req.session);
+    
     if (req.session && req.session.userId) {
-      // Re-fetch the user to ensure the role is up-to-date
       const user = await User.findById(req.session.userId);
       if (!user) {
         return res.status(404).json({ success: false, message: "User not found" });
