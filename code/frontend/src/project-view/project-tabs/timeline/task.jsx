@@ -10,14 +10,12 @@ import {Autocomplete, AutocompleteItem} from "@heroui/autocomplete";
 import {PencilSquareIcon, CheckCircleIcon, ArrowsUpDownIcon, PlusIcon, CheckIcon} from "@heroicons/react/24/outline";
 
 import {useContext, useEffect, useState} from "react";
-import { Document, Page, pdfjs } from 'react-pdf';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
 
 import axios from "axios";
 
 import { ProjectContext } from "../../project-context.jsx";
 import { KPIUpdate } from "./timeline.jsx";
+import DocumentViewer, { DocumentCard } from "../../../components/document-viewer.jsx";
 
 const Task = ({ task }) => {
 
@@ -35,7 +33,7 @@ const Task = ({ task }) => {
     setDescription(task?.description);
   }, [task?.description]);
   useEffect(() => {
-    setDocuments(ctx.documents?.filter(doc => doc.task === task?.id));
+    setDocuments(ctx.documents?.filter(doc => doc.task && doc.task === task?.id));
   }, [ctx?.documents, task?.id]);
 
   // const updates = ctx.KPIUpdates.filter(update => update.task === task?.id );
@@ -89,8 +87,8 @@ const Task = ({ task }) => {
             <ArrowsUpDownIcon className="size-6" />
           </Button>
         </h2>
-        {documents && documents.map(
-          (document, index) => <DocumentViewer document={document} key={index} />
+        {documents && documents.length > 0 && documents.map(
+          (document, index) => <DocumentViewer document={document} slot={<DocumentCard />} key={index} />
         )}
         {updates &&
           chronologicalOrder ? updates.map( (kpiupdate, index) => <KPIUpdate update={kpiupdate} key={index} /> ):
@@ -214,83 +212,5 @@ const KPIUpdateButton = ({ task }) => {
   );
 };
 
-const DocumentViewer = ({ document }) => {
-  pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-  const {isOpen, onOpen, onOpenChange} = useDisclosure();
-  const [numPages, setNumPages] = useState(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [pdfData, setPdfData] = useState(document.data);
-  const [scale, setScale] = useState(1.0);
-
-  useEffect(() => {
-    if (document?.data) {
-      const dataUri = `data:application/pdf;base64,${document.data}`;
-      setPdfData(dataUri);
-    }
-  }, [document?.data]);
-
-  function onDocumentLoadSuccess({ numPages }) {
-    setNumPages(numPages);
-  }
-
-  const zoomIn = () => setScale((prevScale) => Math.min(prevScale + 0.2, 3.0)); // Max zoom level: 3.0
-  const zoomOut = () => setScale((prevScale) => Math.max(prevScale - 0.2, 0.5)); // Min zoom level: 0.5
-
-  return (
-    <>
-      <Button
-        color="primary"
-        onPress={onOpen}
-        className="ml-5"
-      >
-        {document.metadata.Title || document.metadata['File Name'] || "Unnamed document"}
-      </Button>
-      <Modal
-        size="5xl"
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        hideCloseButton={false}
-        scrollBehavior="outside"
-      >
-        <ModalContent className="p-7 m-10">
-          <div>
-            {pdfData && (
-              <>
-                <div className="flex justify-between items-center mb-4">
-                  <Button onPress={zoomOut} disabled={scale <= 0.5}>
-                    Zoom Out
-                  </Button>
-                  <p>Zoom: {Math.round(scale * 100)}%</p>
-                  <Button onPress={zoomIn} disabled={scale >= 3.0}>
-                    Zoom In
-                  </Button>
-                </div>
-                <Document file={pdfData} onLoadSuccess={onDocumentLoadSuccess} className='overflow-scroll'>
-                  <Page pageNumber={pageNumber} scale={scale} />
-                </Document>
-                <p>
-                  Page {pageNumber} of {numPages}
-                </p>
-                <Button 
-                  disabled={pageNumber <= 1} 
-                  onPress={() => setPageNumber(pageNumber - 1)}
-                >
-                  Previous
-                </Button>
-                <Button 
-                  disabled={pageNumber >= numPages} 
-                  onPress={() => setPageNumber(pageNumber + 1)}
-                >
-                  Next
-                </Button>
-              </>
-            )}
-          </div>
-        </ModalContent>
-      </Modal>
-    </>
-  );
-};
-
 export default Task;
-export {Task, KPIUpdateButton, DocumentViewer};
+export {Task, KPIUpdateButton };

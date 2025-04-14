@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import mime from 'mime-types';
 import exifParser from 'exif-parser';
+import process from 'process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,18 +31,25 @@ const updateDocumentJson = (filePath) => {
     const documents = JSON.parse(fs.readFileSync(documentsPath, 'utf-8'));
 
     // Update the first object in the array
-    if (documents.length > 1) {
-        documents[1].metadata = {
-            ...documents[1].metadata,
-            'MIME Type': mimeType,
-            'File Name': fileName,
-            ...exifData,
-        };
-        documents[1].data = binaryData.toString('base64'); // Store binary data as Base64
-    }
+    const doc = {
+        project: "67cadfd3ae068409d0b8fd96"
+    };
+    doc.metadata = {
+        'MIME Type': mimeType,
+        'File Name': fileName,
+        ...exifData,
+    };
+    doc.data = binaryData.toString('base64'); // Store binary data as Base64
+    documents.push(doc);
 
-    // Write the updated JSON back to the file
     fs.writeFileSync(documentsPath, JSON.stringify(documents, null, 4));
+    console.log('Updated documents.json with new file data.');
 };
 
-updateDocumentJson('/home/gautam/Downloads/Assignment 3.pdf');
+const filePath = process.argv[2];
+if (!filePath) {
+    console.error('Please provide a file path as an argument.');
+    process.exit(1);
+}
+
+updateDocumentJson(filePath);
