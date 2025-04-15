@@ -1,5 +1,7 @@
 import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';
+import 'core-js/proposals/promise-with-resolvers';
+import 'whatwg-fetch';
 
 HTMLCanvasElement.prototype.getContext = () => {
     return {
