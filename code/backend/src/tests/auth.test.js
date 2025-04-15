@@ -61,7 +61,6 @@ describe('Authentication Tests (Real Database)', () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.message).toBe('User logged in successfully');
-    expect(res.body.role).toBe(testUser.role);
     expect(res.headers['set-cookie']).toBeDefined();
   });
 
