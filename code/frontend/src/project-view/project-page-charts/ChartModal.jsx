@@ -48,7 +48,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       setData(editingChart.data);
       setColumns(editingChart.columns || []);
       setChartType(editingChart.type);
-      if (editingChart.type === 'pie') {
+      if (editingChart.type === 'pie' || editingChart.type === 'donut') {
         setCategoryField(editingChart.categoryField || '');
         setValueField(editingChart.valueField || '');
       } else {
@@ -94,27 +94,21 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     setColumns(newColumns);
     setStep(2);
     if (newColumns.length >= 2) {
-      if (chartType === 'pie') {
         setCategoryField(newColumns[0]);
         setValueField([newColumns[1]]);
-      } else {
         setXAxis(newColumns[0]);
         setYAxis([newColumns[1]]);
-      }
     }
   };
 
   useEffect(() => {
     if (columns.length >= 2) {
-      if (chartType === 'pie') {
-        if (!categoryField) setCategoryField(xAxis || columns[0]);
-        if (!valueField) setValueField(yAxis || [columns[1]]);
-      } else {
-        if (!xAxis) setXAxis(categoryField || columns[0]);
-        if (!yAxis) setYAxis(valueField || [columns[1]]);
-      }
+      if (!categoryField) setCategoryField(xAxis || columns[0]);
+      if (!valueField) setValueField(yAxis || [columns[1]]);
+      if (!xAxis) setXAxis(categoryField || columns[0]);
+      if (!yAxis) setYAxis(valueField || [columns[1]]);
     }
-  }, [chartType, columns]);
+  }, [columns]);
 
   const handleKpiSelect = (kpi) => {
     setSelectedKpi(kpi);
@@ -153,7 +147,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       kpi_id: selectedKpi ? selectedKpi._id : null,
     };
 
-    if (chartType === 'pie') {
+    if (chartType === 'pie' || chartType === 'donut') {
       chartConfig.categoryField = categoryField;
       chartConfig.valueField = valueField;
     } else {
@@ -171,7 +165,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   };
 
   const getChartData = () => {
-    if (chartType === 'pie') {
+    if (chartType === 'pie' || chartType === 'donut') {
       return {
         labels: data.map((item) => item[categoryField]?.toString() || ''),
         datasets: [
@@ -229,7 +223,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         display: false,
       },
     },
-    ...(chartType !== 'pie' && {
+    ...((chartType !== 'pie' && chartType !== 'donut') && {
       scales: {
         x: {
           stacked: Mode_bar_line === 'stacked',
@@ -251,6 +245,9 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         },
       },      
     }),
+    ...(chartType === 'donut' && {
+      cutout: '50%',
+    }),
   };
 
   const renderPreviewChart = () => {
@@ -261,7 +258,9 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       case 'line':
         return <Line data={chartData} options={options} />;
       case 'pie':
-        return <Pie data={chartData} options={options} />;
+        return <Pie key="pie" data={chartData} options={options} />;
+      case 'donut':
+        return <Pie key="donut" data={chartData} options={options} />;
       case 'scatter':
         return <Scatter data={chartData} options={options} />;
       default:
@@ -269,11 +268,11 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     }
   };
 
-  const isPieChart = chartType === 'pie';
+  const isPieChart = chartType === 'pie' || chartType === 'donut';
   const isAxisBasedChart = !isPieChart;
   const canPreview = isPieChart ? (categoryField && valueField) : (xAxis && yAxis);
   const canSave = (() => {
-    if (chartType === 'pie') {
+    if (chartType === 'pie' || chartType === 'donut') {
       return categoryField && valueField[0];
     }
   
@@ -383,8 +382,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
 
                 <div className="form-group mb-4">
                   <label className="form-label block mb-1">Chart Type</label>
-                  <div className="form-grid flex gap-2">
-                    {['bar', 'line', 'pie', 'scatter'].map((type) => (
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    {['bar', 'line', 'pie', 'donut','scatter'].map((type) => (
                       <button
                         key={type}
                         onClick={() => {
@@ -397,13 +396,14 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                           setChartType(type);
                         }}
                         
-                        className={`btn px-3 py-2 rounded ${
+                        className={`btn w-full px-3 py-2 rounded ${
                           chartType === type ? 'btn-primary' : 'btn-secondary'
                         }`}
                       >
                         {type.charAt(0).toUpperCase() + type.slice(1)}
                       </button>
                     ))}
+                  </div>
                     {chartType === 'bar' && (
                       <div className="form-group mb-4">
                         <label className="form-label block mb-1">Bar Chart Mode</label>
@@ -466,7 +466,6 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                         </div>
                       </div>
                     )}
-                  </div>
                 </div>
 
                 {isAxisBasedChart ? (
@@ -549,7 +548,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                           </div>
                         ))}
                       </>
-                    ) : (
+                    ) : 
+                    (
                       <div className="form-group mb-4 flex items-center space-x-4">
                         <div className="flex-1">
                           <label className="form-label block mb-1">Y-Axis (Value)</label>
