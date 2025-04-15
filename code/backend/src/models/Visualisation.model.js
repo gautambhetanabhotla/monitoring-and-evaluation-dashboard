@@ -37,7 +37,7 @@ const visualisationSchema = new mongoose.Schema({
     },
     type : {
         type : String,
-        enum : ['bar', 'line', 'pie', 'scatter'],
+        enum : ['bar', 'line', 'pie', 'scatter','donut'],
         required : [true, 'Type is required']
     },
     component_1 : {

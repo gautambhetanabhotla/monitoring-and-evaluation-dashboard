@@ -221,33 +221,36 @@ describe('User Routes (Real Database)', () => {
       await User.findByIdAndUpdate(clientUser._id, { passwordHash });
     });
 
-    test('Should update a user password when provided valid data (authenticated)', async () => {
-      await loginAs(agent, clientUser.email, clientPassword);
-
+    test('Should update a user password when provided valid data (as admin)', async () => {
+      await loginAs(agent, adminUser.email, adminPassword);
       const newPassword = "updatedPassword";
+
       const res = await agent
         .patch(`/api/users/updatepwd/${clientUser._id}`)
         .send({ pwd: newPassword });
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
 
-      // Re-fetch the user and check that the password has been updated (by comparing hash)
+      // Check if password has been updated
       const updatedUser = await User.findById(clientUser._id);
       const isMatch = bcrypt.compareSync(newPassword, updatedUser.passwordHash);
       expect(isMatch).toBe(true);
     });
 
     test('Should return 404 if user does not exist for password update', async () => {
-      await loginAs(agent, clientUser.email, clientPassword);
-
+      await loginAs(agent, adminUser.email, adminPassword);
       const fakeId = new mongoose.Types.ObjectId().toHexString();
-      const res = await agent.patch(`/api/users/updatepwd/${fakeId}`).send({ pwd: "somepwd" });
+      const res = await agent
+        .patch(`/api/users/updatepwd/${fakeId}`)
+        .send({ pwd: "somepwd" });
       expect(res.statusCode).toBe(404);
       expect(res.body.message).toBe("User not found");
     });
 
     test('Should return 401 if not authenticated while updating password', async () => {
-      const res = await agent.patch(`/api/users/updatepwd/${clientUser._id}`).send({ pwd: "somepwd" });
+      const res = await agent
+        .patch(`/api/users/updatepwd/${adminUser._id}`)
+        .send({ pwd: "somepwd" });
       expect(res.statusCode).toBe(401);
       expect(res.body.message).toBe("Unauthorized");
     });
@@ -291,7 +294,9 @@ describe('Unauthenticated Access to User Routes', () => {
   });
 
   test('PATCH /api/users/updatepwd/:id should return 401 when not logged in', async () => {
-    const res = await agent.patch(`/api/users/updatepwd/${adminUser._id}`).send({ pwd: "x" });
+    const res = await agent
+      .patch(`/api/users/updatepwd/${adminUser._id}`)
+      .send({ pwd: "x" });
     expect(res.statusCode).toBe(401);
     expect(res.body.message).toBe("Unauthorized");
   });

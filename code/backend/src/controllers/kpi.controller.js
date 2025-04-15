@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 export const createKpi = async (req, res) => {
     const {project_id, indicator, what_it_tracks, 
         logframe_level, explanation, baseline, target} = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     
     if (!project_id || !indicator || !what_it_tracks || 
         !logframe_level || baseline == null || target == null) {
@@ -112,7 +112,7 @@ export const getKpiUpdatesbyKpi = async (req, res) => {
         })
       );
   
-      console.log(kpiUpdates);
+    //   console.log(kpiUpdates);
       return res.status(200).json({
         success: true,
         message: "KPI updates fetched successfully",

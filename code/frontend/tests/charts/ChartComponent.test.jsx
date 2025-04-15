@@ -27,22 +27,32 @@ describe('ChartComponent', () => {
     expect(screen.getByText(/No data available for this chart/i)).toBeInTheDocument();
   });
 
-  test('renders chart when valid data is provided', async () => {
+  test('renders chart with data and displays edit/remove buttons', async () => {
     const chart = {
       id: '1',
       title: 'Bar Chart',
       type: 'bar',
-      data: [{ x: 'A', y: 10 }, { x: 'B', y: 20 }],
+      data: [
+        { x: 'A', y: 10 },
+        { x: 'B', y: 20 }
+      ],
       xAxis: 'x',
-      yAxis: 'y',
+      yAxis: ['y'],
       categoryField: 'x',
-      valueField: 'y',
-      columns: ['x', 'y']
+      valueField: ['y'],
+      columns: ['x', 'y'],
+      colors: [
+        {
+          backgroundColor: 'rgba(54, 162, 235, 0.5)',
+          borderColor: 'rgba(54, 162, 235, 1)'
+        }
+      ]
     };
+  
     render(<ChartComponent chart={chart} onEdit={onEdit} onRemove={onRemove} />);
     await waitFor(() => expect(global.fetch).toHaveBeenCalled());
     expect(screen.getByText(/Bar Chart/i)).toBeInTheDocument();
     expect(screen.getByTitle(/Remove visualization/i)).toBeInTheDocument();
     expect(screen.getByTitle(/Edit visualization/i)).toBeInTheDocument();
-  });
+  });  
 });

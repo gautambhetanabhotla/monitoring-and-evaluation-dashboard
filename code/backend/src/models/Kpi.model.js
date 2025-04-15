@@ -24,7 +24,6 @@ const kpiSchema = new mongoose.Schema({
     },
     explanation : {
         type : String,
-        required : [true, 'Explanation is required'],
         trim : true
     },
     baseline : {
