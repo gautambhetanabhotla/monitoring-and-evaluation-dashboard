@@ -402,68 +402,6 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                         {type.charAt(0).toUpperCase() + type.slice(1)}
                       </button>
                     ))}
-                    {chartType === 'bar' && (
-                      <div className="form-group mb-4">
-                        <label className="form-label block mb-1">Bar Chart Mode</label>
-                        <div className="flex flex-row gap-2">
-                          {['normal', 'stacked', 'grouped'].map((mode) => (
-                            <button
-                              key={mode}
-                              onClick={() => {
-                                setMode(mode);
-                                // Reset number of comparisons when switching back to normal
-                                if (mode === 'normal') {
-                                  setNumComparisons(1);
-                                  setYAxis(['']);
-                                  setSelectedColor(default_color_set);
-                                }
-                                else {
-                                  setNumComparisons(2);
-                                  setYAxis(['', '']);
-                                  setSelectedColor(default_color_set);
-                                }
-                              }}
-                              className={`btn px-3 py-2 rounded ${
-                                Mode_bar_line === mode ? 'btn-primary' : 'btn-secondary'
-                              }`}
-                            >
-                              {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {chartType === 'line' && (
-                      <div className="form-group mb-4">
-                        <label className="form-label block mb-1">Line Chart Mode</label>
-                        <div className="flex flex-row gap-2">
-                          {['normal', 'multi'].map((mode) => (
-                            <button
-                              key={mode}
-                              onClick={() => {
-                                setMode(mode);
-                                // Reset number of comparisons when switching back to normal
-                                if (mode === 'normal') {
-                                  setNumComparisons(1);
-                                  setYAxis(['']);
-                                  setSelectedColor([default_color_set[0]]);
-                                }
-                                else {
-                                  setNumComparisons(2);
-                                  setYAxis(['', '']);
-                                  setSelectedColor(default_color_set);
-                                }
-                              }}
-                              className={`btn px-3 py-2 rounded ${
-                                Mode_bar_line === mode ? 'btn-primary' : 'btn-secondary'
-                              }`}
-                            >
-                              {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
                     {chartType === 'bar' && (
                       <div className="form-group mb-4">
