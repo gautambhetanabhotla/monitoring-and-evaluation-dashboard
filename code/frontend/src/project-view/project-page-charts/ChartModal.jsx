@@ -11,13 +11,17 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   const [columns, setColumns] = useState([]);
   const [chartType, setChartType] = useState('bar');
   const [xAxis, setXAxis] = useState('');
-  const [yAxis, setYAxis] = useState('');
+  const [yAxis, setYAxis] = useState(['']);
   const [categoryField, setCategoryField] = useState('');
-  const [valueField, setValueField] = useState('');
+  const [valueField, setValueField] = useState(['']);
   const [title, setTitle] = useState('');
   const [selectedKpi, setSelectedKpi] = useState(null);
+  const default_color_set=['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#6366f1', '#f472b6', '#8b5cf6', '#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#6366f1', '#f472b6', '#8b5cf6'];
+  const [selectedColor, setSelectedColor] = useState(default_color_set);
   const [category, setCategory] = useState('');
   const [kpiError, setKpiError] = useState('');
+  const [Mode_bar_line, setMode] = useState('normal');
+  const [numComparisons, setNumComparisons] = useState(1);
   const { projectid } = useParams();
 
   const chartColors = {
@@ -50,10 +54,13 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       } else {
         setXAxis(editingChart.xAxis || '');
         setYAxis(editingChart.yAxis || '');
+        setSelectedColor(editingChart.colors?.map((color) => color.backgroundColor) || default_color_set);
       }
       setTitle(editingChart.title);
       setSelectedKpi({ _id: editingChart.kpi_id });
       setCategory(editingChart.category || '');
+      setMode(editingChart.Mode || 'normal');
+      setNumComparisons(editingChart.yAxis.length || 1);
       setStep(2);
     } else {
       resetForm();
@@ -66,11 +73,14 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     setColumns([]);
     setChartType('bar');
     setXAxis('');
-    setYAxis('');
+    setYAxis(['']);
     setCategoryField('');
-    setValueField('');
+    setValueField(['']);
     setTitle('');
     setSelectedKpi(null);
+    setMode('normal');
+    setNumComparisons(1);
+    setSelectedColor(default_color_set);
     setCategory('');
     setKpiError('');
   };
@@ -86,10 +96,10 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     if (newColumns.length >= 2) {
       if (chartType === 'pie') {
         setCategoryField(newColumns[0]);
-        setValueField(newColumns[1]);
+        setValueField([newColumns[1]]);
       } else {
         setXAxis(newColumns[0]);
-        setYAxis(newColumns[1]);
+        setYAxis([newColumns[1]]);
       }
     }
   };
@@ -98,10 +108,10 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     if (columns.length >= 2) {
       if (chartType === 'pie') {
         if (!categoryField) setCategoryField(xAxis || columns[0]);
-        if (!valueField) setValueField(yAxis || columns[1]);
+        if (!valueField) setValueField(yAxis || [columns[1]]);
       } else {
         if (!xAxis) setXAxis(categoryField || columns[0]);
-        if (!yAxis) setYAxis(valueField || columns[1]);
+        if (!yAxis) setYAxis(valueField || [columns[1]]);
       }
     }
   }, [chartType, columns]);
@@ -149,8 +159,12 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     } else {
       chartConfig.xAxis = xAxis;
       chartConfig.yAxis = yAxis;
+      chartConfig.colors = selectedColor.map((color) => ({
+        backgroundColor: color,
+        borderColor: color,
+      }));
     }
-
+    chartConfig.Mode = Mode_bar_line;
     onSave(chartConfig);
     onClose();
     resetForm();
@@ -162,7 +176,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         labels: data.map((item) => item[categoryField]?.toString() || ''),
         datasets: [
           {
-            data: data.map((item) => Number(item[valueField]) || 0),
+            data: data.map((item) => Number(item[valueField[0]]) || 0),
             backgroundColor: chartColors.backgroundColor,
             borderColor: chartColors.borderColor,
             borderWidth: 1,
@@ -173,29 +187,29 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       return {
         datasets: [
           {
-            label: `${xAxis} vs ${yAxis}`,
+            label: `${xAxis} vs ${yAxis[0]}`,
             data: data.map((item) => ({
               x: Number(item[xAxis]) || 0,
-              y: Number(item[yAxis]) || 0,
+              y: Number(item[yAxis[0]]) || 0,
             })),
-            backgroundColor: chartColors.backgroundColor[0],
-            borderColor: chartColors.borderColor[0],
+            backgroundColor: selectedColor[0],
+            borderColor: selectedColor[0],
           },
         ],
       };
     } else {
       return {
         labels: data.map((item) => item[xAxis]?.toString() || ''),
-        datasets: [
-          {
-            label: yAxis,
-            data: data.map((item) => Number(item[yAxis]) || 0),
-            backgroundColor: chartType === 'line' ? chartColors.backgroundColor[0] : chartColors.backgroundColor,
-            borderColor: chartType === 'line' ? chartColors.borderColor[0] : chartColors.borderColor,
-            borderWidth: 1,
-          },
-        ],
-      };
+        datasets: yAxis.map((yKey, idx) => ({
+          label: yKey,
+          data: data.map((item) => Number(item[yKey]) || 0),
+          backgroundColor: selectedColor[idx] || '#3b82f6',
+          borderColor: selectedColor[idx] || '#3b82f6',
+          borderWidth: 1,
+          ...(chartType === 'line' ? { fill: false, tension: 0.1 } : {}),
+          ...(Mode_bar_line === 'stacked' && chartType === 'bar' ? { stack: 'stack1' } : {}),
+        })),
+      };      
     }
   };
 
@@ -218,22 +232,24 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     ...(chartType !== 'pie' && {
       scales: {
         x: {
+          stacked: Mode_bar_line === 'stacked',
           ticks: {
-            color: '#ffffff',
+            color: '#000000',
           },
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)',
+            color: 'rgba(0, 0, 0, 0.1)',
           },
         },
         y: {
+          stacked: Mode_bar_line === 'stacked',
           ticks: {
-            color: '#ffffff',
+            color: '#000000',
           },
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)',
+            color: 'rgba(0, 0, 0, 0.1)',
           },
         },
-      },
+      },      
     }),
   };
 
@@ -256,7 +272,17 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   const isPieChart = chartType === 'pie';
   const isAxisBasedChart = !isPieChart;
   const canPreview = isPieChart ? (categoryField && valueField) : (xAxis && yAxis);
-  const canSave = canPreview;
+  const canSave = (() => {
+    if (chartType === 'pie') {
+      return categoryField && valueField[0];
+    }
+  
+    if (!xAxis || yAxis.length === 0) return false;
+  
+    const allYAxisFilled = yAxis.every((y) => y && y !== '');
+    return allYAxisFilled;
+  })();
+  
 
   if (!isOpen) return null;
 
@@ -361,7 +387,16 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                     {['bar', 'line', 'pie', 'scatter'].map((type) => (
                       <button
                         key={type}
-                        onClick={() => setChartType(type)}
+                        onClick={() => {
+                          if (type === 'line' && chartType === 'bar' && (Mode_bar_line === 'stacked' || Mode_bar_line === 'grouped')) {
+                            setMode('multi');
+                          }
+                          if (type === 'bar' && chartType === 'line' && Mode_bar_line === 'multi') {
+                            setMode('stacked');
+                          }
+                          setChartType(type);
+                        }}
+                        
                         className={`btn px-3 py-2 rounded ${
                           chartType === type ? 'btn-primary' : 'btn-secondary'
                         }`}
@@ -369,6 +404,68 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                         {type.charAt(0).toUpperCase() + type.slice(1)}
                       </button>
                     ))}
+                    {chartType === 'bar' && (
+                      <div className="form-group mb-4">
+                        <label className="form-label block mb-1">Bar Chart Mode</label>
+                        <div className="flex flex-row gap-2">
+                          {['normal', 'stacked', 'grouped'].map((mode) => (
+                            <button
+                              key={mode}
+                              onClick={() => {
+                                setMode(mode);
+                                // Reset number of comparisons when switching back to normal
+                                if (mode === 'normal') {
+                                  setNumComparisons(1);
+                                  setYAxis(['']);
+                                  setSelectedColor(default_color_set);
+                                }
+                                else {
+                                  setNumComparisons(2);
+                                  setYAxis(['', '']);
+                                  setSelectedColor(default_color_set);
+                                }
+                              }}
+                              className={`btn px-3 py-2 rounded ${
+                                Mode_bar_line === mode ? 'btn-primary' : 'btn-secondary'
+                              }`}
+                            >
+                              {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {chartType === 'line' && (
+                      <div className="form-group mb-4">
+                        <label className="form-label block mb-1">Line Chart Mode</label>
+                        <div className="flex flex-row gap-2">
+                          {['normal', 'multi'].map((mode) => (
+                            <button
+                              key={mode}
+                              onClick={() => {
+                                setMode(mode);
+                                // Reset number of comparisons when switching back to normal
+                                if (mode === 'normal') {
+                                  setNumComparisons(1);
+                                  setYAxis(['']);
+                                  setSelectedColor([default_color_set[0]]);
+                                }
+                                else {
+                                  setNumComparisons(2);
+                                  setYAxis(['', '']);
+                                  setSelectedColor(default_color_set);
+                                }
+                              }}
+                              className={`btn px-3 py-2 rounded ${
+                                Mode_bar_line === mode ? 'btn-primary' : 'btn-secondary'
+                              }`}
+                            >
+                              {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -390,21 +487,104 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                       </select>
                     </div>
 
-                    <div className="form-group mb-4">
-                      <label className="form-label block mb-1">Y-Axis (Value)</label>
-                      <select
-                        value={yAxis}
-                        onChange={(e) => setYAxis(e.target.value)}
-                        className="form-select w-full border rounded px-3 py-2"
-                      >
-                        <option value="">Select Y-Axis</option>
-                        {columns.map((column) => (
-                          <option key={column} value={column}>
-                            {column}
-                          </option>
+                    {((Mode_bar_line === 'stacked' || Mode_bar_line === 'grouped') && chartType === 'bar') || (chartType === 'line' && Mode_bar_line === 'multi') ? (
+                      <>
+                        <div className="form-group mb-4">
+                          <label className="form-label block mb-1">Number of components to compare</label>
+                          <input
+                            type="number"
+                            min={2}
+                            value={numComparisons}
+                            onChange={(e) => {
+                              const value = Number(e.target.value);
+                              if (!isNaN(value)) {
+                                setNumComparisons(value);
+                                setYAxis(Array(value).fill(''));
+                                setSelectedColor(default_color_set.slice(0, value));
+                              }
+                            }}
+                            className="form-input w-full border rounded px-3 py-2"
+                          />
+                        </div>
+
+                        {yAxis.map((_, index) => (
+                          <div key={index} className="form-group mb-4 flex items-center space-x-4">
+                            <div className="flex-1">
+                              <label className="form-label block mb-1">Y-Axis {index + 1}</label>
+                              <select
+                                value={yAxis[index]}
+                                onChange={(e) => {
+                                  const updated = [...yAxis];
+                                  updated[index] = e.target.value;
+                                  setYAxis(updated);
+                                }}
+                                className="form-select w-full border rounded px-3 py-2"
+                              >
+                                <option value="">Select Y-Axis</option>
+                                {columns.map((col) => (
+                                  <option key={col} value={col}>{col}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className="flex flex-col items-start">
+                              <label className="form-label block mb-1">Color</label>
+                              <input
+                                type="color"
+                                value={selectedColor[index]}
+                                onChange={(e) => {
+                                  const newColors = [...selectedColor];
+                                  newColors[index] = e.target.value;
+                                  setSelectedColor(newColors);
+                                }}
+                                style={{
+                                  appearance: 'none',
+                                  backgroundColor: 'transparent',
+                                  width: '32px',
+                                  height: '32px',
+                                  padding: '0',
+                                  border: 'none',
+                                }}
+                              />
+                            </div>
+                          </div>
                         ))}
-                      </select>
-                    </div>
+                      </>
+                    ) : (
+                      <div className="form-group mb-4 flex items-center space-x-4">
+                        <div className="flex-1">
+                          <label className="form-label block mb-1">Y-Axis (Value)</label>
+                          <select
+                            value={yAxis[0]}
+                            onChange={(e) => setYAxis([e.target.value])}
+                            className="form-select w-full border rounded px-3 py-2"
+                          >
+                            <option value="">Select Y-Axis</option>
+                            {columns.map((column) => (
+                              <option key={column} value={column}>
+                                {column}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="flex flex-col items-start">
+                          <label className="form-label block mb-1">Color</label>
+                          <input
+                            type="color"
+                            value={selectedColor[0]}
+                            onChange={(e) => setSelectedColor([e.target.value, ...selectedColor.slice(1)])}
+                            style={{
+                              appearance: 'none',
+                              backgroundColor: 'transparent',
+                              width: '32px',
+                              height: '32px',
+                              padding: '0',
+                              border: 'none',
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
                   </>
                 ) : (
                   <>
@@ -427,8 +607,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                     <div className="form-group mb-4">
                       <label className="form-label block mb-1">Value Field (Sizes)</label>
                       <select
-                        value={valueField}
-                        onChange={(e) => setValueField(e.target.value)}
+                        value={valueField[0]}
+                        onChange={(e) => setValueField([e.target.value])}
                         className="form-select w-full border rounded px-3 py-2"
                       >
                         <option value="">Select Value Field</option>
@@ -443,7 +623,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                 )}
 
                 <div className="form-buttons flex gap-4">
-                  <button className="btn btn-secondary px-4 py-2 rounded" onClick={() => setStep(0)}>
+                  <button className="btn btn-secondary px-4 py-2 rounded" onClick={() => { setStep(0); resetForm(); }}>
                     Back to Upload
                   </button>
                   <button onClick={handleSave} disabled={!canSave} className="btn btn-primary px-4 py-2 rounded">

@@ -43,25 +43,27 @@ const KpiList = ({ projectId, onSelectKpi, selectedKpiId }) => {
 
   return (
     <div className="p-4">
-      <h3 className="text-lg font-medium mb-4 text-gray-100">Select KPI</h3>
+      <h3 className="text-lg font-medium mb-4 text-gray-900">Select KPI</h3>
       <ul className="space-y-2">
         {kpis.map((kpi) => {
           const isSelected = kpi._id === selectedKpiId;
           return (
             <li
-              key={kpi._id}
-              onClick={() => onSelectKpi(kpi)}
-              tabIndex={0}
-              className={`cursor-pointer border p-2 rounded text-white
-                focus:outline-none focus:ring-0 active:ring-0
-                ${
-                  isSelected
-                    ? 'bg-blue-600 border-blue-600'
-                    : 'bg-gray-800 border-gray-500 hover:bg-gray-600'
-                }`}
-            >
-              <span className="font-semibold">{kpi.indicator}</span>
-            </li>
+            key={kpi._id}
+            onClick={() => onSelectKpi(kpi)}
+            tabIndex={0}
+            className={`cursor-pointer border p-2 rounded
+              focus:outline-none focus:ring-0 active:ring-0
+              ${
+                isSelected
+                  ? 'bg-blue-500 border-blue-500'
+                  : 'bg-gray-100 border-gray-300 hover:bg-gray-200'
+              }`}
+          >
+            <span className={`font-semibold ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+              {kpi.indicator}
+            </span>
+          </li>
           );
         })}
       </ul>

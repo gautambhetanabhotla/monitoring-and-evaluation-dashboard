@@ -32,7 +32,7 @@ const App = () => {
 
         {/* Protected Routes */}
         <Route path='/projects' element={
-          <ProtectedRoute allowedRoles={["admin", "user"]}>
+          <ProtectedRoute allowedRoles={["admin", "client"]}>
             <ProjectGallery />
           </ProtectedRoute>
         } />

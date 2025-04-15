@@ -47,6 +47,7 @@
     "chart.js": "^4.4.8",
     "chartjs-plugin-datalabels": "^2.2.0",
     "clsx": "2.1.1",
+    "core-js": "^3.41.0",
     "dotenv": "^16.4.7",
     "exifreader": "^4.28.1",
     "exiftool-vendored": "^29.3.0",
@@ -96,6 +97,7 @@
     "globals": "^16.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "jest-transform-stub": "^2.0.0",
     "postcss": "8.4.38",
     "prettier": "3.3.3",
     "vite": "^6.2.0"

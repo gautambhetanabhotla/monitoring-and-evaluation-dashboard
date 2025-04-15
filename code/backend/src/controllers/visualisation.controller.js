@@ -14,6 +14,8 @@ export const createVisualisation = async (req, res) => {
         columns,
         category,
         kpi_id = null,
+        colors,
+        Mode,
         width = 0,
         height = 0
     } = req.body;
@@ -39,6 +41,8 @@ export const createVisualisation = async (req, res) => {
         columns,
         category,
         kpi_id,
+        colors,
+        Mode,
         width,
         height
     });
@@ -76,7 +80,17 @@ export const getVisualisationsByProject = async (req, res) => {
                     visualisations[i].file = JSON.stringify([]);
                 } else {
                     visualisations[i].file = JSON.stringify(
-                        kpiUpdates.map(kpiUpdate => ({ DateTime: kpiUpdate.updated_at, Value: kpiUpdate.final }))
+                        kpiUpdates.map(kpiUpdate => ({
+                            DateTime: kpiUpdate.updated_at.toLocaleString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true,
+                            }),
+                            Value: kpiUpdate.final 
+                        }))
                     );
                 }
             }
@@ -122,6 +136,8 @@ export const updateVisualisation = async (req, res) => {
         columns,
         category,
         kpi_id = null,
+        colors,
+        Mode,
         width = 0,
         height = 0
     } = req.body;
@@ -155,7 +171,9 @@ export const updateVisualisation = async (req, res) => {
         visualisation.category = category;
         visualisation.kpi_id = kpi_id;
         visualisation.width = width;
+        visualisation.Mode = Mode;
         visualisation.height = height;
+        visualisation.colors = colors;
 
         await visualisation.save();
         console.log("Visualisation updated successfully");
