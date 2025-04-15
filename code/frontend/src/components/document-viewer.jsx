@@ -2,12 +2,17 @@ import { useState, cloneElement } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
+import csv from 'papaparse';
 
 import { Modal, ModalContent, useDisclosure } from "@heroui/modal";
 import { Button } from "@heroui/button";
 import { Card } from "@heroui/card";
 import { Spacer } from "@heroui/spacer";
 import { Chip } from "@heroui/chip";
+import { Table, TableHeader, TableBody, TableColumn, TableRow, TableCell} from "@heroui/table";
+import { Image } from "@heroui/image";
+import { Code } from "@heroui/react";
+import { Link } from "@heroui/link";
 
 import {
   DocumentTextIcon,
@@ -17,7 +22,9 @@ import {
   MagnifyingGlassMinusIcon,
   ArrowUturnRightIcon,
   ArrowUturnLeftIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  TableCellsIcon,
+  ArrowDownTrayIcon
 } from "@heroicons/react/24/outline";
 
 const DocumentCard = ({ document, onPress }) => {
@@ -29,14 +36,20 @@ const DocumentCard = ({ document, onPress }) => {
             {document.metadata["MIMEType"] === "application/pdf" ? (
               <DocumentTextIcon className="h-20 text-white" />
             ) : document.metadata["MIMEType"].split("/")[0] === "image" ? (
-              <PhotoIcon className="w-6 h-6 text-white" />
+              <PhotoIcon className="h-20 text-white" />
+            ) : document.metadata["MIMEType"].split("/")[0] === "text" ? (
+              document.metadata["MIMEType"].split("/")[1] === "csv" ? (
+                <TableCellsIcon className="h-20 text-white" />
+              ) : (
+                <DocumentTextIcon className="h-20 text-white" />
+              )
             ) : (
-              <DocumentIcon className="w-6 h-6 text-white" />
-            )}
+              <DocumentIcon className="h-20 text-white" />
+            )}  
           </div>
           <div className="m-4">
             <span className="flex flex-row gap-3">
-              <h1 className="prose text-lg font-semibold text-gray-900">
+              <h1 className="prose inline text-lg font-semibold text-gray-900">
                 {document.metadata.Title ||
                   document.metadata["FileName"] ||
                   "Unnamed document"}
@@ -46,6 +59,83 @@ const DocumentCard = ({ document, onPress }) => {
           </div>
         </div>
       </Card>
+    </>
+  );
+};
+
+const DownloadButton = ({ doc }) => {
+  const handleDownload = () => {
+    const blob = new Blob([atob(doc.data)], { type: doc.metadata["MIMEType"] });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = doc.metadata["FileName"] || "downloaded-file";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <>
+      <Button isIconOnly onPress={handleDownload}>
+        <ArrowDownTrayIcon className="h-5 w-5" />
+      </Button>
+    </>
+  );
+};
+
+const CSVviewer = ({ document }) => {
+  
+  const data = csv.parse(atob(document.data.toString())).data;
+  // console.dir(data);
+
+  return (
+    <>
+      <div className="flex flex-row items-center gap-4 mb-4">
+        <h1 className="prose text-2xl">
+          {document.metadata.FileName}
+        </h1>
+        <DownloadButton doc={document} />
+      </div>
+      {data.length > 0 && (
+        <Table aria-label="Current table">
+          <TableHeader>
+            {data[0].map((header, index) => (
+              <TableColumn key={index}><h1 className="prose text-xl font-bold">{header}</h1></TableColumn>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {data.slice(1, data.length - 1).map((row, rowIndex) => (
+              <TableRow key={rowIndex}>
+                {row.map((value, colIndex) => (
+                  <TableCell key={2 * rowIndex + colIndex}><p className="prose text-md">{value}</p></TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </>
+  );
+};
+
+const ImageViewer = ({ document }) => {
+  const imageData = `data:${document.metadata["MIMEType"]};base64,${document.data}`;
+
+  return (
+    <>
+      <div className="flex flex-row items-center gap-4 mb-4">
+        <h1 className="prose text-2xl">
+          {document.metadata.FileName}
+        </h1>
+        <DownloadButton doc={document} />
+      </div>
+      <div className="flex justify-center items-center">
+        <Image
+          src={imageData}
+          alt={document.metadata["FileName"] || "Image"}
+          className="max-w-full max-h-screen"
+        />
+      </div>
     </>
   );
 };
@@ -97,6 +187,7 @@ const PDFViewer = ({ document }) => {
                 <ArrowUturnRightIcon className="h-5 w-5" />
               </Button>
               <p className="prose">Page {pageNumber} of {numPages}</p>
+              <DownloadButton doc={document} />
             </div>
             <Document
               file={pdfData}
@@ -105,8 +196,6 @@ const PDFViewer = ({ document }) => {
             >
               <Page pageNumber={pageNumber} scale={scale} />
             </Document>
-            
-            
           </>
         )}
       </div>
@@ -116,6 +205,12 @@ const PDFViewer = ({ document }) => {
 
 const DocumentViewer = ({ document, slot }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const viewerComponents = new Map([
+    ["pdf", PDFViewer],
+    ["csv", CSVviewer],
+    ["png", ImageViewer],
+  ]);
 
   return (
     <>
@@ -128,7 +223,23 @@ const DocumentViewer = ({ document, slot }) => {
         scrollBehavior="outside"
       >
         <ModalContent className="p-7 m-10">
-          <PDFViewer document={document} />
+          {viewerComponents.get(document.metadata["MIMEType"].split("/")[1]) ? (
+            viewerComponents
+              .get(document.metadata["MIMEType"].split("/")[1])
+              .call(this, { document })
+          ) : (
+            <div className="prose">
+              <h1 className="prose text-2xl font-extrabold mb-3">Unsupported file type</h1>
+              <p>
+                The file type <Code color="primary">{document.metadata["MIMEType"]}</Code> is not supported
+                for viewing.
+                <Link
+                  href={`data:${document.metadata["MIMEType"]};base64,${document.data}`}
+                  download={document.metadata["FileName"] || "downloaded-file"}
+                >&nbsp;Download the file instead.</Link>
+              </p>
+            </div>
+          )}
         </ModalContent>
       </Modal>
     </>

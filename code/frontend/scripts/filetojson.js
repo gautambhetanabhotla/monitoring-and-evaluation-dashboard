@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const updateDocumentJson = async (filePath) => {
-    const documentsPath = path.join(__dirname, 'public', 'documents.json');
+    const documentsPath = path.join(__dirname, '..', 'public', 'documents.json');
 
     // Read the binary data of the file
     const binaryData = fs.readFileSync(filePath);
