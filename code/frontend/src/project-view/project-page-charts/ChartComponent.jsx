@@ -51,7 +51,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
   }, []);
 
   if (!chart) return null;
-  const { type, data, xAxis, yAxis, categoryField, valueField, title,colors } = chart;
+  const { type, data, xAxis, yAxis, categoryField, valueField, title,colors,Mode } = chart;
 
   let chartData;
   if (!Array.isArray(data) || data.length === 0) {
@@ -119,15 +119,39 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
   } else {
     chartData = {
       labels: data.map((item) => item[xAxis]?.toString() || ''),
-      datasets: [
-        {
-          label: yAxis[0],
-          data: data.map((item) => Number(item[yAxis[0]]) || 0),
-          backgroundColor: colors[0]?.backgroundColor || 'rgba(54, 162, 235, 1)',
-          borderColor: colors[0]?.borderColor || 'rgba(54, 162, 235, 1)',
+      datasets: yAxis.map((yKey, idx) => {
+        const base = {
+          label: yKey,
+          data: data.map((item) => Number(item[yKey]) || 0),
+          backgroundColor: colors[idx]?.backgroundColor || 'rgba(54, 162, 235, 1)',
+          borderColor: colors[idx]?.borderColor || 'rgba(54, 162, 235, 1)',
           borderWidth: 1,
-        },
-      ],
+        };
+      
+        // For line chart, use line-specific styling
+        if (type === 'line') {
+          return {
+            ...base,
+            fill: false,
+            tension: 0.1,
+          };
+        }
+      
+        // For stacked bar
+        if (type === 'bar') {
+          if(Mode === 'stacked') {
+            return {
+              ...base,
+              stack: 'stack1',
+            };
+          }
+          return {
+            ...base,
+          };
+        }
+      
+        return base;
+      }),      
     };
   }
   const options = {
@@ -182,6 +206,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
     ...(type !== 'pie' && {
       scales: {
         x: {
+          stacked: Mode === 'stacked',
           ticks: {
             color: '#000000',
           },
@@ -190,6 +215,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
           },
         },
         y: {
+          stacked: Mode === 'stacked',
           ticks: {
             color: '#000000',
           },
@@ -199,6 +225,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
         },
       },
     }),
+    
   };
   const handleLegendClick = (index) => {
     if (chartRef.current) {

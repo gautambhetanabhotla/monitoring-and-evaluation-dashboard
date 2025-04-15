@@ -74,7 +74,10 @@ const visualisationSchema = new mongoose.Schema({
     height : { 
         type : Number,
         required : [true, 'Height is required']
-    }
+    },
+    Mode : {
+        type : String,
+    },
 });
 
 const Visualisation = mongoose.model('Visualisation', visualisationSchema);
