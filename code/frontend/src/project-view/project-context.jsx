@@ -20,7 +20,10 @@ const ProjectContextProvider = ({ children }) => {
   useEffect(() => {
     if(!project?.id) return;
     fetch(`/api/kpi/getKpis/${project?.id}`)
-    .then(response => {console.dir(response); return response.json();})
+    .then(response => {
+      // console.dir(response);
+      return response.json();
+    })
     .then(data => {
       if(data.success) {
         for (const element of data.data) {
@@ -171,6 +174,14 @@ const ProjectContextProvider = ({ children }) => {
     setKPIs(KPIs.map(KPI => KPI.id === targetKPI.id ? targetKPI : KPI));
   };
 
+  const addDocuments = (newDocuments) => {
+    setDocuments([...documents, ...newDocuments]);
+  };
+
+  const addDocument = (newDocument) => {
+    setDocuments([...documents, newDocument]);
+  };
+
   return (
     <ProjectContext.Provider
       value={{
@@ -189,7 +200,9 @@ const ProjectContextProvider = ({ children }) => {
         updateTaskDescription,
         addTask,
         addKPI,
-        documents
+        documents,
+        addDocuments,
+        addDocument
       }}
     >
       {children}

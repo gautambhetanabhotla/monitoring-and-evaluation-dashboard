@@ -10,12 +10,12 @@ import {Autocomplete, AutocompleteItem} from "@heroui/autocomplete";
 import {PencilSquareIcon, CheckCircleIcon, ArrowsUpDownIcon, PlusIcon, CheckIcon} from "@heroicons/react/24/outline";
 
 import {useContext, useEffect, useState} from "react";
-import { Document, Page, pdfjs } from 'react-pdf';
 
 import axios from "axios";
 
 import { ProjectContext } from "../../project-context.jsx";
 import { KPIUpdate } from "./timeline.jsx";
+import DocumentViewer, { DocumentCard } from "../../../components/document-viewer.jsx";
 
 const Task = ({ task }) => {
 
@@ -33,7 +33,7 @@ const Task = ({ task }) => {
     setDescription(task?.description);
   }, [task?.description]);
   useEffect(() => {
-    setDocuments(ctx.documents?.filter(doc => doc.task === task?.id));
+    setDocuments(ctx.documents?.filter(doc => doc.task && doc.task === task?.id));
   }, [ctx?.documents, task?.id]);
 
   // const updates = ctx.KPIUpdates.filter(update => update.task === task?.id );
@@ -87,8 +87,8 @@ const Task = ({ task }) => {
             <ArrowsUpDownIcon className="size-6" />
           </Button>
         </h2>
-        {documents && documents.map(
-          (document, index) => <DocumentViewer document={document} key={index} />
+        {documents && documents.length > 0 && documents.map(
+          (document, index) => <DocumentViewer document={document} slot={<DocumentCard />} key={index} />
         )}
         {updates &&
           chronologicalOrder ? updates.map( (kpiupdate, index) => <KPIUpdate update={kpiupdate} key={index} /> ):
@@ -212,69 +212,5 @@ const KPIUpdateButton = ({ task }) => {
   );
 };
 
-const DocumentViewer = ({ document }) => {
-  pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-  const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
-  const [numPages, setNumPages] = useState(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [pdfData, setPdfData] = useState(document.data);
-
-  useEffect(() => {
-    if (document?.data) {
-      const dataUri = `data:application/pdf;base64,${document.data}`;
-      setPdfData(dataUri);
-    }
-  }, [document?.data]);
-
-  function onDocumentLoadSuccess({ numPages }) {
-    setNumPages(numPages);
-  }
-
-  return (
-    <>
-      <Button
-        color="primary"
-        onPress={onOpen}
-        className="ml-5"
-      >
-        {document.metadata.Title}
-      </Button>
-      <Modal
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        isDismissable={false}
-        hideCloseButton={false}
-      >
-        <ModalContent>
-          <div>
-            {pdfData && (
-              <>
-                <Document file={pdfData} onLoadSuccess={onDocumentLoadSuccess}>
-                  <Page pageNumber={pageNumber} />
-                </Document>
-                <p>
-                  Page {pageNumber} of {numPages}
-                </p>
-                <Button 
-                  disabled={pageNumber <= 1} 
-                  onPress={() => setPageNumber(pageNumber - 1)}
-                >
-                  Previous
-                </Button>
-                <Button 
-                  disabled={pageNumber >= numPages} 
-                  onPress={() => setPageNumber(pageNumber + 1)}
-                >
-                  Next
-                </Button>
-              </>
-            )}
-          </div>
-        </ModalContent>
-      </Modal>
-    </>
-  );
-};
-
 export default Task;
-export {Task, KPIUpdateButton, DocumentViewer};
+export {Task, KPIUpdateButton };
