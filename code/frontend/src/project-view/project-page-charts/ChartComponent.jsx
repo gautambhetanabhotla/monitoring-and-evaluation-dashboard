@@ -111,8 +111,8 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
             x: Number(item[xAxis]) || 0,
             y: Number(item[yAxis[0]]) || 0,
           })),
-          backgroundColor: colors?.backgroundColor?.[0] || 'rgba(54, 162, 235, 1)',
-          borderColor:     colors?.borderColor?.[0]     || 'rgba(54, 162, 235, 1)',
+          backgroundColor: colors[0]?.backgroundColor || 'rgba(54, 162, 235, 1)',
+          borderColor:     colors[0]?.borderColor     || 'rgba(54, 162, 235, 1)',
         },
       ],
     };
@@ -123,8 +123,8 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
         {
           label: yAxis[0],
           data: data.map((item) => Number(item[yAxis[0]]) || 0),
-          backgroundColor: colors?.backgroundColor?.[0] || 'rgba(54, 162, 235, 1)',
-          borderColor: colors?.borderColor?.[0] || 'rgba(54, 162, 235, 1)',
+          backgroundColor: colors[0]?.backgroundColor || 'rgba(54, 162, 235, 1)',
+          borderColor: colors[0]?.borderColor || 'rgba(54, 162, 235, 1)',
           borderWidth: 1,
         },
       ],

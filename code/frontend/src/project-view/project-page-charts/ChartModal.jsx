@@ -16,7 +16,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   const [valueField, setValueField] = useState(['']);
   const [title, setTitle] = useState('');
   const [selectedKpi, setSelectedKpi] = useState(null);
-  const [selectedColor, setSelectedColor] = useState('#3b82f6');
+  const   default_color_set=['#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#6366f1', '#f472b6', '#8b5cf6', '#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#6366f1', '#f472b6', '#8b5cf6'];
+  const [selectedColor, setSelectedColor] = useState(default_color_set);
   const [category, setCategory] = useState('');
   const [kpiError, setKpiError] = useState('');
   const { projectid } = useParams();
@@ -51,7 +52,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       } else {
         setXAxis(editingChart.xAxis || '');
         setYAxis(editingChart.yAxis || '');
-        setSelectedColor(editingChart.colors?.backgroundColor[0] || '#3b82f6');
+        setSelectedColor(editingChart.colors?.map((color) => color.backgroundColor) || default_color_set);
       }
       setTitle(editingChart.title);
       setSelectedKpi({ _id: editingChart.kpi_id });
@@ -73,7 +74,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     setValueField(['']);
     setTitle('');
     setSelectedKpi(null);
-    setSelectedColor('#3b82f6');
+    setSelectedColor(default_color_set);
     setCategory('');
     setKpiError('');
   };
@@ -152,10 +153,10 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     } else {
       chartConfig.xAxis = xAxis;
       chartConfig.yAxis = yAxis;
-      chartConfig.colors={
-        backgroundColor: [selectedColor],
-        borderColor: [selectedColor],
-      };
+      chartConfig.colors = selectedColor.map((color) => ({
+        backgroundColor: color,
+        borderColor: color,
+      }));
     }
 
     onSave(chartConfig);
@@ -185,8 +186,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
               x: Number(item[xAxis]) || 0,
               y: Number(item[yAxis[0]]) || 0,
             })),
-            backgroundColor: selectedColor,
-            borderColor: selectedColor,
+            backgroundColor: selectedColor[0],
+            borderColor: selectedColor[0],
           },
         ],
       };
@@ -197,8 +198,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
           {
             label: yAxis[0],
             data: data.map((item) => Number(item[yAxis[0]]) || 0),
-            backgroundColor: selectedColor,
-            borderColor:    selectedColor,
+            backgroundColor: selectedColor[0],
+            borderColor:    selectedColor[0],
             borderWidth: 1,
           },
         ],
@@ -416,11 +417,18 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                       <div className="flex flex-col items-start">
                         <label className="form-label block mb-1">Color</label>
                         <input
-                          type="color"
-                          value={selectedColor}
-                          onChange={(e) => setSelectedColor(e.target.value)}
-                          className="w-8 h-8 p-0 border-0"
-                        />
+                        type="color"
+                        value={selectedColor[0]}
+                        onChange={(e) => setSelectedColor([e.target.value, ...selectedColor.slice(1)])}
+                        style={{
+                          appearance: 'none',
+                          backgroundColor: 'transparent',
+                          width: '32px',
+                          height: '32px',
+                          padding: '0',
+                          border: 'none',
+                        }}
+                      />
                       </div>
                   </div>
                   </>
