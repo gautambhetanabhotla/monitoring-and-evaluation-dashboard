@@ -74,7 +74,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
     );
   }
 
-  if (type === 'pie') {
+  if (type === 'pie' || type === 'doughnut') {
     chartData = {
       labels: data.map((item) => item[categoryField]?.toString() || ''),
       datasets: [
@@ -160,22 +160,22 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
     layout: {
       padding: {
         top: 10,
-        right: type === 'pie' ? 10 : 0,
+        right: (type === 'pie' || type === 'doughnut') ? 10 : 0,
         bottom: 10,
         left: 10,
       },
     },
     plugins: {
       legend: {
-        display: type === 'pie' ? false : true,
-        position: type === 'pie' ? 'right' : 'top',
+        display: type === 'pie' || type === 'doughnut' ? false : true,
+        position: type === 'pie' || type === 'doughnut' ? 'right' : 'top',
       },
       title: {
         display: true,
         text: title,
       },
       tooltip:
-        type === 'pie'
+        (type === 'pie' || type === 'doughnut')
           ? {
               callbacks: {
                 label: (tooltipItem) => {
@@ -189,7 +189,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
             }
           : undefined,
       datalabels:
-        type === 'pie'
+        (type === 'pie' || type === 'doughnut')
           ? {
               formatter: (value, context) => {
                 const dataArr = context.chart.data.datasets[0].data;
@@ -203,7 +203,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
             }
           : { display: false },
     },
-    ...(type !== 'pie' && {
+    ...((type !== 'pie' && type !== 'doughnut') && {
       scales: {
         x: {
           stacked: Mode === 'stacked',
@@ -236,7 +236,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
   };
 
   const renderCustomLegend = () => {
-    if (type !== 'pie') return null;
+    if (type !== 'pie' && type !== 'doughnut') return null;
     const dataset = chartData.datasets[0];
     return (
       <div
@@ -291,6 +291,8 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
         return <Line data={chartData} options={options} />;
       case 'pie':
         return <Pie ref={chartRef} data={chartData} options={options} />;
+      case 'doughnut' : 
+        return <Pie ref={chartRef} data={chartData} options={{ ...options, cutout: '50%' }} />;
       case 'scatter':
         return <Scatter data={chartData} options={options} />;
       default:
@@ -310,7 +312,7 @@ const ChartComponent = ({ chart, onEdit, onRemove }) => {
           </button>
         </>
       )}
-      {type === 'pie' ? (
+      {(type === 'pie' || type === 'doughnut') ? (
         <div style={{ display: 'flex', marginTop: '20px', gap: '20px' }}>
           <div className="chart-container" style={{ flex: 1 }}>
             {renderChart()}
