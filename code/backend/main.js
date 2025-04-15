@@ -73,3 +73,5 @@ const sslOptions = {
 https.createServer(sslOptions, app).listen(PORT, () => {
     console.log(`HTTPS Server is running on https://0.0.0.0:${PORT}`);
 });
+
+console.log(`${process.env.MONGO_URI || 'mongodb://localhost:27017/session_db'}`)

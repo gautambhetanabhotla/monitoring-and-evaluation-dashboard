@@ -19,7 +19,7 @@ const ProjectContextProvider = ({ children }) => {
   // KPIs
   useEffect(() => {
     if(!project?.id) return;
-    fetch(`/api/kpi/getKpis/${project?.id}`)
+    fetch(`/api/kpi/getKpis/${project?.id}`,{ credentials: 'include' })
     .then(response => {
       // console.dir(response);
       return response.json();
@@ -54,7 +54,7 @@ const ProjectContextProvider = ({ children }) => {
   useEffect(() => {
     if(!project?.id || !KPIs || KPIs.length === 0) return;
     for (const kpi of KPIs) {
-      fetch(`/api/kpi/getKpiUpdates/${kpi?.id}`)
+      fetch(`/api/kpi/getKpiUpdates/${kpi?.id}`,{ credentials: 'include' })
       .then(response => response.json())
       .then(data => {
         // console.dir(data);
@@ -111,7 +111,7 @@ const ProjectContextProvider = ({ children }) => {
   // Tasks
   useEffect(() => {
     if(!project?.id) return;
-    fetch(`/api/task/getTasks/${project?.id}`)
+    fetch(`/api/task/getTasks/${project?.id}`,{ credentials: 'include' })
     .then(response => response.json())
     .then(data => {
       if(!data.data) return;

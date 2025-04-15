@@ -2,7 +2,12 @@
 import User from '../models/User.model.js';
 
 export const requireAuth = (req, res, next) => {
-  console.log("requireAuth : ",req.session);
+  if(req.session){
+    console.log("Session present in requireAuth");
+    if(req.session.userId){
+      console.log("Session userId present in requireAuth");
+    }
+  }    
   if (req.session && req.session.userId) {
     return next();
   }
@@ -11,8 +16,12 @@ export const requireAuth = (req, res, next) => {
 
 export const requireRole = (roles) => {
   return async (req, res, next) => {
-    console.log("requireRole : "+req.session);
-    
+    if(req.session){
+      console.log("Session present in requireRole");
+      if(req.session.userId){
+        console.log("Session userId present in requireRole");
+      }
+    }    
     if (req.session && req.session.userId) {
       const user = await User.findById(req.session.userId);
       if (!user) {

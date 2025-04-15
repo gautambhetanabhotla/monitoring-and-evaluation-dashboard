@@ -8,7 +8,7 @@ import { requireAuth,requireRole } from "../middleware/auth.middleware.js";
 const kpiRouter = express.Router();
 
 kpiRouter.post('/create',requireAuth,requireRole(["admin"]), createKpi);
-kpiRouter.get('/getKpis/:project_id',requireRole(["client","field staff"]),requireAuth, getKpisByProject);
+kpiRouter.get('/getKpis/:project_id',requireRole(["admin","client","field staff"]),requireAuth, getKpisByProject);
 kpiRouter.delete('/delete/:id',requireAuth,requireRole(["admin"]), deleteKpi);
 kpiRouter.put('/edit/:id',requireAuth,requireRole(["admin"]), editKpi);
 kpiRouter.put('/update/:kpi_id',requireAuth,requireRole(["admin","field staff"]), updateKpi);
