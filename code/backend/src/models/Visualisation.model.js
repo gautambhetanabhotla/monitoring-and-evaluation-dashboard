@@ -53,17 +53,19 @@ const visualisationSchema = new mongoose.Schema({
         type : Array,
         required : [true, 'Columns are required']
     },
-   colors: {
-        type: Object,
-        // required: [true, 'Colors are required'],
-        backgroundColor: {
-            type: [String],
-            required: true
-        },
-        borderColor: {
-            type: [String],
-            required: true
-        }
+    colors: {
+        type: [
+            {
+                backgroundColor: {
+                    type: String,
+                    required: true
+                },
+                borderColor: {
+                    type: String,
+                    required: true
+                }
+            }
+        ],
     },
     width : {
         type : Number,
@@ -72,7 +74,10 @@ const visualisationSchema = new mongoose.Schema({
     height : { 
         type : Number,
         required : [true, 'Height is required']
-    }
+    },
+    Mode : {
+        type : String,
+    },
 });
 
 const Visualisation = mongoose.model('Visualisation', visualisationSchema);
