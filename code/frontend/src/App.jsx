@@ -56,7 +56,7 @@ const App = () => {
         } />
 
         <Route path='/:projectid' element={
-          <ProtectedRoute allowedRoles={["admin", "user", "field_staff"]}>
+          <ProtectedRoute allowedRoles={["admin", "client", "field_staff"]}>
             <ProjectPage />
           </ProtectedRoute>
         }>
