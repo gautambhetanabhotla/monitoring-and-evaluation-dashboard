@@ -3,6 +3,7 @@ import { render, waitFor, screen, fireEvent } from '@testing-library/react';
 import Login from '../src/Login.jsx';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
+import { AuthContext } from '../src/AuthContext.jsx';
 
 const mockedNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
@@ -10,23 +11,30 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockedNavigate,
 }));
 
+const mockAuthContext = {
+  login: jest.fn(),
+};
+
+const renderWithProviders = (component) => {
+  return render(
+    <AuthContext.Provider value={mockAuthContext}>
+      <MemoryRouter>
+        {component}
+      </MemoryRouter>
+    </AuthContext.Provider>
+  );
+};
+
 beforeEach(() => {
-  global.fetch = jest.fn().mockResolvedValue({
-    json: async () => ({ success: true, role: 'admin' }),
-  });
+  mockAuthContext.login.mockReset();
   mockedNavigate.mockReset();
 });
 
 describe('Login Component', () => {
   test('renders login form with header, input fields, and login button', async () => {
-    render(
-      <MemoryRouter>
-        <Login />
-      </MemoryRouter>
-    );
+    renderWithProviders(<Login />);
 
     await waitFor(() => expect(screen.getByText(/Welcome Back/i)).toBeInTheDocument());
-
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
     await waitFor(() =>
@@ -50,20 +58,15 @@ describe('Login Component', () => {
   // });
 
   test('navigates to the correct route on successful login for admin role', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      json: async () => ({ success: true, role: 'admin' }),
+    mockAuthContext.login.mockResolvedValue({
+      success: true,
+      user: { role: 'admin' }
     });
 
-    render(
-      <MemoryRouter>
-        <Login />
-      </MemoryRouter>
-    );
+    renderWithProviders(<Login />);
 
-    
     fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'admin@example.com' } });
     fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'password123' } });
-
     
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
 
@@ -73,17 +76,12 @@ describe('Login Component', () => {
   });
 
   test('displays error message when login fails', async () => {
-    // Set fetch mock to return a failed login response
-    global.fetch = jest.fn().mockResolvedValue({
-      json: async () => ({ success: false, message: 'Login failed' }),
+    mockAuthContext.login.mockResolvedValue({
+      success: false,
+      message: 'Login failed'
     });
 
-    render(
-      <MemoryRouter>
-        <Login />
-      </MemoryRouter>
-    );
-
+    renderWithProviders(<Login />);
     
     fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: 'user@example.com' } });
     fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'wrongpassword' } });

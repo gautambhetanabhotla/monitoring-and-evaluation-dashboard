@@ -21,8 +21,22 @@ describe('Canvas Component', () => {
   const onEditChart = jest.fn();
   const onRemoveChart = jest.fn();
   const charts = [
-    { id: '1', title: 'Chart 1', type: 'bar', data: [{ x: 'A', y: 10 }], xAxis: 'x', yAxis: 'y' },
+    {
+      id: '1',
+      title: 'Chart 1',
+      type: 'bar',
+      data: [{ x: 'A', y: 10 }],
+      xAxis: 'x',
+      yAxis: ['y'],
+      colors: [
+        {
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+        },
+      ],
+    },
   ];
+  
 
   test('renders dashboard header and add button for admin', async () => {
     render(

@@ -34,6 +34,7 @@ function Charts() {
                 category: item.category,
                 kpi_id: item.kpi_id,
                 colors: item.colors,
+                Mode: item.Mode,
               };
             } catch (error) {
               console.error('Error parsing chart data:', error);
@@ -90,7 +91,8 @@ function Charts() {
         columns : chartConfig.columns,
         category: chartConfig.category,
         kpi_id: chartConfig.kpi_id,
-        colors: chartConfig.colors
+        colors: chartConfig.colors,
+        Mode: chartConfig.Mode
       };
       try {
         const response= await fetch(`/api/visualisation/update-visualisation/${editingChartId}`, {
@@ -121,7 +123,8 @@ function Charts() {
         columns : chartConfig.columns,
         category: chartConfig.category,
         kpi_id: chartConfig.kpi_id,
-        colors: chartConfig.colors
+        colors: chartConfig.colors,
+        Mode: chartConfig.Mode
       };
       try {
         const response= await fetch('/api/visualisation/save-visualisation', {

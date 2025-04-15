@@ -15,11 +15,12 @@ export const createVisualisation = async (req, res) => {
         category,
         kpi_id = null,
         colors,
+        Mode,
         width = 0,
         height = 0
     } = req.body;
 
-    if (!project_id || !title || !type || !component_1 || !component_2 || !columns || !category || !colors) {
+    if (!project_id || !title || !type || !component_1 || !component_2 || !columns || !category) {
         return res.status(400).json({ success: false, message: "Please give values for all the fields" });
     }
 
@@ -41,6 +42,7 @@ export const createVisualisation = async (req, res) => {
         category,
         kpi_id,
         colors,
+        Mode,
         width,
         height
     });
@@ -135,12 +137,13 @@ export const updateVisualisation = async (req, res) => {
         category,
         kpi_id = null,
         colors,
+        Mode,
         width = 0,
         height = 0
     } = req.body;
 
     // Validate required fields for all visualisations
-    if (!title || !type || !component_1 || !component_2 || !columns || !category || !colors) {
+    if (!title || !type || !component_1 || !component_2 || !columns || !category) {
         return res.status(400).json({ success: false, message: "Please give values for all the fields" });
     }
 
@@ -168,6 +171,7 @@ export const updateVisualisation = async (req, res) => {
         visualisation.category = category;
         visualisation.kpi_id = kpi_id;
         visualisation.width = width;
+        visualisation.Mode = Mode;
         visualisation.height = height;
         visualisation.colors = colors;
 

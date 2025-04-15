@@ -2,19 +2,18 @@ export default {
     testEnvironment: 'jsdom',
     setupFilesAfterEnv: ['<rootDir>/tests/jest.setup.mjs'],
     moduleNameMapper: {
-        '/\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-        "/^@heroui(.*)$/": "<rootDir>/node_modules/@heroui$1",
-        "/^@heroicons/react(.*)$/": "<rootDir>/node_modules/@heroicons/react$1",
-        // "^react-chartjs-2": "<rootDir>/node_modules/react-chartjs-2",
+        '\\.module\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+        '\\.(css|less|scss|sass)$': 'jest-transform-stub',
+        '^@heroui(.*)$/': '<rootDir>/node_modules/@heroui$1',
+        '^@heroicons/react(.*)$/': '<rootDir>/node_modules/@heroicons/react$1',
     },
     testMatch: ["**/tests/**/*.test.jsx"],
     transform: {
         '^.+\\.(js|jsx|mjs)$': 'babel-jest',
-        'node_modules/(?!(react|react-dom|@heroui|@heroicons)/)': 'babel-jest',
-    },
+    },    
     transformIgnorePatterns: [
-        "node_modules/(?!(@heroui|@heroicons)/)"
-    ],
+        "node_modules/(?!(@heroui|@heroicons|pdfjs-dist|react-pdf)/)"
+    ],    
     extensionsToTreatAsEsm: ['.jsx'],
     moduleFileExtensions: ['js', 'jsx', 'mjs'],
     testEnvironmentOptions: {
