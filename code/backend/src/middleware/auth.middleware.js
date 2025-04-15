@@ -17,7 +17,6 @@ export const requireRole = (roles) => {
         return res.status(404).json({ success: false, message: "User not found" });
       }
       if (!roles.includes(user.role)) {
-        // Optionally destroy the session if the role is no longer valid
         req.session.destroy();
         return res.status(403).json({ success: false, message: "Forbidden" });
       }

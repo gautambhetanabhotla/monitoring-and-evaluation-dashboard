@@ -9,6 +9,7 @@ import userRouter from './src/routes/user.routes.js';
 import projectRouter from './src/routes/project.routes.js';
 import visualisationRouter from './src/routes/visualisation.routes.js';
 import kpiRouter from './src/routes/kpi.routes.js';
+import documentRouter from './src/routes/document.routes.js';
 import taskRouter from './src/routes/task.routes.js';
 import cors from 'cors';
 import connectDB from './src/config/connectDB.js';
@@ -58,6 +59,7 @@ app.use('/api/projects', projectRouter);
 app.use('/api/visualisation', visualisationRouter);
 app.use('/api/kpi', kpiRouter);
 app.use('/api/task', taskRouter);
+app.use('/api/document', documentRouter);
 
 const PORT = process.env.PORT || 5011;
 
