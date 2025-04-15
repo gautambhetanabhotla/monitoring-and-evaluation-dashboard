@@ -48,7 +48,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       setData(editingChart.data);
       setColumns(editingChart.columns || []);
       setChartType(editingChart.type);
-      if (editingChart.type === 'pie' || editingChart.type === 'doughnut') {
+      if (editingChart.type === 'pie' || editingChart.type === 'donut') {
         setCategoryField(editingChart.categoryField || '');
         setValueField(editingChart.valueField || '');
       } else {
@@ -147,7 +147,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
       kpi_id: selectedKpi ? selectedKpi._id : null,
     };
 
-    if (chartType === 'pie' || chartType === 'doughnut') {
+    if (chartType === 'pie' || chartType === 'donut') {
       chartConfig.categoryField = categoryField;
       chartConfig.valueField = valueField;
     } else {
@@ -165,7 +165,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
   };
 
   const getChartData = () => {
-    if (chartType === 'pie' || chartType === 'doughnut') {
+    if (chartType === 'pie' || chartType === 'donut') {
       return {
         labels: data.map((item) => item[categoryField]?.toString() || ''),
         datasets: [
@@ -223,7 +223,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         display: false,
       },
     },
-    ...((chartType !== 'pie' && chartType !== 'doughnut') && {
+    ...((chartType !== 'pie' && chartType !== 'donut') && {
       scales: {
         x: {
           stacked: Mode_bar_line === 'stacked',
@@ -245,7 +245,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         },
       },   
     }),
-    ...(chartType === 'doughnut' && {
+    ...(chartType === 'donut' && {
       cutout: '50%',
     }),
   };
@@ -259,8 +259,8 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
         return <Line data={chartData} options={options} />;
       case 'pie':
         return <Pie key="pie" data={chartData} options={options} />;
-      case 'doughnut':
-        return <Pie key="doughnut" data={chartData} options={options} />;
+      case 'donut':
+        return <Pie key="donut" data={chartData} options={options} />;
       case 'scatter':
         return <Scatter data={chartData} options={options} />;
       default:
@@ -268,11 +268,11 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
     }
   };
 
-  const isPieChart = chartType === 'pie' || chartType === 'doughnut';
+  const isPieChart = chartType === 'pie' || chartType === 'donut';
   const isAxisBasedChart = !isPieChart;
   const canPreview = isPieChart ? (categoryField && valueField) : (xAxis && yAxis);
   const canSave = (() => {
-    if (chartType === 'pie' || chartType === 'doughnut') {
+    if (chartType === 'pie' || chartType === 'donut') {
       return categoryField && valueField[0];
     }
   
@@ -383,7 +383,7 @@ const ChartModal = ({ isOpen, onClose, onSave, editingChart }) => {
                 <div className="form-group mb-4">
                   <label className="form-label block mb-1">Chart Type</label>
                   <div className="grid grid-cols-2 gap-2 mb-4">
-                    {['bar', 'line', 'pie', 'doughnut','scatter'].map((type) => (
+                    {['bar', 'line', 'pie', 'donut','scatter'].map((type) => (
                       <button
                         key={type}
                         onClick={() => {
