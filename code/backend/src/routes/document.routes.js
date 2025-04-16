@@ -1,17 +1,13 @@
 import express from 'express';
-import multer from 'multer';
-import path from 'path';
-import { uploadDocument,getDocumentsByProject } from '../controllers/document.controller.js';
+import { uploadDocument, getDocumentsByProject,deleteDocument } from '../controllers/document.controller.js';
 
 const documentRouter = express.Router();
 
-const upload = multer({
-  dest: path.join(process.cwd(), 'uploads/tmp'),
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
-});
+// Use express.json middleware in your main app with a payload limit if needed.
+// For example: app.use(express.json({ limit: '50mb' }));
 
-
-documentRouter.post('/upload/', upload.single('file'), uploadDocument);
+documentRouter.post('/upload', uploadDocument);
 documentRouter.get('/getDocuments/:projectId', getDocumentsByProject);
+documentRouter.delete('/delete/:documentId', deleteDocument);
 
 export default documentRouter;
