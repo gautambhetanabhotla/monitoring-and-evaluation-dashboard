@@ -97,6 +97,8 @@ export const getVisualisationsByProject = async (req, res) => {
         }
 
         console.log("Visualisations fetched successfully");
+        //reverse the order
+        visualisations.reverse();
         return res.status(200).json({ success: true, message: "Visualisations fetched successfully", data: visualisations });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
