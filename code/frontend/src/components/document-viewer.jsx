@@ -24,7 +24,8 @@ import {
   ArrowUturnLeftIcon,
   ArrowPathIcon,
   TableCellsIcon,
-  ArrowDownTrayIcon
+  ArrowDownTrayIcon,
+  TrashIcon
 } from "@heroicons/react/24/outline";
 
 const DocumentCard = ({ document, onPress }) => {
@@ -33,12 +34,12 @@ const DocumentCard = ({ document, onPress }) => {
       <Card isPressable onPress={onPress}>
         <div className="flex flex-row flex-wrap h-auto">
           <div className="flex items-center justify-center bg-blue-500 p-5">
-            {document.metadata["MIMEType"] === "application/pdf" ? (
+            {document.metadata?.MIMEType === "application/pdf" ? (
               <DocumentTextIcon className="h-20 text-white" />
-            ) : document.metadata["MIMEType"].split("/")[0] === "image" ? (
+            ) : document.metadata?.MIMEType.split("/")[0] === "image" ? (
               <PhotoIcon className="h-20 text-white" />
-            ) : document.metadata["MIMEType"].split("/")[0] === "text" ? (
-              document.metadata["MIMEType"].split("/")[1] === "csv" ? (
+            ) : document.metadata?.MIMEType.split("/")[0] === "text" ? (
+              document.metadata?.MIMEType.split("/")[1] === "csv" ? (
                 <TableCellsIcon className="h-20 text-white" />
               ) : (
                 <DocumentTextIcon className="h-20 text-white" />
@@ -50,11 +51,11 @@ const DocumentCard = ({ document, onPress }) => {
           <div className="m-4">
             <span className="flex flex-row gap-3">
               <h1 className="prose inline text-lg font-semibold text-gray-900">
-                {document.metadata.Title ||
-                  document.metadata["FileName"] ||
+                {document.metadata?.Title ||
+                  document.metadata?.FileName ||
                   "Unnamed document"}
               </h1>
-              <Chip>{document.metadata["FileType"]}</Chip>
+              {document.metadata && document.metadata.FileType && <Chip>{document.metadata.FileType}</Chip>}
             </span>
           </div>
         </div>
@@ -65,9 +66,8 @@ const DocumentCard = ({ document, onPress }) => {
 
 const DownloadButton = ({ doc }) => {
   const handleDownload = () => {
-    const blob = new Blob([atob(doc.data)], { type: doc.metadata["MIMEType"] });
     const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
+    link.href = `data:${doc.metadata["MIMEType"] || ''};base64,${doc.data}`;
     link.download = doc.metadata["FileName"] || "downloaded-file";
     document.body.appendChild(link);
     link.click();
@@ -223,19 +223,19 @@ const DocumentViewer = ({ document, slot }) => {
         scrollBehavior="outside"
       >
         <ModalContent className="p-7 m-10">
-          {viewerComponents.get(document.metadata["MIMEType"].split("/")[1]) ? (
+          {viewerComponents.get(document.metadata?.MIMEType.split("/")[1]) ? (
             viewerComponents
-              .get(document.metadata["MIMEType"].split("/")[1])
+              .get(document.metadata?.MIMEType.split("/")[1])
               .call(this, { document })
           ) : (
             <div className="prose">
               <h1 className="prose text-2xl font-extrabold mb-3">Unsupported file type</h1>
               <p>
-                The file type <Code color="primary">{document.metadata["MIMEType"]}</Code> is not supported
+                The file type <Code color="primary">{document.metadata?.MIMEType}</Code> is not supported
                 for viewing.
                 <Link
-                  href={`data:${document.metadata["MIMEType"]};base64,${document.data}`}
-                  download={document.metadata["FileName"] || "downloaded-file"}
+                  href={`data:${document.metadata?.MIMEType};base64,${document.data}`}
+                  download={document.metadata?.FileName || "downloaded-file"}
                 >&nbsp;Download the file instead.</Link>
               </p>
             </div>

@@ -11,7 +11,7 @@ const upload = multer({
 });
 
 
-documentRouter.post('/upload/', upload.single('file'), uploadDocument);
+documentRouter.post('/upload', upload.single('file'), uploadDocument);
 documentRouter.get('/getDocuments/:projectId', getDocumentsByProject);
 
 export default documentRouter;

@@ -12,7 +12,7 @@ import { MapPinIcon, CurrencyRupeeIcon, CalendarDateRangeIcon, UserIcon, LinkIco
 // import '../index.css';
 
 import { ProjectContext, ProjectContextProvider } from './project-context.jsx';
-import { AuthContext } from '../AuthContext';
+import { AuthContext } from '../AuthContext.jsx';
 
 const ProjectHeader = () => {
 
@@ -70,6 +70,9 @@ const ProjectHeader = () => {
 };
 
 const Nav = () => {
+
+  const actx = useContext(AuthContext);
+  console.dir(actx.user);
 
   let tabname = useLocation().pathname.split("/").pop();
   if (!(['overview', 'charts', 'kpis', 'timeline', 'success-stories', 'log-framework'].includes(tabname))) {
