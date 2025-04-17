@@ -1,11 +1,17 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useMemo } from "react";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { useNavigate } from "react-router-dom";
 import { Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/modal";
 import { Input } from "@heroui/input";
 import { Alert } from "@heroui/alert";
+import { Form } from "@heroui/form";
 import { AuthContext } from "../AuthContext";
+
+const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    return emailRegex.test(email);
+};
 
 const getAllClients = async () => {
     try {
@@ -31,6 +37,7 @@ const getAllClients = async () => {
 
 export const ClientGallery = () => {
     const [clientList, setClientList] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [username, setUsername] = useState("");
@@ -39,6 +46,7 @@ export const ClientGallery = () => {
     const [password, setPassword] = useState("");
     const [showAlert, setShowAlert] = useState(false);
     const { logout } = useContext(AuthContext);
+    const [modalErrors, setModalErrors] = useState("");
 
     const resetFormFields = () => {
         setUsername("");
@@ -60,8 +68,19 @@ export const ClientGallery = () => {
         }
     }, [isOpen]);
 
+    const filteredClients = useMemo(() => {
+        return clientList.filter(client => 
+            client.username.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [clientList, searchQuery]);
+
     const createClient = async () => {
         try {
+            if (!isValidEmail(email)) {
+                setModalErrors("Please enter a valid email address");
+                return;
+            }
+
             const length = Math.floor(Math.random() * (11 - 8 + 1)) + 8;
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let pwd = '';
@@ -102,7 +121,11 @@ export const ClientGallery = () => {
                 resetFormFields();
                 onOpenChange(false);
             } else {
-                console.error("Adding client failed:", data.message);
+                setModalErrors(data.message);
+                setTimeout(() => {
+                    setModalErrors("");
+                }, 7000);
+                console.error("Error adding client:", data.message);
             }
         } catch (error) {
             console.error("Error creating client:", error);
@@ -112,12 +135,17 @@ export const ClientGallery = () => {
     const handleOpenChange = (open) => {
         if (!open) {
             resetFormFields();
+            setModalErrors("");
         }
         onOpenChange(open);
     };
 
+    const handleClearSearch = () => {
+        setSearchQuery("");
+    };
+
     return (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col items-center min-h-screen p-6">
             {showAlert && (
                 <div className="fixed top-4 right-4 z-50">
                     <Alert 
@@ -133,93 +161,34 @@ export const ClientGallery = () => {
                 </div>
             )}
 
-            <div className="flex-none p-6 z-10 border-b border-cyan-800">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-4xl font-bold">Client List</h2>
-                    <div className="flex space-x-4">
-                        <Button
-                            className="text-xl font-bold py-2 px-4 text-black"
-                            onPress={onOpen}
-                            size="md"
-                            radius="large"
-                            color="primary"
-                        >
-                            Add Client
-                        </Button>
-                        <Button
-                            className="text-xl font-bold py-2 px-4 text-black"
-                            onPress={logout}
-                            size="md"
-                            radius="large"
-                            color="primary"
-                        >
-                            Logout
-                        </Button>
-                    </div>
+            <h2 className="text-4xl font-bold mb-6 mt-8 text-center">Client List</h2>
 
-                    <Modal isOpen={isOpen} onOpenChange={handleOpenChange} placement="center" size="md">
-                        <ModalContent>
-                            {() => (
-                                <>
-                                    <ModalHeader className="flex flex-col gap-1">Add Client</ModalHeader>
-                                    <ModalBody>
-                                    <Input
-                                        isRequired
-                                        label="Username"
-                                        labelPlacement="outside"
-                                        placeholder="Enter username"
-                                        variant="bordered"
-                                        type="text"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                    />
-                                    <Input
-                                        isRequired
-                                        label="Email"
-                                        labelPlacement="outside"
-                                        placeholder="Enter email"
-                                        variant="bordered"
-                                        type="email"
-                                        errorMessage="Please enter a valid email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                    />
-                                    <Input
-                                        isRequired
-                                        label="Phone Number"
-                                        labelPlacement="outside"
-                                        placeholder="Enter phone number"
-                                        variant="bordered"
-                                        type="tel"
-                                        maxLength="10"
-                                        errorMessage="Please enter a valid phone number"
-                                        value={phoneNumber}
-                                        onChange={(e) => setPhoneNumber(e.target.value)}
-                                    />
-                                    </ModalBody>
-                                    <ModalFooter>
-                                        <Button color="primary" onPress={createClient}>
-                                            Add
-                                        </Button>
-                                    </ModalFooter>
-                                </>
-                            )}
-                        </ModalContent>
-                    </Modal>
-                </div>
-            </div>
+            <Input
+                isClearable
+                className="w-full max-w-3xl mb-6"
+                placeholder="Search clients..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onClear={handleClearSearch}
+                startContent={<i className="fas fa-search text-gray-400" />}
+                classNames={{
+                    clearButton: "opacity-100"
+                }}
+            />
 
-            <div className="flex-grow overflow-y-auto p-6 pt-4">
+            <div className="w-full max-w-3xl h-[60vh] overflow-y-auto border-2 border-cyan-800 rounded-lg p-4 mb-6 bg-white">
                 <div className="flex flex-col space-y-4">
-                    {clientList.length === 0 ? (
-                        <p className="text-xl text-gray-500">No clients found.</p>
+                    {filteredClients.length === 0 ? (
+                        <p className="text-xl text-gray-500 text-center">
+                            {searchQuery ? "No matching clients found." : "No clients found."}
+                        </p>
                     ) : (
-                        clientList.map((client) => (
+                        filteredClients.map((client) => (
                             <Card
                                 key={client._id}
                                 isPressable
                                 onPress={() => navigate(`/projects?clientId=${client._id}`)}
-                                className="border rounded-lg shadow-md w-full border-cyan-800"
+                                className="border-2 rounded-lg shadow-md w-full border-cyan-800 hover:bg-gray-50"
                             >
                                 <CardBody className="p-6">
                                     <h3 className="font-medium text-xl mb-2">Username: {client.username}</h3>
@@ -230,6 +199,114 @@ export const ClientGallery = () => {
                     )}
                 </div>
             </div>
+
+            <div className="flex space-x-4">
+                <Button
+                    className="text-xl font-bold py-2 px-4"
+                    onPress={onOpen}
+                    size="md"
+                    radius="large"
+                    color="primary"
+                >
+                    Add Client
+                </Button>
+                <Button
+                    className="text-xl font-bold py-2 px-4"
+                    onPress={logout}
+                    size="md"
+                    radius="large"
+                    color="primary"
+                >
+                    Logout
+                </Button>
+            </div>
+
+            <Modal isOpen={isOpen} onOpenChange={handleOpenChange} placement="center" size="md">
+                <ModalContent>
+                    {() => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">Add Client</ModalHeader>
+                            {modalErrors && (
+                                <div className="px-6">
+                                    <Alert
+                                        className="mb-4"
+                                        variant="solid"
+                                        color="danger"
+                                        onClose={() => setModalErrors("")}
+                                    >
+                                        <div className="font-medium text-sm">{modalErrors}</div>
+                                        <div className="text-xs mt-1">Please try again.</div>
+                                    </Alert>
+                                </div>
+                            )}
+                            <Form 
+                                validationBehavior="aria"
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    if (!isValidEmail(email)) {
+                                        setModalErrors("Please enter a valid email address");
+                                        return;
+                                    }
+                                    createClient();
+                                }}
+                                className="w-full"
+                            >
+                            <ModalBody className="gap-4">
+                                <Input
+                                    isRequired
+                                    label="Username"
+                                    labelPlacement="outside"
+                                    placeholder="Enter username"
+                                    variant="bordered"
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    classNames={{
+                                        inputWrapper: "w-full"
+                                    }}
+                                />
+                                <Input
+                                    isRequired
+                                    label="Email"
+                                    labelPlacement="outside"
+                                    placeholder="Enter email"
+                                    variant="bordered"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    isInvalid={email !== "" && !isValidEmail(email)}
+                                    errorMessage={email !== "" && !isValidEmail(email) ? "Please enter a valid email address" : ""}
+                                    aria-invalid={email !== "" && !isValidEmail(email)}
+                                    aria-errormessage="email-error"
+                                    classNames={{
+                                        inputWrapper: "w-full"
+                                    }}
+                                />
+                                <Input
+                                    isRequired
+                                    label="Phone Number"
+                                    labelPlacement="outside"
+                                    placeholder="Enter phone number"
+                                    variant="bordered"
+                                    type="tel"
+                                    maxLength="10"
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    classNames={{
+                                        inputWrapper: "w-full"
+                                    }}
+                                />
+                            </ModalBody>
+                            <ModalFooter className="flex justify-end">
+                                <Button type="submit" color="primary">
+                                    Add
+                                </Button>
+                            </ModalFooter>
+                            </Form>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </div>
     );
 };
