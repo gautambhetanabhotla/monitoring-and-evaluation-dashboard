@@ -11,7 +11,7 @@ import {Form} from "@heroui/form";
 import {Input} from "@heroui/input";
 // import {NumberInput} from "@heroui/number-input";
 import {Spacer} from "@heroui/spacer";
-import Dropzone from 'react-dropzone';
+import Dropzone from '../../components/file-drop-zone.jsx';
 
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 
@@ -35,62 +35,7 @@ const Overview = () => {
         {documents && documents.map(
           (document, index) => <DocumentViewer document={document} slot={<DocumentCard />} key={index} />
         )}
-        <Dropzone
-          onDrop={
-            async (acceptedFiles) => {
-              acceptedFiles.forEach((file) => {
-                const reader = new FileReader();
-                reader.onabort = () => console.log('file reading was aborted');
-                reader.onerror = () => console.log('file reading has failed');
-                reader.onload = () => {
-                  ctx.addDocument({
-                    project: ctx.project.id,
-                    data: reader.result
-                  });
-                };
-                reader.readAsArrayBuffer(file);
-              });
-              // await axios.post('/api/upload', formData, {
-              //   headers: {
-              //     'Content-Type': 'multipart/form-data',
-              //   },
-              // });
-            }
-          }
-          accept={{ 'application/pdf': ['.pdf'], 'image/*': ['.jpeg', '.jpg', '.png'] }}
-          multiple
-          // noClick
-          noKeyboard
-        >
-          {({ getRootProps, getInputProps, isDragActive }) => (
-            <div
-              {...getRootProps()}
-              className="w-full
-                         flex
-                         flex-col
-                         items-center
-                         justify-center
-                         border-2
-                         border-gray-300
-                         hover:border-blue-500
-                         transition-colors
-                         border-dashed
-                         rounded-xl
-                         max-w-sm
-                         p-5
-                         py-6
-                         h-auto"
-            >
-              <ArrowUpTrayIcon className="h-10 w-10 text-gray-500" />
-              <input {...getInputProps()} />
-              {isDragActive ? (
-                <p className="text-blue-500">Drop the files here...</p>
-              ) : (
-                <p className="text-gray-500">Drag and drop files here, or click to select files</p>
-              )}
-            </div>
-          )}
-        </Dropzone>
+        <Dropzone />
       </div>
     </div>
     </>
