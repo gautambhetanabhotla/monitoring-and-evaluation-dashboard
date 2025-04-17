@@ -112,7 +112,7 @@ function Charts() {
         console.error('Error saving chart:', error);
       }
     } else {
-      setCharts([...charts, chartConfig]);
+      setCharts([chartConfig, ...charts]);
       const chartData = {
         project_id: projectid,
         title : chartConfig.title,
@@ -138,7 +138,7 @@ function Charts() {
         const data = await response.json();
         console.log(data);
         chartConfig.id = data.id;
-        setCharts([...charts, chartConfig]);
+        setCharts([chartConfig, ...charts]);
       } catch (error) {
         console.error('Error saving chart:', error);
       }

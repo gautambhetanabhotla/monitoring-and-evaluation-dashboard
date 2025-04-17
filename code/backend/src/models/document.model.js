@@ -1,29 +1,34 @@
 import mongoose from 'mongoose';
 
 const DocumentSchema = new mongoose.Schema({
-  project: {
+  projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
     required: true,
   },
-  task: {
+  taskId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Task',
   },
-  kpiUpdate: {
+  kpiUpdateId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'KPIUpdate',
   },
-  filename: {
-    type: String,
-    // required: true,
+  metadata: {
+    type: mongoose.Schema.Types.Mixed,  // store the JSON metadata
   },
-  mimeType: String,
-  metadata: mongoose.Schema.Types.Mixed,  // store the entire exif object
+  binaryData: {
+    type: String,  // store the binary file data
+  },
   createdAt: {
     type: Date,
     default: Date.now,
   },
+  createdBy : {
+    type : mongoose.Schema.Types.ObjectId,
+    ref : 'User',
+    required : [true, 'Created by is required'],
+  }
 });
 
 const Document = mongoose.models.Document || mongoose.model('Document', DocumentSchema);
