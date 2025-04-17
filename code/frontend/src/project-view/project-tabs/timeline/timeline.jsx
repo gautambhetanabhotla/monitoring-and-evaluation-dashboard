@@ -55,7 +55,7 @@ const AddTaskButton = () => {
                 project_id: ctx.project.id,
                 title: title,
                 description: description,
-              })
+              }, {withCredentials: true})
               .then(res => {
                 if (!res.data.success) return;
                 console.dir(res.data);

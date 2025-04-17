@@ -37,10 +37,10 @@ export const login = async (req, res) => {
         role: user.role,
         email: user.email,
         name: user.username,
-      }// You can still return the role in the response if needed.
+      }
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message});
   }
 };
 
@@ -56,7 +56,7 @@ export const logout = (req, res) => {
       res.clearCookie("connect.sid");
       return res.status(200).json({ 
         success: true, 
-        message: "Logged out successfully" 
+        message: "User logged out successfully" 
       });
     });
   } else {
