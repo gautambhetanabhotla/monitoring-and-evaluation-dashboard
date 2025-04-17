@@ -11,6 +11,7 @@ import visualisationRouter from './src/routes/visualisation.routes.js';
 import kpiRouter from './src/routes/kpi.routes.js';
 import documentRouter from './src/routes/document.routes.js';
 import taskRouter from './src/routes/task.routes.js';
+import successStoryRouter from './src/routes/successStory.routes.js';
 import cors from 'cors';
 import connectDB from './src/config/connectDB.js';
 import process from 'process';
@@ -60,6 +61,7 @@ app.use('/api/visualisation', visualisationRouter);
 app.use('/api/kpi', kpiRouter);
 app.use('/api/task', taskRouter);
 app.use('/api/document', documentRouter);
+app.use('/api/success-story', successStoryRouter);
 
 const PORT = process.env.PORT || 5011;
 
