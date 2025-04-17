@@ -1,7 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import https from 'https';
 import fs from 'fs';
 import express from 'express';
-import dotenv from 'dotenv';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import authRouter from './src/routes/auth.routes.js';
@@ -15,8 +17,7 @@ import cors from 'cors';
 import connectDB from './src/config/connectDB.js';
 import process from 'process';
 
-dotenv.config();
-connectDB(); // Connect to MongoDB
+connectDB();
 
 const app = express();
 app.use(cors({
@@ -28,7 +29,6 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Session Configuration
 app.use(
     session({
         secret: process.env.SESSION_SECRET || "supersecretkey",
@@ -63,13 +63,11 @@ app.use('/api/document', documentRouter);
 
 const PORT = process.env.PORT || 5011;
 
-// Load SSL certificate and private key
 const sslOptions = {
     key: fs.readFileSync('./certs/key.pem'),
     cert: fs.readFileSync('./certs/cert.pem'),
 };
 
-// Create HTTPS server
 https.createServer(sslOptions, app).listen(PORT, () => {
     console.log(`HTTPS Server is running on https://0.0.0.0:${PORT}`);
 });

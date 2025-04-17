@@ -78,6 +78,7 @@ const ProjectGallery = () => {
 
     const [password, setPassword] = useState("");
     const [showAlert, setShowAlert] = useState(false);
+    const [emailSent, setEmailSent] = useState(false);
 
     const [clientData, setClientData] = useState(null);
     const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -170,11 +171,13 @@ const ProjectGallery = () => {
 
             if (data.success) {
                 setPassword(`New password: ${pwd}`);
+                setEmailSent(data.emailSent);
                 setShowAlert(true);
                 
                 setTimeout(() => {
                     setShowAlert(false);
                     setPassword("");
+                    setEmailSent(false);
                 }, 7000);
             } else {
                 console.error("Updating password failed:", data.message);
@@ -217,7 +220,10 @@ const ProjectGallery = () => {
                     >
                         <div className="font-medium text-sm">Password updated successfully!</div>
                         <div className="text-sm">{password}</div>
-                        <div className="text-xs mt-1">This password will only be shown once. Please copy it now.</div>
+                        {emailSent 
+                            ? <div className="text-xs mt-1">An email containing the new password has been sent.</div>
+                            : <div className="text-xs mt-1 text-yellow-200">Warning: Failed to send password email.</div>
+                        }
                     </Alert>
                 </div>
             )}

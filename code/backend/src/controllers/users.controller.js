@@ -1,6 +1,7 @@
 import User from "../models/User.model.js";
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
+import { sendPasswordEmail } from "../utils/emailService.js";
 
 export const getClients = async (req, res) => {
   try {
@@ -50,10 +51,17 @@ export const addUser = async (req, res) => {
 
   try {
     const newUser = await user.save();
+
+    let emailSent = false;
+    if (role === 'client') {
+      emailSent = await sendPasswordEmail(email, username, password);
+    }
+
     return res.status(201).json({
       success: true,
       message: "User added successfully",
       id: newUser._id,
+      emailSent: emailSent
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -133,14 +141,13 @@ export const updateUser = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    // Update user properties
     user.username = username;
     user.email = email;
     user.role = role;
     user.phone_number = phone_number;
 
     const updatedUser = await user.save();
-    // Since we only store the user ID in session, there's no need to update the session here.
+
     return res.status(200).json({ success: true, user: updatedUser });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -163,16 +170,21 @@ export const updatePassword = async (req, res) => {
     const user = await User.findById(id);
 
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
     const passwordHash = bcrypt.hashSync(pwd, 10);
     user.passwordHash = passwordHash;
 
     const updatedUser = await user.save();
-    return res.status(200).json({ success: true, user: updatedUser });
+
+    const emailSent = await sendPasswordEmail(user.email, user.username, pwd);
+    
+    return res.status(200).json({ 
+      success: true, 
+      user: updatedUser,
+      emailSent: emailSent
+    });
 
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

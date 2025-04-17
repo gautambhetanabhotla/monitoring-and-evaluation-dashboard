@@ -38,6 +38,7 @@ const getAllClients = async () => {
 export const ClientGallery = () => {
     const [clientList, setClientList] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [emailSent, setEmailSent] = useState(false);
     const navigate = useNavigate();
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [username, setUsername] = useState("");
@@ -109,13 +110,14 @@ export const ClientGallery = () => {
             if (data.success) {
                 const updatedClients = await getAllClients();
                 setClientList(updatedClients);
-
+                setEmailSent(data.emailSent);
                 setPassword(`Generated password: ${pwd}`);
                 setShowAlert(true);
                 
                 setTimeout(() => {
                     setShowAlert(false);
                     setPassword("");
+                    setEmailSent(false);
                 }, 7000);
 
                 resetFormFields();
@@ -156,7 +158,11 @@ export const ClientGallery = () => {
                     >
                         <div className="font-medium text-sm">Client user account created successfully!</div>
                         <div className="text-sm">{password}</div>
-                        <div className="text-xs mt-1">This password will only be shown once. Please copy it now.</div>
+                        <div className="text-xs mt-1">
+                            {emailSent 
+                                ? "An email containing the password has been sent to the client." 
+                                : "Warning: Failed to send password email to the client."}
+                        </div>
                     </Alert>
                 </div>
             )}
