@@ -6,6 +6,7 @@ import { Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure
 import { Input } from "@heroui/input";
 import { Alert } from "@heroui/alert";
 import { Form } from "@heroui/form";
+import { Search, UserPlus, LogOut } from "lucide-react";
 import { AuthContext } from "../AuthContext";
 
 const isValidEmail = (email) => {
@@ -176,13 +177,13 @@ export const ClientGallery = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onClear={handleClearSearch}
-                startContent={<i className="fas fa-search text-gray-400" />}
+                startContent={<Search className="text-gray-400 w-5 h-5" />}
                 classNames={{
                     clearButton: "opacity-100"
                 }}
             />
 
-            <div className="w-full max-w-3xl h-[60vh] overflow-y-auto border-2 border-cyan-800 rounded-lg p-4 mb-6 bg-white">
+            <div className="w-full max-w-3xl h-[60vh] overflow-y-auto rounded-lg p-4 mb-6 bg-white shadow-lg border border-gray-200">
                 <div className="flex flex-col space-y-4">
                     {filteredClients.length === 0 ? (
                         <p className="text-xl text-gray-500 text-center">
@@ -194,7 +195,7 @@ export const ClientGallery = () => {
                                 key={client._id}
                                 isPressable
                                 onPress={() => navigate(`/projects?clientId=${client._id}`)}
-                                className="border-2 rounded-lg shadow-md w-full border-cyan-800 hover:bg-gray-50"
+                                className="rounded-lg shadow-md w-full bg-gray-50 hover:bg-gray-200 border border-gray-100"
                             >
                                 <CardBody className="p-6">
                                     <h3 className="font-medium text-xl mb-2">Username: {client.username}</h3>
@@ -208,21 +209,23 @@ export const ClientGallery = () => {
 
             <div className="flex space-x-4">
                 <Button
-                    className="text-xl font-bold py-2 px-4"
+                    className="text-lg py-2 px-4 flex items-center gap-2"
                     onPress={onOpen}
                     size="md"
                     radius="large"
                     color="primary"
                 >
+                    <UserPlus className="w-5 h-5" />
                     Add Client
                 </Button>
                 <Button
-                    className="text-xl font-bold py-2 px-4"
+                    className="text-lg py-2 px-4 flex items-center gap-2"
                     onPress={logout}
                     size="md"
                     radius="large"
                     color="primary"
                 >
+                    <LogOut className="w-5 h-5" />
                     Logout
                 </Button>
             </div>

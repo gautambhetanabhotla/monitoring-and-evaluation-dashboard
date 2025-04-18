@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Card, CardHeader, CardBody } from "@heroui/card";
-import { Button, ButtonGroup } from "@heroui/button";
+import { Button } from "@heroui/button";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/modal";
 import { Input, Textarea } from "@heroui/input";
 import { Alert } from "@heroui/alert";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
-import { ChevronLeft, PieChart, LayoutGrid, MoreVertical } from "lucide-react";
+import { Plus, Key, Trash2, LogOut, Users, LayoutDashboard, ChevronDown } from "lucide-react";
 import { AuthContext } from "../AuthContext";
+import StatsTab from "./stats-tab";
+import ProjectsTab from "./projects-tab";
 
 const getProjectsByClientId = async (clientId) => {
     try {
@@ -61,7 +61,7 @@ const getClientData = async (clientId) => {
 };
 
 const ProjectGallery = () => {
-    const [activeTab, setActiveTab] = useState("projects");
+    const [activeTab, setActiveTab] = useState("visualization");
     const [clientProjects, setClientProjects] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
@@ -209,113 +209,125 @@ const ProjectGallery = () => {
     };
 
     return (
-        <div className="flex flex-col h-screen p-6 relative">
-            {showAlert && (
-                <div className="fixed top-4 right-4 z-50">
-                    <Alert 
-                        className="max-w-md"
-                        variant="solid"
-                        color="success"
-                        onClose={() => setShowAlert(false)}
-                    >
-                        <div className="font-medium text-sm">Password updated successfully!</div>
-                        <div className="text-sm">{password}</div>
-                        {emailSent 
-                            ? <div className="text-xs mt-1">An email containing the new password has been sent.</div>
-                            : <div className="text-xs mt-1 text-yellow-200">Warning: Failed to send password email.</div>
-                        }
-                    </Alert>
+        <div className="flex h-screen bg-gray-50">
+            <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
+                <div className="p-6 border-b border-gray-200">
+                    <h1 className="text-xl font-bold text-gray-800">
+                        {clientData ? clientData.username : 'Loading...'}
+                    </h1>
+                    <p className="text-sm text-gray-500 mt-1">Project Gallery</p>
                 </div>
-            )}
 
-            <div className="mb-6 text-center">
-                <h1 className="text-4xl font-bold">
-                    {clientData ? clientData.username : 'Loading client...'}
-                </h1>
+                <nav className="flex-1 p-4">
+                    <div className="space-y-2">
+                        <Button 
+                            onPress={() => setActiveTab("visualization")}
+                            className={`w-full justify-start ${
+                                activeTab === "visualization" 
+                                ? "bg-blue-50 text-blue-700" 
+                                : "bg-transparent text-gray-700 hover:bg-gray-100"
+                            }`}
+                            startContent={<LayoutDashboard size={20} />}
+                            >
+                            Dashboard
+                        </Button>
+                        
+                        <Button 
+                            onPress={() => setActiveTab("projects")}
+                            className={`w-full justify-start ${
+                                activeTab === "projects" 
+                                ? "bg-blue-50 text-blue-700" 
+                                : "bg-transparent text-gray-700 hover:bg-gray-100"
+                            }`}
+                            startContent={<Users size={20} />}
+                            >
+                            Projects
+                        </Button>
+                    </div>
+                </nav>
+
+                <div className="p-4 border-t border-gray-200">
+                <div className="space-y-2">
+                    {clientId && (
+                        <>
+                        <Button 
+                            onPress={onOpen}
+                            className="w-full justify-start bg-transparent text-gray-700 hover:bg-gray-100"
+                            startContent={<Plus size={20} />}
+                        >
+                        New Project
+                        </Button>
+                        
+                        <Button 
+                            onPress={generatePassword}
+                            className="w-full justify-start bg-transparent text-gray-700 hover:bg-gray-100"
+                            startContent={<Key size={20} />}
+                        >
+                        Update Password
+                        </Button>
+                        
+                        <Button 
+                            onPress={() => setConfirmDeleteOpen(true)}
+                            className="w-full justify-start bg-transparent text-red-600 hover:bg-red-50"
+                            startContent={<Trash2 size={20} />}
+                        >
+                        Remove Client
+                        </Button>
+                        </>
+                    )}
+                    
+                    <Button 
+                        onPress={logout}
+                        className="w-full justify-start bg-transparent text-gray-700 hover:bg-gray-100"
+                        startContent={<LogOut size={20} />}
+                    >
+                    Logout
+                    </Button>
+                </div>
+                </div>
             </div>
 
-            <div className="flex justify-between items-center mb-6 rounded-xl p-3 shadow-md bg-gray-900">
+            <div className="flex-1 overflow-hidden flex flex-col">
                 {clientId && (
-                    <Button 
-                        className="flex items-center gap-1 text-black"
-                        size="md"
-                        radius="large"
-                        onPress={() => navigate('/clients')}
-                        color="primary"
-                    >
-                        <ChevronLeft size={18} />
-                        Back
-                    </Button>
+                    <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
+                        <Button
+                            onPress={() => navigate('/clients')}
+                            variant="light"
+                            className="text-gray-700 hover:text-gray-900"
+                            startContent={<ChevronDown className="rotate-90" size={20} />}
+                        >
+                            Back to Clients
+                        </Button>
+
+                        {showAlert && (
+                            <div className="fixed top-4 right-4 z-50">
+                                <Alert 
+                                    className="max-w-md"
+                                    variant="solid"
+                                    color="success"
+                                    onClose={() => setShowAlert(false)}
+                                >
+                                    <div className="font-medium text-sm">Password updated successfully!</div>
+                                    <div className="text-sm">{password}</div>
+                                    {emailSent 
+                                        ? <div className="text-xs mt-1">An email containing the new password has been sent.</div>
+                                        : <div className="text-xs mt-1 text-yellow-200">Warning: Failed to send password email.</div>
+                                    }
+                                </Alert>
+                            </div>
+                        )}
+                    </div>
                 )}
 
-                <ButtonGroup>
-                    <Button
-                        className={`flex items-center gap-1 ${
-                            activeTab === "projects"
-                                ? "text-black"
-                                : "text-cyan-700"
-                        }`}
-                        onPress={() => setActiveTab("projects")}
-                        size="md"
-                        radius="large"
-                        color="primary"
-                        variant={activeTab === "projects" ? "solid" : "flat"}
-                    >
-                        <LayoutGrid size={18} />
-                        Projects
-                    </Button>
-                    <Button
-                        className={`flex items-center gap-1 ${
-                            activeTab === "visualization"
-                                ? "text-black"
-                                : "text-cyan-700"
-                        }`}
-                        onPress={() => setActiveTab("visualization")}
-                        size="md"
-                        radius="large"
-                        color="primary"
-                        variant={activeTab === "visualization" ? "solid" : "flat"}
-                    >
-                        <PieChart size={18} />
-                        Project Stats
-                    </Button>
-                </ButtonGroup>
+                <div className="flex-1 overflow-auto p-8">
+                    {activeTab === "visualization" && (
+                        <StatsTab clientProjects={clientProjects} clientId={clientId} />
+                    )}
 
-                <Dropdown>
-                    <DropdownTrigger>
-                        <Button 
-                            className="text-black"
-                            size="md"
-                            radius="large"
-                            color="primary"
-                        >
-                            <MoreVertical size={18} />
-                            More
-                        </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu aria-label="Client Options">
-                        {clientId && (
-                            <>
-                            <DropdownItem onPress={onOpen} key="add-project">
-                                Add Project
-                            </DropdownItem>
-                            <DropdownItem onPress={generatePassword} key="update-password">
-                                Update Password
-                            </DropdownItem>
-                            <DropdownItem 
-                                onPress={() => setConfirmDeleteOpen(true)} 
-                                key="remove-client"
-                                className="text-red-500"
-                            >
-                                Remove This Client
-                            </DropdownItem>
-                            </>
-                        )}
-                        <DropdownItem onPress={logout} key="logout">
-                            Logout
-                        </DropdownItem>
-                    </DropdownMenu>
-                </Dropdown>
+                    {activeTab === "projects" && (
+                        <ProjectsTab clientProjects={clientProjects} clientId={clientId} />
+                    )}
+                </div>
             </div>
 
             <Modal isOpen={isOpen} onOpenChange={handleOpenChange} placement="center" size="md">
@@ -400,55 +412,6 @@ const ProjectGallery = () => {
                     )}
                 </ModalContent>
             </Modal>
-
-            {activeTab === "projects" && (
-                <div className="flex flex-col rounded-xl shadow-lg p-6 mb-6 overflow-y-auto h-[90%] border border-cyan-800">
-                    <h1 className="text-4xl font-bold border-b pb-4 border-cyan-800">
-                        Your Projects
-                    </h1>
-                    <div className="pt-6 overflow-y-auto flex-1">
-                    <div className="flex gap-8 flex-wrap">
-                        {clientProjects.length === 0 ? (
-                            <p className="text-xl text-gray-500">No projects found.</p>
-                        ) : (
-                            clientProjects.map((project, index) => (
-                                <Card
-                                    key={index}
-                                    className="border border-cyan-800 p-4 rounded-lg shadow-md w-64 h-64"
-                                    isPressable
-                                    onPress={() => navigate(clientId ? `/${project._id}?clientId=${clientId}` : `/${project._id}`)}
-                                >
-                                    <CardHeader>
-                                        <h2 className="text-lg font-semibold">{project.name}</h2>
-                                    </CardHeader>
-                                    <CardBody>
-                                        <p className="text-sm">Start Date: {project.start_date}</p>
-                                        <h3 className="text-sm font-medium mt-2">Project Progress</h3>
-                                        <div className="w-full bg-gray-400 rounded-full h-3 mt-1">
-                                            <div
-                                                className="bg-green-700 h-3 rounded-full"
-                                                style={{ width: `${project.project_progress}%` }}
-                                            ></div>
-                                        </div>
-                                    </CardBody>
-                                </Card>
-                            ))
-                        )}
-                    </div>
-                    </div>
-                </div>
-            )}
-
-            {activeTab === "visualization" && (
-                <div className="flex flex-col rounded-xl shadow-lg p-6 h-[90%] border border-cyan-800">
-                    <h1 className="text-4xl font-bold mb-4 border-b pb-4 border-cyan-800">
-                        Your Projects in Numbers
-                    </h1>
-                    <div className="overflow-y-auto flex-1">
-                        <p className="text-2xl">Stats and charts go here...</p>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

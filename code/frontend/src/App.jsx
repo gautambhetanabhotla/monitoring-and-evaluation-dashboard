@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 import ProtectedRoute from './ProtectedRoute';  
 import ProjectPage from './project-view/project-header.jsx';
-import ProjectGallery from './project-gallery/project-gallery-client.jsx';
+import ProjectGallery from './project-gallery/project-gallery.jsx';
 import Overview from './project-view/project-tabs/overview.jsx';
 import Charts from './project-view/project-page-charts.jsx';
 import KPIs from './project-view/project-tabs/kpis.jsx';
@@ -12,7 +12,7 @@ import SuccessStories from './project-view/project-tabs/success-stories.jsx';
 import LogFramework from './project-view/project-tabs/log-framework.jsx';
 import Admin from './Admin.jsx';
 import Field_Staff from './Field_Staff.jsx'; 
-import { ClientGallery } from './project-gallery/project-gallery-admin.jsx';
+import { ClientGallery } from './project-gallery/client-gallery.jsx';
 import Unauthorized from './Unauthorized';  
 import HomePage from './HomePage';
 import { AuthProvider } from './AuthContext.jsx';
@@ -26,11 +26,9 @@ const App = () => {
     <BrowserRouter>
       <AuthProvider>
       <Routes>
-        {/* Public Routes */}
         <Route path='/' element={<HomePage />} />
         <Route path='/unauthorized' element={<Unauthorized />} />
 
-        {/* Protected Routes */}
         <Route path='/projects' element={
           <ProtectedRoute allowedRoles={["admin", "client"]}>
             <ProjectGallery />
