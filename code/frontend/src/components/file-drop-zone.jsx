@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useContext, useState } from 'react';
 import { ArrowUpTrayIcon, TrashIcon } from "@heroicons/react/24/outline";
 import {  Modal,  ModalContent,  ModalHeader,  ModalBody,  ModalFooter, useDisclosure} from "@heroui/modal";
+import { addToast } from "@heroui/toast";
 import { DocumentCard, DocumentViewer } from "./document-viewer.jsx";
 import { Button } from "@heroui/button";
 
@@ -18,12 +19,60 @@ function _arrayBufferToBase64( buffer ) {
   return window.btoa( binary );
 }
 
-const FileDropZone = () => {
+const FileDropZone = ({ kpiUpdateId, taskId }) => {
 
   const ctx = useContext(ProjectContext);
   const actx = useContext(AuthContext);
   const [docsToBeUploaded, setDocsToBeUploaded] = useState([]);
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
+
+  const uploadDocuments = async () => {
+    try {
+      // Map over the documents and create an array of promises
+      const uploadPromises = docsToBeUploaded.map((doc) =>
+        axios.post('/api/document/upload', {
+          projectId: ctx.project.id,
+          taskId,
+          kpiUpdateId,
+          data: doc.data,
+          createdBy: actx.user.id,
+          meta: doc.metadata
+        })
+        .then((response) => {
+          console.dir(response);
+          ctx.addDocument({
+            ...doc,
+            ...response.data
+          });
+          addToast({
+            title: "Document uploaded successfully",
+            description: doc.metadata?.FileName || "Unnamed document",
+            color: "success",
+            duration: 2000
+          });
+          setDocsToBeUploaded(docsToBeUploaded => docsToBeUploaded.filter(d => d !== doc));
+        })
+        .catch((error) => {
+          console.error("Error uploading document:", error);
+  
+          addToast({
+            title: "Failure uploading document",
+            description: doc.metadata?.FileName || "Unnamed document",
+            color: "danger",
+            duration: 2000
+          });
+        })
+      );
+  
+      // Wait for all uploads to complete
+      await Promise.all(uploadPromises);
+  
+      // Clear the uploaded documents from the state
+      setDocsToBeUploaded([]);
+    } catch (error) {
+      console.error("Error during upload process:", error);
+    }
+  };
 
   return (
     <>
@@ -42,6 +91,7 @@ const FileDropZone = () => {
             })}
           </ModalBody>
           <ModalFooter>
+            <Button onPress={uploadDocuments}>Upload</Button>
             <Button
               onPress={() => {
                 setDocsToBeUploaded([]);

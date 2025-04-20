@@ -7,8 +7,13 @@ import mongoose from 'mongoose';
 const exiftool = new ExifTool();
 
 export const uploadDocument = async (req, res, next) => {
+  console.log("Upload request received");
+  console.log({
+    ...req.body,
+    data: "..."
+  })
   try {
-    const { projectId, taskId, kpiUpdateId, data, createdBy} = req.body;
+    const { projectId, taskId, kpiUpdateId, data, createdBy, meta } = req.body;
     
     if (!projectId || !data || !createdBy) {
       return res.status(400).json({ message: 'Missing required fields: projectId and binaryData' });
@@ -30,26 +35,37 @@ export const uploadDocument = async (req, res, next) => {
       return res.status(400).json({ success : false , message: "Invalid user ID" });
     }
 
-    const buffer = Buffer.from(data, 'base64');
+    const buffer = atob(data);
+    // console.log(buffer);
     
-    const tmpDir = path.join(process.cwd(), 'uploads', 'tmp');
-    if (!fs.existsSync(tmpDir)) {
-      fs.mkdirSync(tmpDir, { recursive: true });
-    }
-    const tmpFileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-    const tmpFilePath = path.join(tmpDir, tmpFileName);
+    // const tmpDir = path.join(process.cwd(), 'uploads', 'tmp');
+    // if (!fs.existsSync(tmpDir)) {
+    //   fs.mkdirSync(tmpDir, { recursive: true });
+    // }
+    // const tmpFileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+    // const tmpFilePath = path.join(tmpDir, tmpFileName);
     
-    fs.writeFileSync(tmpFilePath, buffer);
+    // fs.writeFileSync(tmpFilePath, buffer);
     
-    const metadata = await exiftool.read(tmpFilePath);
+    // const metadata = await exiftool.read(tmpFilePath);
     
-    fs.unlinkSync(tmpFilePath);
+    // fs.unlinkSync(tmpFilePath);
+    let md;
+    exiftool.read(buffer).then((metadata) => {
+      console.dir(metadata);
+      md = metadata;
+    }).catch(err => {
+      console.error(err);
+    })
     
     const doc = new Document({
       projectId,
       taskId: taskId || undefined,
       kpiUpdateId: kpiUpdateId || undefined,
-      metadata,
+      metadata: {
+        ...md,
+        ...meta
+      },
       binaryData: data,
       createdBy
     });
@@ -57,8 +73,13 @@ export const uploadDocument = async (req, res, next) => {
     
     res.status(200).json({
       id: doc._id,
-      metadata,
+      metadata: {
+        ...md,
+        ...meta
+      },
     });
+
+    console.dir({...md, ...meta});
   } catch (err) {
     next(err);
   }
