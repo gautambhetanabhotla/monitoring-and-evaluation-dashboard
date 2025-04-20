@@ -1,10 +1,10 @@
 import React from "react";
 import { Card, CardBody } from "@heroui/card";
+import IndiaMap from "../components/IndiaMap";
 
-const StatsTab = ({ clientProjects }) => {
+const StatsTab = ({ clientProjects }) => {    
     return (
-        <div className="space-y-6">
-            {/* Stats Overview */}
+        <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card className="bg-white shadow-sm">
                     <CardBody>
@@ -29,6 +29,15 @@ const StatsTab = ({ clientProjects }) => {
                     </CardBody>
                 </Card>
             </div>
+
+            <Card className="bg-white shadow-sm min-h-[480px]">
+                <CardBody>
+                    <h3 className="text-gray-500 text-sm font-medium mb-4">Project Locations</h3>
+                    <div className="w-full h-[400px]">
+                        <IndiaMap projects={clientProjects} />
+                    </div>
+                </CardBody>
+            </Card>
         </div>
     );
 };

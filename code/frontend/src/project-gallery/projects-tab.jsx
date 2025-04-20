@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardBody } from "@heroui/card";
 import { useNavigate } from "react-router-dom";
+import {Progress} from "@heroui/progress";
 
 const ProjectsTab = ({ clientProjects, clientId }) => {
     const navigate = useNavigate();
@@ -26,12 +27,7 @@ const ProjectsTab = ({ clientProjects, clientId }) => {
                                     <span className="text-gray-500">Progress</span>
                                     <span className="font-medium">{project.project_progress}%</span>
                                 </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div
-                                        className="bg-blue-600 h-2 rounded-full"
-                                        style={{ width: `${project.project_progress}%` }}
-                                    />
-                                </div>
+                                <Progress aria-label="Loading..." className="max-w-md" value={project.project_progress} />
                             </div>
                         </div>
                     </CardBody>

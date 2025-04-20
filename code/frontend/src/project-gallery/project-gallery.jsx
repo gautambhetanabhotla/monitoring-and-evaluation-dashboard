@@ -5,9 +5,13 @@ import { Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure
 import { Input, Textarea } from "@heroui/input";
 import { Alert } from "@heroui/alert";
 import { Plus, Key, Trash2, LogOut, Users, LayoutDashboard, ChevronDown } from "lucide-react";
+import { Listbox, ListboxItem } from "@heroui/listbox";
+import { Chip } from "@heroui/chip";
+import { DatePicker } from "@heroui/date-picker";
 import { AuthContext } from "../AuthContext";
 import StatsTab from "./stats-tab";
 import ProjectsTab from "./projects-tab";
+import { CalendarDate } from "@internationalized/date";
 
 const getProjectsByClientId = async (clientId) => {
     try {
@@ -24,11 +28,12 @@ const getProjectsByClientId = async (clientId) => {
             console.error("Error fetching projects:", data.message);
             return [];
         }
-        return data.projects.map(({ name, start_date, project_progress, _id }) => ({
+        return data.projects.map(({ name, start_date, project_progress, _id, states }) => ({
             name,
             start_date,
             project_progress,
-            _id
+            _id,
+            states
         }));
     } catch (error) {
         console.error("Error fetching projects:", error);
@@ -61,7 +66,7 @@ const getClientData = async (clientId) => {
 };
 
 const ProjectGallery = () => {
-    const [activeTab, setActiveTab] = useState("visualization");
+    const [activeTab, setActiveTab] = useState("stats");
     const [clientProjects, setClientProjects] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
@@ -72,9 +77,20 @@ const ProjectGallery = () => {
 
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [name, setName] = useState("");
-    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
-    const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+    const [startDate, setStartDate] = useState(new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()));
+    const [endDate, setEndDate] = useState(new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()));
     const [description, setDescription] = useState("");
+    const [selectedStates, setSelectedStates] = useState(new Set());
+
+    const indianStates = [
+        'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 
+        'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 
+        'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 
+        'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 
+        'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 
+        'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 
+        'Lakshadweep', 'Delhi', 'Puducherry', 'Ladakh', 'Jammu and Kashmir'
+    ];
 
     const [password, setPassword] = useState("");
     const [showAlert, setShowAlert] = useState(false);
@@ -85,9 +101,10 @@ const ProjectGallery = () => {
 
     const resetFormFields = () => {
         setName("");
-        setStartDate(new Date().toISOString().split('T')[0]);
-        setEndDate(new Date().toISOString().split('T')[0]);
+        setStartDate(new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()));
+        setEndDate(new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()));
         setDescription("");
+        setSelectedStates(new Set());
     };
 
     useEffect(() => {
@@ -117,10 +134,11 @@ const ProjectGallery = () => {
                 credentials: "include",
                 body: JSON.stringify({
                     name,
-                    start_date: startDate,
-                    end_date: endDate,
+                    start_date: startDate.toString(),
+                    end_date: endDate.toString(),
                     project_progress: 0,
-                    description
+                    description,
+                    states: Array.from(selectedStates)
                 })
             });
     
@@ -208,6 +226,12 @@ const ProjectGallery = () => {
         }
     };
 
+    const removeState = (stateToRemove) => {
+        const newStates = new Set(selectedStates);
+        newStates.delete(stateToRemove);
+        setSelectedStates(newStates);
+    };
+
     return (
         <div className="flex h-screen bg-gray-50">
             <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
@@ -221,9 +245,9 @@ const ProjectGallery = () => {
                 <nav className="flex-1 p-4">
                     <div className="space-y-2">
                         <Button 
-                            onPress={() => setActiveTab("visualization")}
+                            onPress={() => setActiveTab("stats")}
                             className={`w-full justify-start ${
-                                activeTab === "visualization" 
+                                activeTab === "stats" 
                                 ? "bg-blue-50 text-blue-700" 
                                 : "bg-transparent text-gray-700 hover:bg-gray-100"
                             }`}
@@ -320,7 +344,7 @@ const ProjectGallery = () => {
                 )}
 
                 <div className="flex-1 overflow-auto p-8">
-                    {activeTab === "visualization" && (
+                    {activeTab === "stats" && (
                         <StatsTab clientProjects={clientProjects} clientId={clientId} />
                     )}
 
@@ -330,56 +354,111 @@ const ProjectGallery = () => {
                 </div>
             </div>
 
-            <Modal isOpen={isOpen} onOpenChange={handleOpenChange} placement="center" size="md">
+            <Modal 
+                isOpen={isOpen} 
+                onOpenChange={handleOpenChange} 
+                placement="center" 
+                size="md"
+                isDismissable={false}
+                isKeyboardDismissDisabled={true}
+                scrollBehavior="inside"
+                classNames={{
+                    base: "max-h-[80vh]",
+                    body: "overflow-y-auto py-4"
+                }}
+            >
                 <ModalContent>
                     {() => (
                         <>
                             <ModalHeader className="flex flex-col gap-1">Add Project</ModalHeader>
                             <ModalBody>
-                            <Input
-                                isRequired
-                                label="Project Name"
-                                labelPlacement="outside"
-                                placeholder="Enter project name"
-                                variant="bordered"
-                                type="text"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                            />
-                            <Input
-                                isRequired
-                                label="Start Date"
-                                labelPlacement="outside"
-                                placeholder="Enter start date"
-                                variant="bordered"
-                                type="date"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                            />
-                            <Input
-                                isRequired
-                                label="End Date"
-                                labelPlacement="outside"
-                                placeholder="Enter end date"
-                                variant="bordered"
-                                type="date"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                min={startDate}
-                            />
-                            <Textarea
-                                isRequired
-                                label="Project Description"
-                                labelPlacement="outside"
-                                placeholder="Describe the project here, in 500 characters"
-                                variant="bordered"
-                                maxLength={500}
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                minRows={3}
-                                maxRows={5}
-                                className="max-h-40 overflow-y-auto"
-                            />
+                                <div className="space-y-4">
+                                <Input
+                                    isRequired
+                                    label="Project Name"
+                                    labelPlacement="outside"
+                                    placeholder="Enter project name"
+                                    variant="bordered"
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                />
+                                <div className="space-y-2">
+                                    <label className="text-sm">
+                                        Select States/UTs
+                                    </label>
+                                    <div className="border border-gray-300 rounded-lg p-2">
+                                        <Listbox
+                                            aria-label="Select States/UTs"
+                                            selectionMode="multiple"
+                                            selectedKeys={selectedStates}
+                                            onSelectionChange={setSelectedStates}
+                                            disallowEmptySelection
+                                            isVirtualized
+                                            virtualization={{
+                                                maxListboxHeight: 200,
+                                                itemHeight: 40,
+                                            }}
+                                        >
+                                            {indianStates.map((state) => (
+                                                <ListboxItem key={state}>
+                                                    {state}
+                                                </ListboxItem>
+                                            ))}
+                                        </Listbox>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {Array.from(selectedStates).map((state) => (
+                                            <Chip
+                                                key={state}
+                                                onClose={() => removeState(state)}
+                                                variant="flat"
+                                                color="primary"
+                                            >
+                                                {state}
+                                            </Chip>
+                                        ))}
+                                    </div>
+                                    {selectedStates.size === 0 && (
+                                        <small className="text-gray-500">
+                                            At least one state is required
+                                        </small>
+                                    )}
+                                </div>
+                                <DatePicker
+                                    isRequired
+                                    label="Start Date"
+                                    labelPlacement="outside"
+                                    placeholder="Select start date"
+                                    variant="bordered"
+                                    defaultValue={startDate}
+                                    showMonthAndYearPickers
+                                    onChange={(date) => setStartDate(date || new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()))}
+                                />
+                                <DatePicker
+                                    isRequired
+                                    label="End Date"
+                                    labelPlacement="outside"
+                                    placeholder="Select end date"
+                                    variant="bordered"
+                                    defaultValue={endDate}
+                                    showMonthAndYearPickers
+                                    minValue={startDate}
+                                    onChange={(date) => setEndDate(date || new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()))}
+                                />
+                                <Textarea
+                                    isRequired
+                                    label="Project Description"
+                                    labelPlacement="outside"
+                                    placeholder="Describe the project here"
+                                    variant="bordered"
+                                    maxLength={500}
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    minRows={3}
+                                    maxRows={5}
+                                                                    />
+</div>
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="primary" onPress={createProject}>
