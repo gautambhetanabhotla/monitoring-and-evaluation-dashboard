@@ -1,0 +1,16 @@
+runtime: nodejs22
+
+env_variables:
+  NODE_ENV: "production"
+
+handlers:
+  - url: /static
+    static_dir: backend/public/static
+  - url: /assets
+    static_dir: backend/public/assets
+  - url: /(.*\.(json|ico|js|txt))$
+    static_files: backend/public/\1
+    upload: backend/public/.*\.(json|ico|js|txt)$
+  - url: /.*
+    script: auto
+

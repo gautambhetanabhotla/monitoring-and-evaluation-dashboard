@@ -25,7 +25,6 @@ import {
   ArrowPathIcon,
   TableCellsIcon,
   ArrowDownTrayIcon,
-  TrashIcon
 } from "@heroicons/react/24/outline";
 
 const DocumentCard = ({ document, onPress }) => {

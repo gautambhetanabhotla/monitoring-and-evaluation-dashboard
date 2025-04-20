@@ -130,14 +130,14 @@ const ProjectContextProvider = ({ children }) => {
 
   // Documents
   useEffect(() => {
-    if(!project?.id) return;
-    fetch('/documents.json')
+    if(!project || !project?.id) return;
+    fetch(`/api/document/getDocuments/${project.id}`)
     .then(res => res.json())
     .then(data => {
-      // console.dir(data);
-      setDocuments(data);
+      console.dir(data);
+      setDocuments(data.documents);
     });
-  }, [project?.id]);
+  }, [project, project?.id]);
   
   const updateKPI = (update) => {
     setKPIUpdates([...KPIUpdates, update]);
@@ -175,11 +175,11 @@ const ProjectContextProvider = ({ children }) => {
   };
 
   const addDocuments = (newDocuments) => {
-    setDocuments([...documents, ...newDocuments]);
+    setDocuments(documents => [...documents, ...newDocuments]);
   };
 
   const addDocument = (newDocument) => {
-    setDocuments([...documents, newDocument]);
+    setDocuments(documents => [...documents, newDocument]);
   };
 
   return (
