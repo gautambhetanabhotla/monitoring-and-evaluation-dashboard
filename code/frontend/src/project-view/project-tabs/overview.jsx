@@ -19,7 +19,7 @@ import { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
 import { ProjectContext } from "../project-context.jsx";
-import  DocumentViewer, { DocumentCard } from "../../components/document-viewer.jsx";
+import DocumentViewer, { DocumentCard } from "../../components/document-viewer.jsx";
 
 const Overview = () => {
   const ctx = useContext(ProjectContext);

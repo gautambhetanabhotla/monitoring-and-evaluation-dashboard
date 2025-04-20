@@ -6,6 +6,6 @@
         "install:dev": "npm install --workspaces",
         "install:prod": "npm install --workspaces --omit=dev",
         "build": "cd frontend && npm run build && mkdir -p ../backend/public && cp -r dist/* ../backend/public",
-        "start": "cd backend && npm run prod"
+        "start": "cd backend && npm run start"
     }
 }
