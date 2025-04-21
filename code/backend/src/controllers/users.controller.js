@@ -36,7 +36,7 @@ export const addUser = async (req, res) => {
   if (existingUser) {
     return res
       .status(400)
-      .json({ success: false, message: "User already exists" });
+      .json({ success: false, message: "User already exists. Please try providing different credentials." });
   }
 
   const passwordHash = bcrypt.hashSync(password, 10);
@@ -53,9 +53,7 @@ export const addUser = async (req, res) => {
     const newUser = await user.save();
 
     let emailSent = false;
-    if (role === 'client' || role === 'field staff') {
-      emailSent = await sendPasswordEmail(email, username, password);
-    }
+    emailSent = await sendPasswordEmail(email, username, password);
 
     return res.status(201).json({
       success: true,

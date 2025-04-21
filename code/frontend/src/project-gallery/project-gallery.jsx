@@ -98,6 +98,7 @@ const ProjectGallery = () => {
 
     const [clientData, setClientData] = useState(null);
     const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+    const [modalErrors, setModalErrors] = useState("");
 
     const resetFormFields = () => {
         setName("");
@@ -150,6 +151,10 @@ const ProjectGallery = () => {
                 resetFormFields();
                 onOpenChange(false);
             } else {
+                setModalErrors(data.message);
+                setTimeout(() => {
+                    setModalErrors("");
+                }, 7000);
                 console.error("Adding project failed:", data.message);
             }
         } catch (error) {
@@ -371,6 +376,19 @@ const ProjectGallery = () => {
                     {() => (
                         <>
                             <ModalHeader className="flex flex-col gap-1">Add Project</ModalHeader>
+                            {modalErrors && (
+                                <div className="px-6">
+                                    <Alert
+                                        className="mb-4"
+                                        variant="solid"
+                                        color="danger"
+                                        onClose={() => setModalErrors("")}
+                                    >
+                                        <div className="font-medium text-sm">{modalErrors}</div>
+                                        <div className="text-xs mt-1">Please try again.</div>
+                                    </Alert>
+                                </div>
+                            )}
                             <ModalBody>
                                 <div className="space-y-4">
                                 <Input

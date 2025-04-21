@@ -25,11 +25,11 @@ export const sendPasswordEmail = async (email, username, newPassword) => {
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
-            subject: 'Your Password Has Been Updated',
+            subject: 'Your New Password',
             html: `
-                <h1>Password Update Notification</h1>
+                <h1>New Password Notification</h1>
                 <p>Hello ${username},</p>
-                <p>Your password has been updated. Here is your new password:</p>
+                <p>Here is your new password:</p>
                 <p style="background-color: #f0f0f0; padding: 10px; font-family: monospace;">${newPassword}</p>
                 <p>Please login with this password here onwards, until your password is changed again.</p>
                 <p>If you did not request this change, please contact the administrator immediately.</p>

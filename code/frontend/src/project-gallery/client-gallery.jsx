@@ -170,7 +170,7 @@ export const ClientGallery = () => {
                         color="success"
                         onClose={() => setShowAlert(false)}
                     >
-                        <div className="font-medium text-sm">Client user account created successfully!</div>
+                        <div className="font-medium text-sm">User account created successfully!</div>
                         <div className="text-sm">{password}</div>
                         <div className="text-xs mt-1">
                             {emailSent 
@@ -317,9 +317,6 @@ export const ClientGallery = () => {
                                     type="text"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    classNames={{
-                                        inputWrapper: "w-full"
-                                    }}
                                 />
                                 <Input
                                     isRequired
@@ -334,9 +331,6 @@ export const ClientGallery = () => {
                                     errorMessage={email !== "" && !isValidEmail(email) ? "Please enter a valid email address" : ""}
                                     aria-invalid={email !== "" && !isValidEmail(email)}
                                     aria-errormessage="email-error"
-                                    classNames={{
-                                        inputWrapper: "w-full"
-                                    }}
                                 />
                                 <Input
                                     isRequired
@@ -348,9 +342,6 @@ export const ClientGallery = () => {
                                     maxLength="10"
                                     value={phoneNumber}
                                     onChange={(e) => setPhoneNumber(e.target.value)}
-                                    classNames={{
-                                        inputWrapper: "w-full"
-                                    }}
                                 />
                                 <RadioGroup
                                     label="Select User Type"
@@ -358,8 +349,9 @@ export const ClientGallery = () => {
                                     value={userType}
                                     onValueChange={setUserType}
                                 >
-                                    <Radio value="client">Client</Radio>
-                                    <Radio value="field staff">Field Staff</Radio>
+                                    <Radio value="client" className="mr-9">Client</Radio>
+                                    <Radio value="field staff" className="mr-9">Field Staff</Radio>
+                                    <Radio value="admin" className="mr-9">Admin</Radio>
                                 </RadioGroup>
                             </ModalBody>
                             <ModalFooter className="flex justify-end">
