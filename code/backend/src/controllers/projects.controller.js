@@ -4,7 +4,6 @@ import Project from '../models/Project.model.js';
 
 export const getProjectById = async (req, res) => {
     const { projectId } = req.params;
-    // console.log("REQUEST RECIEVS");
     if(!mongoose.Types.ObjectId.isValid(projectId)) {
         return res.status(404).json({ success: false, message: 'Invalid project ID' });
     }
@@ -52,7 +51,7 @@ export const getProjectsByClientId = async (req, res) => {
 
 export const addProjectToClient = async (req, res) => {
     const { clientId } = req.params;
-    const {name,start_date,end_date,project_progress,description} = req.body;
+    const {name, start_date, end_date, project_progress, description, states} = req.body;
 
     try {
         if (!mongoose.Types.ObjectId.isValid(clientId)) {
@@ -69,8 +68,8 @@ export const addProjectToClient = async (req, res) => {
             return res.status(400).json({ success: false, message: 'User cannot have projects' });
         }
 
-        if(!name || !start_date || !end_date || !description) {
-            return res.status(400).json({ success: false, message: 'Please enter all fields' });
+        if(!name || !start_date || !end_date || !description || !states || !states.length) {
+            return res.status(400).json({ success: false, message: 'Please enter all fields including at least one state' });
         }
 
         const project = new Project({
@@ -78,7 +77,8 @@ export const addProjectToClient = async (req, res) => {
             start_date,
             end_date,
             project_progress,
-            description
+            description,
+            states
         });
 
         const newProject = await project.save();
@@ -86,10 +86,10 @@ export const addProjectToClient = async (req, res) => {
         user.assigned_projects.push(newProject._id);
         await user.save();
 
-        return res.status(201).json({ success: true, message: `Project created successfully under ${user.username}`,id : newProject._id });
+        return res.status(201).json({ success: true, message: `Project created successfully under ${user.username}`, id: newProject._id });
     } catch (error) {
         console.error('Error assigning project to user:', error);
-        return res.status(500).json({ success: false, message: `Internal server error :`,error });
+        return res.status(500).json({ success: false, message: 'Internal server error', error });
     }
 }
 
@@ -101,8 +101,7 @@ export const deleteProject = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid project ID' });
         }
 
-      
-        const deletedProject  = await Project.findByIdAndDelete(projectId);
+        const deletedProject = await Project.findByIdAndDelete(projectId);
 
         if (!deletedProject) {
             return res.status(404).json({ success: false, message: 'Project not found' });
@@ -113,4 +112,4 @@ export const deleteProject = async (req, res) => {
         console.error('Error deleting project:', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
-};  
+};

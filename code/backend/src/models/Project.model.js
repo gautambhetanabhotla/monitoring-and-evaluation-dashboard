@@ -24,6 +24,23 @@ const projectSchema = new mongoose.Schema({
     description : {
         type : String,
         trim : true
+    },
+    states : {
+        type : [String],
+        required : [true, 'At least one state is required'],
+        validate: {
+            validator: function(v) {
+                return v && v.length > 0;
+            },
+            message: 'At least one state must be selected'
+        },
+        enum: ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 
+               'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 
+               'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 
+               'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 
+               'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 
+               'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 
+               'Lakshadweep', 'Delhi', 'Puducherry', 'Ladakh', 'Jammu and Kashmir']
     }
 });
 
