@@ -211,7 +211,7 @@ const DocumentViewer = ({ document, slot }) => {
     ["png", ImageViewer],
   ]);
 
-  return (
+  if (document) return (
     <>
       {slot && cloneElement(slot, { onPress: onOpen, document: document })}
       <Modal
@@ -230,7 +230,7 @@ const DocumentViewer = ({ document, slot }) => {
             <div className="prose">
               <h1 className="prose text-2xl font-extrabold mb-3">Unsupported file type</h1>
               <p>
-                The file type <Code color="primary">{document.metadata?.MIMEType}</Code> is not supported
+                The file type {document.metadata?.MIMEType && <Code color="primary">{document.metadata?.MIMEType}</Code>} is not supported
                 for viewing.
                 <Link
                   href={`data:${document.metadata?.MIMEType};base64,${document.data}`}
@@ -243,6 +243,7 @@ const DocumentViewer = ({ document, slot }) => {
       </Modal>
     </>
   );
+  else return (<></>);
 };
 
 export default DocumentViewer;
