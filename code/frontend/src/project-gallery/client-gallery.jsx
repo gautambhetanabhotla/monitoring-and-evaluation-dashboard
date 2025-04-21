@@ -6,6 +6,7 @@ import { Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure
 import { Input } from "@heroui/input";
 import { Alert } from "@heroui/alert";
 import { Form } from "@heroui/form";
+import { RadioGroup, Radio } from "@heroui/radio";
 import { Search, UserPlus, LogOut } from "lucide-react";
 import { AuthContext } from "../AuthContext";
 
@@ -22,16 +23,17 @@ const getAllClients = async () => {
         });
         const data = await response.json();
         if (!data.success) {
-            console.error("Error fetching clients:", data.message);
+            console.error("Couldn't fetch users:", data.message);
             return [];
         }
-        return data.clients.map(({ username, email, _id }) => ({
+        return data.users.map(({ username, email, role, _id }) => ({
             username,
             email,
+            role,
             _id
         }));
     } catch (error) {
-        console.error("Error fetching clients:", error);
+        console.error("Error fetching users:", error);
         return [];
     }
 };
@@ -49,11 +51,13 @@ export const ClientGallery = () => {
     const [showAlert, setShowAlert] = useState(false);
     const { logout } = useContext(AuthContext);
     const [modalErrors, setModalErrors] = useState("");
+    const [userType, setUserType] = useState("client");
 
     const resetFormFields = () => {
         setUsername("");
         setEmail("");
         setPhoneNumber("");
+        setUserType("client");
     };
 
     useEffect(() => {
@@ -76,7 +80,20 @@ export const ClientGallery = () => {
         );
     }, [clientList, searchQuery]);
 
-    const createClient = async () => {
+    const usersByRole = useMemo(() => {
+        const clients = [];
+        const staff = [];
+        filteredClients.forEach((client) => {
+            if (client.role === "field staff") {
+                staff.push(client);
+            } else {
+                clients.push(client);
+            }
+        });
+        return { clients, staff };
+    }, [filteredClients]);
+
+    const createUser = async () => {
         try {
             if (!isValidEmail(email)) {
                 setModalErrors("Please enter a valid email address");
@@ -102,7 +119,7 @@ export const ClientGallery = () => {
                     username,
                     email,
                     password: pwd,
-                    role: 'client',
+                    role: userType,
                     phone_number: phoneNumber
                 })
             });
@@ -143,12 +160,8 @@ export const ClientGallery = () => {
         onOpenChange(open);
     };
 
-    const handleClearSearch = () => {
-        setSearchQuery("");
-    };
-
     return (
-        <div className="flex flex-col items-center min-h-screen p-6">
+        <div className="flex flex-col items-center min-h-screen p-2">
             {showAlert && (
                 <div className="fixed top-4 right-4 z-50">
                     <Alert 
@@ -168,42 +181,76 @@ export const ClientGallery = () => {
                 </div>
             )}
 
-            <h2 className="text-4xl font-bold mb-6 mt-8 text-center">Client List</h2>
+            <h2 className="text-4xl font-bold mb-6 mt-8 text-center">User List</h2>
 
             <Input
                 isClearable
                 className="w-full max-w-3xl mb-6"
-                placeholder="Search clients..."
+                placeholder="Search users..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onClear={handleClearSearch}
+                onClear={()  => setSearchQuery("")}
                 startContent={<Search className="text-gray-400 w-5 h-5" />}
                 classNames={{
                     clearButton: "opacity-100"
                 }}
             />
 
-            <div className="w-full max-w-3xl h-[60vh] overflow-y-auto rounded-lg p-4 mb-6 bg-white shadow-lg border border-gray-200">
-                <div className="flex flex-col space-y-4">
-                    {filteredClients.length === 0 ? (
-                        <p className="text-xl text-gray-500 text-center">
-                            {searchQuery ? "No matching clients found." : "No clients found."}
-                        </p>
-                    ) : (
-                        filteredClients.map((client) => (
-                            <Card
-                                key={client._id}
-                                isPressable
-                                onPress={() => navigate(`/projects?clientId=${client._id}`)}
-                                className="rounded-lg shadow-md w-full bg-gray-50 hover:bg-gray-200 border border-gray-100"
-                            >
-                                <CardBody className="p-6">
-                                    <h3 className="font-medium text-xl mb-2">Username: {client.username}</h3>
-                                    <p>Email: {client.email}</p>
-                                </CardBody>
-                            </Card>
-                        ))
-                    )}
+            <div className="w-full max-w-7xl mx-auto rounded-lg p-4 mb-6 bg-white shadow-lg border border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-h-[60vh]">
+                    <div className="flex flex-col overflow-hidden border rounded h-[60vh]">
+                        <div className="bg-white z-10 p-4 sticky top-0">
+                            <h3 className="text-xl font-semibold text-center">Clients</h3>
+                            <hr className="mt-2 border-gray-300" />
+                        </div>
+
+                        <div className="overflow-y-auto px-4 pb-4">
+                            {usersByRole.clients.length === 0 ? (
+                                <p className="text-gray-500 text-center">No clients found.</p>
+                            ) : (
+                                usersByRole.clients.map((client) => (
+                                    <Card
+                                        key={client._id}
+                                        isPressable
+                                        onPress={() => navigate(`/projects?clientId=${client._id}`)}
+                                        className="rounded-lg shadow-md w-full mb-4 bg-gray-50 hover:bg-gray-200 border border-gray-100"
+                                    >
+                                        <CardBody className="p-6">
+                                            <h3 className="font-medium text-xl mb-2">Username: {client.username}</h3>
+                                            <p className="text-sm mt-1">Email: {client.email}</p>
+                                        </CardBody>
+                                    </Card>
+                                ))
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col overflow-hidden border rounded h-[60vh]">
+                        <div className="bg-white z-10 p-4 sticky top-0">
+                            <h3 className="text-xl font-semibold text-center">Field Staff</h3>
+                            <hr className="mt-2 border-gray-300" />
+                        </div>
+
+                        <div className="overflow-y-auto px-4 pb-4">
+                            {usersByRole.staff.length === 0 ? (
+                                <p className="text-gray-500 text-center">No field staff found.</p>
+                            ) : (
+                                usersByRole.staff.map((staff) => (
+                                    <Card
+                                        key={staff._id}
+                                        isPressable
+                                        onPress={() => navigate(`/unauthorized`)}
+                                        className="rounded-lg shadow-md w-full mb-4 bg-gray-50 hover:bg-gray-200 border border-gray-100"
+                                    >
+                                        <CardBody className="p-6">
+                                            <h3 className="font-medium text-xl mb-2">Username: {staff.username}</h3>
+                                            <p className="text-sm mt-1">Email: {staff.email}</p>
+                                        </CardBody>
+                                    </Card>
+                                ))
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -216,14 +263,14 @@ export const ClientGallery = () => {
                     color="primary"
                 >
                     <UserPlus className="w-5 h-5" />
-                    Add Client
+                    Add User
                 </Button>
                 <Button
                     className="text-lg py-2 px-4 flex items-center gap-2"
                     onPress={logout}
                     size="md"
                     radius="large"
-                    color="primary"
+                    color="danger"
                 >
                     <LogOut className="w-5 h-5" />
                     Logout
@@ -256,7 +303,7 @@ export const ClientGallery = () => {
                                         setModalErrors("Please enter a valid email address");
                                         return;
                                     }
-                                    createClient();
+                                    createUser();
                                 }}
                                 className="w-full"
                             >
@@ -305,6 +352,15 @@ export const ClientGallery = () => {
                                         inputWrapper: "w-full"
                                     }}
                                 />
+                                <RadioGroup
+                                    label="Select User Type"
+                                    orientation="horizontal"
+                                    value={userType}
+                                    onValueChange={setUserType}
+                                >
+                                    <Radio value="client">Client</Radio>
+                                    <Radio value="field staff">Field Staff</Radio>
+                                </RadioGroup>
                             </ModalBody>
                             <ModalFooter className="flex justify-end">
                                 <Button type="submit" color="primary">

@@ -3,13 +3,13 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { sendPasswordEmail } from "../utils/emailService.js";
 
-export const getClients = async (req, res) => {
+export const getUsers = async (req, res) => {
   try {
-    const clients = await User.find({ role: "client" }).select("-passwordHash");
+    const users = await User.find({ role: { $in: ["client", "field staff"] } }).select("-passwordHash");
     return res.status(200).json({
       success: true,
-      message: "Clients fetched successfully",
-      clients: clients,
+      message: "Users fetched successfully",
+      users: users,
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -53,7 +53,7 @@ export const addUser = async (req, res) => {
     const newUser = await user.save();
 
     let emailSent = false;
-    if (role === 'client') {
+    if (role === 'client' || role === 'field staff') {
       emailSent = await sendPasswordEmail(email, username, password);
     }
 

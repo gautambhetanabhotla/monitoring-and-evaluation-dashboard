@@ -457,8 +457,8 @@ const ProjectGallery = () => {
                                     onChange={(e) => setDescription(e.target.value)}
                                     minRows={3}
                                     maxRows={5}
-                                                                    />
-</div>
+                                />
+                                </div>
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="primary" onPress={createProject}>

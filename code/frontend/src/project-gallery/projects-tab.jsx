@@ -46,7 +46,7 @@ const ProjectsTab = ({ clientProjects, clientId }) => {
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+        const month = String(date.getMonth() + 1).padStart(2, "0");
         const year = date.getFullYear();
         return `${day}-${month}-${year}`;
     };
@@ -60,6 +60,11 @@ const ProjectsTab = ({ clientProjects, clientId }) => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full max-w-4xl"
                     startContent={<MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />}
+                    isClearable
+                    onClear={() => setSearchQuery("")}
+                    classNames={{
+                        clearButton: "opacity-100"
+                    }}
                 />
                 <Popover placement="left" closeOnInteractOutside={false}>
                     <PopoverTrigger>
