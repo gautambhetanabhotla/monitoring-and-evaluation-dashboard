@@ -13,6 +13,7 @@ const ProjectContextProvider = ({ children }) => {
   const [KPIs, setKPIs] = useState([]);
   const [adjustedKPIs, setAdjustedKPIs] = useState([]);
   const [documents, setDocuments] = useState([]);
+  const [adjustedProgress, setAdjustedProgress] = useState(0);
 
   const location = useLocation();
 
@@ -88,7 +89,7 @@ const ProjectContextProvider = ({ children }) => {
     // console.log(project_id);
     axios.get(`/api/projects/get/${project_id}`, { credentials: 'include' })
     .then(response => {
-      // console.dir(response);
+      console.dir(response);
       if(response.data.success) {
         const proj = response.data.project;
         proj.start = proj.start_date;
@@ -96,6 +97,7 @@ const ProjectContextProvider = ({ children }) => {
         proj.progress = proj.project_progress;
         proj.id = proj._id;
         setProject(proj);
+        setAdjustedProgress(proj.project_progress);
       }
     });
   }, [location.pathname]);
@@ -191,6 +193,15 @@ const ProjectContextProvider = ({ children }) => {
     setDocuments(documents => [...documents, newDocument]);
   };
 
+  useEffect(() => {
+    const avg_kpi_progress = adjustedKPIs.reduce((acc, kpi) => {
+      console.log(((kpi.current - kpi.baseline)/(kpi.target - kpi.baseline)));
+      return acc + ((kpi.current - kpi.baseline)/(kpi.target - kpi.baseline));
+    }, 0) / adjustedKPIs.length;
+    console.log("AVERAGE KPI PROGRES: ", avg_kpi_progress);
+    setAdjustedProgress(avg_kpi_progress);
+  }, [adjustedKPIs]);
+
   return (
     <ProjectContext.Provider
       value={{
@@ -211,7 +222,8 @@ const ProjectContextProvider = ({ children }) => {
         addKPI,
         documents,
         addDocuments,
-        addDocument
+        addDocument,
+        adjustedProgress,
       }}
     >
       {children}
