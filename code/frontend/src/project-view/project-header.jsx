@@ -30,31 +30,31 @@ const ProjectHeader = () => {
       <div className="mt-15 pt-15 grid grid-cols-1 p-5">
         <Card className='my-5' data-testid="project-title">
           <div className="md:col-span-2 drop-shadow-white">
-            <article
-              className="prose text-7xl font-bold pt-14 pl-10 pr-10 pb-16 drop-shadow-[0_35px_35px_rgba(255, 255, 255, 0.781)]"
+            <h1
+              className="prose text-5xl font-bold pt-14 pl-10 pr-10 pb-16 drop-shadow-[0_35px_35px_rgba(255, 255, 255, 0.781)]"
             >
               {ctx.project.name}
-            </article>
+            </h1>
           </div>
         </Card>
         <div className="flex flex-row justify-center flex-wrap">
           <Chip className='p-5 m-1'>
             <span className='flex flex-row justify-center align-middle'>
               <MapPinIcon className="size-6 stroke-blue-500" />
-              <p className='prose pl-2 pr-2 text-lg text-blue-500'>{ctx.project.location}</p>
+              <p className='prose pl-2 pr-2 text-lg text-blue-500'>{ctx.project.location || "Telangana"}</p>
               <LinkIcon className='mt-1 size-5 stroke-blue-500' />
             </span>
           </Chip>
           <Chip className='p-5 m-1'>
             <span className='flex flex-row'>
               <UserIcon className="size-6" />
-              <p className='prose pl-2 text-lg'>{ctx.project.client}</p>
+              <p className='prose pl-2 text-lg'>{ctx.project.client || "Client 1"}</p>
             </span>
           </Chip>
           <Chip className='p-5 m-1'>
             <span className='flex flex-row'>
               <CurrencyRupeeIcon className="size-6" />
-              <p className='prose pl-2 text-lg'>{ctx.project.funding_partner}</p>
+              <p className='prose pl-2 text-lg'>{ctx.project.funding_partner || "Funding partner 1"}</p>
             </span>
           </Chip>
           <Chip className='p-5 m-1'>
