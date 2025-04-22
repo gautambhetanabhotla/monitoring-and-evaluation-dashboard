@@ -9,7 +9,7 @@ import { RadioGroup, Radio } from "@heroui/radio";
 import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 import { FunnelIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
-const ProjectsTab = ({ clientProjects, clientId }) => {
+const ProjectsTab = ({ clientProjects, clientId, staffId }) => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
     const [progressFilter, setProgressFilter] = useState(0);
@@ -155,7 +155,15 @@ const ProjectsTab = ({ clientProjects, clientId }) => {
                     <Card
                         key={index}
                         isPressable
-                        onPress={() => navigate(clientId ? `/${project._id}?clientId=${clientId}` : `/${project._id}`)}
+                        onPress={() => {
+                            if (clientId) {
+                                navigate(`/${project._id}?clientId=${clientId}`);
+                            } else if (staffId) {
+                                navigate(`/${project._id}?staffId=${staffId}`);
+                            } else {
+                                navigate(`/${project._id}`);
+                            }   
+                        }}
                         className="bg-white shadow-sm hover:shadow-md transition-shadow"
                     >
                         <CardBody>

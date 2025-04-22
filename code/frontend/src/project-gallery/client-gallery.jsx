@@ -239,7 +239,7 @@ export const ClientGallery = () => {
                                     <Card
                                         key={staff._id}
                                         isPressable
-                                        onPress={() => navigate(`/unauthorized`)}
+                                        onPress={() => navigate(`/projects?staffId=${staff._id}`)}
                                         className="rounded-lg shadow-md w-full mb-4 bg-gray-50 hover:bg-gray-200 border border-gray-100"
                                     >
                                         <CardBody className="p-6">

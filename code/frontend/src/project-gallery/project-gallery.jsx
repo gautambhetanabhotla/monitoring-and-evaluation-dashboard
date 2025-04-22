@@ -4,21 +4,23 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Modal, ModalBody, ModalContent, ModalHeader, ModalFooter, useDisclosure } from "@heroui/modal";
 import { Input, Textarea } from "@heroui/input";
 import { Alert } from "@heroui/alert";
-import { Plus, Key, Trash2, LogOut, Users, LayoutDashboard, ChevronDown } from "lucide-react";
+import { Plus, Key, Trash2, LogOut, Users, LayoutDashboard, ChevronDown, UserRoundPlus } from "lucide-react";
 import { Listbox, ListboxItem } from "@heroui/listbox";
 import { Chip } from "@heroui/chip";
 import { DatePicker } from "@heroui/date-picker";
+import Select from "react-select";
 import { AuthContext } from "../AuthContext";
 import StatsTab from "./stats-tab";
 import ProjectsTab from "./projects-tab";
 import { CalendarDate } from "@internationalized/date";
 
-const getProjectsByClientId = async (clientId) => {
+const getProjectsByClientId = async (userId) => {
     try {
         let url = "/api/projects/getProjects";
-        if (clientId) {
-            url += `?clientId=${clientId}`;
+        if (userId) {
+            url += `?userId=${userId}`;
         }
+
         const response = await fetch(url, {
             method: 'GET',
             credentials: 'include'
@@ -41,11 +43,11 @@ const getProjectsByClientId = async (clientId) => {
     }
 };
 
-const getClientData = async (clientId) => {
+const getClientData = async (userId) => {
     try {
         let url = "/api/user/getUser";
-        if (clientId) {
-            url += `?clientId=${clientId}`;
+        if (userId) {
+            url += `?userId=${userId}`;
         }
         
         const response = await fetch(url, {
@@ -66,14 +68,17 @@ const getClientData = async (clientId) => {
 };
 
 const ProjectGallery = () => {
-    const [activeTab, setActiveTab] = useState("stats");
-    const [clientProjects, setClientProjects] = useState([]);
+    const [userProjects, setUserProjects] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
-    const { logout } = useContext(AuthContext);
+    const { user, logout } = useContext(AuthContext);
+    const isAdmin = user?.role === "admin";
+    const isFieldStaff = user?.role === "field staff";
+    const [activeTab, setActiveTab] = useState("");
 
     const queryParams = new URLSearchParams(location.search);
     const clientId = queryParams.get('clientId');
+    const staffId = queryParams.get('staffId');
 
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [name, setName] = useState("");
@@ -96,9 +101,14 @@ const ProjectGallery = () => {
     const [showAlert, setShowAlert] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
 
-    const [clientData, setClientData] = useState(null);
+    const [userData, setUserData] = useState(null);
     const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
     const [modalErrors, setModalErrors] = useState("");
+
+    const [fieldStaffModalOpen, setFieldStaffModalOpen] = useState(false);
+    const [fieldStaff, setFieldStaff] = useState([]);
+    const [selectedFieldStaff, setSelectedFieldStaff] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
 
     const resetFormFields = () => {
         setName("");
@@ -106,24 +116,41 @@ const ProjectGallery = () => {
         setEndDate(new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()));
         setDescription("");
         setSelectedStates(new Set());
+        setModalErrors("");
     };
 
     useEffect(() => {
         const fetchData = async () => {
-            const projects = await getProjectsByClientId(clientId);
-            setClientProjects(projects);
+            const projects = await getProjectsByClientId(clientId || staffId);
+            setUserProjects(projects);
 
-            const client = await getClientData(clientId);
-            setClientData(client);
+            const user = await getClientData(clientId || staffId);
+            setUserData(user);
         };
         fetchData();
-    }, [clientId]);
+    }, [clientId, staffId]);
 
     useEffect(() => {
         if (!isOpen) {
             resetFormFields();
         }
     }, [isOpen]);
+
+    useEffect(() => {
+        const fetchFieldAgents = async () => {
+            const agents = await retrieveFieldAgents();
+            setFieldStaff(agents);
+        };
+        fetchFieldAgents();
+    }, []);
+
+    useEffect(() => {
+        if (staffId || isFieldStaff) {
+            setActiveTab("projects");
+        } else {
+            setActiveTab("stats");
+        }
+    }, [staffId, isFieldStaff]);
 
     const createProject = async () => {
         try {
@@ -146,7 +173,7 @@ const ProjectGallery = () => {
             const data = await response.json();
             if (data.success) {
                 const updatedProjects = await getProjectsByClientId(clientId);
-                setClientProjects(updatedProjects);
+                setUserProjects(updatedProjects);
 
                 resetFormFields();
                 onOpenChange(false);
@@ -169,7 +196,7 @@ const ProjectGallery = () => {
         onOpenChange(open);
     };
 
-    const generatePassword = async () => {
+    const generatePassword = async (userId) => {
         try {
             const length = Math.floor(Math.random() * (11 - 8 + 1)) + 8;
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -180,7 +207,7 @@ const ProjectGallery = () => {
                 pwd += characters[randomIndex];
             }
 
-            const response = await fetch(`/api/user/updatepwd/${clientId}`, {
+            const response = await fetch(`/api/user/updatepwd/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     "Content-Type": "application/json"
@@ -210,9 +237,9 @@ const ProjectGallery = () => {
         }
     };
 
-    const removeClient = async () => {
+    const removeClient = async (userId) => {
         try {
-            const response = await fetch(`/api/user/delete/${clientId}`, {
+            const response = await fetch(`/api/user/delete/${userId}`, {
                 method: 'DELETE',
                 credentials: 'include'
             });
@@ -237,29 +264,109 @@ const ProjectGallery = () => {
         setSelectedStates(newStates);
     };
 
+    const retrieveFieldAgents = async () => {
+        try {
+            const response = await fetch("/api/user/clients", {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+            if (!data.success) {
+                console.error("Couldn't fetch field staff:", data.message);
+                return [];
+            }
+
+            const fieldStaff = data.users.filter(client => client.role === "field staff");
+            return fieldStaff.map(({ username, assigned_projects, _id }) => ({
+                username,
+                projectCount: assigned_projects?.length || 0,
+                _id
+            }));
+        } catch (error) {
+            console.error("Error fetching field staff:", error);
+            return [];
+        }
+    };
+
+    const assignFieldAgent = async () => {
+        if (!selectedFieldStaff || !selectedProject) {
+            console.error("Please select a project AND at least one field staff.");
+            return;
+        }
+
+        const fieldStaffIds = selectedFieldStaff.map((staff) => staff.value);
+        const projectId = selectedProject;
+        const projectData = {
+            projectId,
+            fieldStaffIds
+        };
+
+        try {
+            const response = await fetch(`/api/user/updateproject`, {
+                method: 'PATCH',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify(projectData)
+            });
+            const data = await response.json();
+            if (data.success) {
+                setFieldStaffModalOpen(false);
+                setSelectedFieldStaff(null);
+                setSelectedProject(null);
+
+                const agents = await retrieveFieldAgents();
+                setFieldStaff(agents);
+
+                const updatedProjects = await getProjectsByClientId(clientId);
+                setUserProjects(updatedProjects);
+                console.log("Field agent assigned successfully");
+            } else {
+                console.error("Error assigning field agent:", data.message);
+            }
+        }
+        catch (error) {
+            console.error("Error assigning field agent:", error);
+        }
+    };
+
+    const projectOptions = userProjects.map((proj) => ({
+        value: proj._id,
+        label: proj.name,
+    }));
+
+    const fieldStaffOptions = fieldStaff.map((agent) => ({
+        value: agent._id,
+        label: `${agent.username} (${agent.projectCount} projects)`,
+    }));
+
     return (
         <div className="flex h-screen bg-gray-50">
             <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
                 <div className="p-6 border-b border-gray-200">
                     <h1 className="text-xl font-bold text-gray-800">
-                        {clientData ? clientData.username : 'Loading...'}
+                        {userData ? userData.username : 'Loading...'}
                     </h1>
                     <p className="text-sm text-gray-500 mt-1">Project Gallery</p>
                 </div>
 
                 <nav className="flex-1 p-4">
                     <div className="space-y-2">
-                        <Button 
-                            onPress={() => setActiveTab("stats")}
-                            className={`w-full justify-start ${
-                                activeTab === "stats" 
-                                ? "bg-blue-50 text-blue-700" 
-                                : "bg-transparent text-gray-700 hover:bg-gray-100"
-                            }`}
-                            startContent={<LayoutDashboard size={20} />}
-                            >
-                            Dashboard
-                        </Button>
+                        {!staffId && !isFieldStaff && (
+                            <Button 
+                                onPress={() => setActiveTab("stats")}
+                                className={`w-full justify-start ${
+                                    activeTab === "stats" 
+                                    ? "bg-blue-50 text-blue-700" 
+                                    : "bg-transparent text-gray-700 hover:bg-gray-100"
+                                }`}
+                                startContent={<LayoutDashboard size={20} />}
+                                >
+                                Dashboard
+                            </Button>
+                        )}
                         
                         <Button 
                             onPress={() => setActiveTab("projects")}
@@ -277,18 +384,30 @@ const ProjectGallery = () => {
 
                 <div className="p-4 border-t border-gray-200">
                 <div className="space-y-2">
-                    {clientId && (
+                    {isAdmin && (
                         <>
-                        <Button 
-                            onPress={onOpen}
-                            className="w-full justify-start bg-transparent text-gray-700 hover:bg-gray-100"
-                            startContent={<Plus size={20} />}
-                        >
-                        New Project
-                        </Button>
+                        {clientId && (
+                            <>
+                            <Button 
+                                onPress={onOpen}
+                                className="w-full justify-start bg-transparent text-gray-700 hover:bg-gray-100"
+                                startContent={<Plus size={20} />}
+                            >
+                            New Project
+                            </Button>
+
+                            <Button 
+                                onPress={() => setFieldStaffModalOpen(true)}
+                                className="w-full justify-start bg-transparent text-gray-700 hover:bg-gray-100"
+                                startContent={<UserRoundPlus size={20} />}
+                            >
+                            Assign Field Agent
+                            </Button>
+                            </>
+                        )}
                         
                         <Button 
-                            onPress={generatePassword}
+                            onPress={() => generatePassword(clientId || staffId)}
                             className="w-full justify-start bg-transparent text-gray-700 hover:bg-gray-100"
                             startContent={<Key size={20} />}
                         >
@@ -300,7 +419,7 @@ const ProjectGallery = () => {
                             className="w-full justify-start bg-transparent text-red-600 hover:bg-red-50"
                             startContent={<Trash2 size={20} />}
                         >
-                        Remove Client
+                        Remove User
                         </Button>
                         </>
                     )}
@@ -317,7 +436,7 @@ const ProjectGallery = () => {
             </div>
 
             <div className="flex-1 overflow-hidden flex flex-col">
-                {clientId && (
+                {isAdmin && (
                     <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
                         <Button
                             onPress={() => navigate('/clients')}
@@ -325,7 +444,7 @@ const ProjectGallery = () => {
                             className="text-gray-700 hover:text-gray-900"
                             startContent={<ChevronDown className="rotate-90" size={20} />}
                         >
-                            Back to Clients
+                            Back to Users
                         </Button>
 
                         {showAlert && (
@@ -349,12 +468,12 @@ const ProjectGallery = () => {
                 )}
 
                 <div className="flex-1 overflow-auto p-8">
-                    {activeTab === "stats" && (
-                        <StatsTab clientProjects={clientProjects} clientId={clientId} />
+                    {activeTab === "stats" && !isFieldStaff && !staffId && (
+                        <StatsTab clientProjects={userProjects} />
                     )}
 
                     {activeTab === "projects" && (
-                        <ProjectsTab clientProjects={clientProjects} clientId={clientId} />
+                        <ProjectsTab clientProjects={userProjects} clientId={clientId} staffId={staffId} />
                     )}
                 </div>
             </div>
@@ -492,16 +611,16 @@ const ProjectGallery = () => {
                 <ModalContent>
                     {() => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1 text-red-500">Remove Client</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1 text-red-500">Remove User</ModalHeader>
                             <ModalBody>
                                 <p>Are you sure you want to remove this client? This action cannot be undone.</p>
-                                <p className="font-bold">{clientData?.username}</p>
+                                <p className="font-bold">{userData?.username}</p>
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="default" onPress={() => setConfirmDeleteOpen(false)}>
                                     Cancel
                                 </Button>
-                                <Button color="danger" onPress={removeClient}>
+                                <Button color="danger" onPress={() => removeClient(clientId || staffId)}>
                                     Remove
                                 </Button>
                             </ModalFooter>
@@ -509,6 +628,70 @@ const ProjectGallery = () => {
                     )}
                 </ModalContent>
             </Modal>
+
+            <Modal isOpen={fieldStaffModalOpen} placement="center" size="md" className="overflow-y-auto py-4"
+                onOpenChange={(open) => {
+                    setFieldStaffModalOpen(open);
+                    if (!open) {
+                        setSelectedFieldStaff(null);
+                        setSelectedProject(null);
+                    }
+                }}
+            >
+                <ModalContent>
+                    {() => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">
+                                Assign Field Agent
+                            </ModalHeader>
+                            <ModalBody className="space-y-4">
+                                <div>
+                                <label className="text-sm font-medium mb-1 block">Select Project</label>
+                                <Select
+                                    options={projectOptions}
+                                    placeholder="Choose a project"
+                                    value={projectOptions.find((opt) => opt.value === selectedProject)}
+                                    onChange={(selected) => setSelectedProject(selected?.value || null)}
+                                    menuPlacement="bottom"
+                                    menuPosition="absolute"
+                                    menuShouldScrollIntoView={false}
+                                    styles={{
+                                        menuList: (base) => ({
+                                          ...base,
+                                          maxHeight: '20vh',
+                                        }),
+                                    }}
+                                />
+                                </div>
+                                <div>
+                                <label className="text-sm font-medium mb-1 block">Select Field Staff</label>
+                                <Select
+                                    options={fieldStaffOptions}
+                                    placeholder="Choose field staff"
+                                    value={selectedFieldStaff}
+                                    onChange={(selected) => setSelectedFieldStaff(selected || [])}
+                                    isMulti
+                                    menuPlacement="bottom"
+                                    menuPosition="absolute"
+                                    styles={{
+                                        menuList: (base) => ({
+                                          ...base,
+                                          maxHeight: '20vh',
+                                        }),
+                                    }}
+                                />
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="primary" onPress={assignFieldAgent}>
+                                    Assign
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+            
         </div>
     );
 };

@@ -30,7 +30,7 @@ const App = () => {
         <Route path='/unauthorized' element={<Unauthorized />} />
 
         <Route path='/projects' element={
-          <ProtectedRoute allowedRoles={["admin", "client"]}>
+          <ProtectedRoute allowedRoles={["admin", "client", "field staff"]}>
             <ProjectGallery />
           </ProtectedRoute>
         } />
@@ -42,7 +42,7 @@ const App = () => {
         } />
 
         <Route path='/field-staff' element={
-          <ProtectedRoute allowedRoles={["field_staff"]}>
+          <ProtectedRoute allowedRoles={["field staff"]}>
             <Field_Staff />
           </ProtectedRoute>
         } />
@@ -54,7 +54,7 @@ const App = () => {
         } />
 
         <Route path='/:projectid' element={
-          <ProtectedRoute allowedRoles={["admin", "client", "field_staff"]}>
+          <ProtectedRoute allowedRoles={["admin", "client", "field staff"]}>
             <ProjectPage />
           </ProtectedRoute>
         }>
