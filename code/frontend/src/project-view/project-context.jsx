@@ -135,7 +135,16 @@ const ProjectContextProvider = ({ children }) => {
     .then(res => res.json())
     .then(data => {
       console.dir(data);
-      setDocuments(data.documents);
+      setDocuments(data.documents.map(d => {
+        return {
+          id: d._id,
+          project: d.projectId,
+          task: d.taskId,
+          kpiUpdate: d.kpi_update_id,
+          metadata: d.metadata,
+          data: d.binaryData,
+        };
+      }));
     });
   }, [project, project?.id]);
   

@@ -23,52 +23,55 @@ const FileDropZone = ({ kpiUpdateId, taskId }) => {
 
   const ctx = useContext(ProjectContext);
   const actx = useContext(AuthContext);
-  const [docsToBeUploaded, setDocsToBeUploaded] = useState([]);
+  const [docToBeUploaded, setDocToBeUploaded] = useState(null);
   const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
 
-  const uploadDocuments = async () => {
+  const uploadDocument = () => {
+    console.log("Uploading document");
+    onClose();
+    const formData = new FormData();
+    formData.append('projectId', ctx.project.id);
+    taskId && formData.append('taskId', taskId);
+    kpiUpdateId && formData.append('kpiUpdateId', kpiUpdateId);
+    // formData.append('data', docToBeUploaded.data); // should be a File or Blob
+    formData.append('createdBy', actx.user.id);
+    formData.append('meta', JSON.stringify(docToBeUploaded.metadata));
+    formData.append('file', docToBeUploaded.file); // should be a File or Blob
     try {
-      // Map over the documents and create an array of promises
-      const uploadPromises = docsToBeUploaded.map((doc) =>
-        axios.post('/api/document/upload', {
-          projectId: ctx.project.id,
-          taskId,
-          kpiUpdateId,
-          data: doc.data,
-          createdBy: actx.user.id,
-          meta: doc.metadata
-        })
-        .then((response) => {
-          console.dir(response);
-          ctx.addDocument({
-            ...doc,
-            ...response.data
-          });
-          addToast({
-            title: "Document uploaded successfully",
-            description: doc.metadata?.FileName || "Unnamed document",
-            color: "success",
-            duration: 2000
-          });
-          setDocsToBeUploaded(docsToBeUploaded => docsToBeUploaded.filter(d => d !== doc));
-        })
-        .catch((error) => {
-          console.error("Error uploading document:", error);
-  
-          addToast({
-            title: "Failure uploading document",
-            description: doc.metadata?.FileName || "Unnamed document",
-            color: "danger",
-            duration: 2000
-          });
-        })
-      );
-  
-      // Wait for all uploads to complete
-      await Promise.all(uploadPromises);
-  
-      // Clear the uploaded documents from the state
-      setDocsToBeUploaded([]);
+      let doc = docToBeUploaded;
+      console.log(docToBeUploaded.file);
+      axios.post('/api/document/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Accept': 'application/json'
+        }
+      })
+      .then((response) => {
+        console.dir(response);
+        ctx.addDocument({
+          ...doc,
+          ...response.data
+        });
+        addToast({
+          title: "Document uploaded successfully",
+          description: doc.metadata?.FileName || "Unnamed document",
+          color: "success",
+          duration: 2000
+        });
+        setDocToBeUploaded(null);
+      })
+      .catch((error) => {
+        console.error("Error uploading document:", error);
+
+        addToast({
+          title: "Failure uploading document",
+          description: doc.metadata?.FileName || "Unnamed document",
+          color: "danger",
+          duration: 2000
+        });
+        setDocToBeUploaded(null);
+      });
+      
     } catch (error) {
       console.error("Error during upload process:", error);
     }
@@ -76,25 +79,20 @@ const FileDropZone = ({ kpiUpdateId, taskId }) => {
 
   return (
     <>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size='xl'>
         <ModalContent>
           <ModalHeader><h1 className="prose text-2xl">Upload Documents</h1></ModalHeader>
           <ModalBody>
-            {docsToBeUploaded.map((doc, index) => {
-              return (
-                <DocumentViewer
-                  key={index}
-                  document={doc}
-                  slot={<DocumentCard />}
-                />
-              );
-            })}
+            <DocumentViewer
+              document={docToBeUploaded}
+              slot={<DocumentCard />}
+            />
           </ModalBody>
           <ModalFooter>
-            <Button onPress={uploadDocuments}>Upload</Button>
+            <Button onPress={uploadDocument}>Upload</Button>
             <Button
               onPress={() => {
-                setDocsToBeUploaded([]);
+                setDocToBeUploaded(null);
                 onClose();
               }}
               color="danger"
@@ -108,48 +106,51 @@ const FileDropZone = ({ kpiUpdateId, taskId }) => {
       </Modal>
       <Dropzone
         onDrop={async (acceptedFiles) => {
-          const filePromises = acceptedFiles.map((file) => {
-            return new Promise((resolve, reject) => {
-              const reader = new FileReader();
-        
-              reader.onabort = () => {
-                console.log('File reading was aborted');
-                reject('File reading was aborted');
-              };
-        
-              reader.onerror = () => {
-                console.log('File reading has failed');
-                reject('File reading has failed');
-              };
-        
-              reader.onload = () => {
-                const arrayBuffer = reader.result; // This is an ArrayBuffer
-                const base64Data = _arrayBufferToBase64(arrayBuffer); // Convert to Base64
-                resolve({
-                  project: ctx.project.id,
-                  data: base64Data, // Base64-encoded data
-                  createdBy: actx.user.id,
-                  metadata: {
-                    MIMEType: file.type,
-                    FileName: file.name,
-                  },
-                });
-              };
-        
-              reader.readAsArrayBuffer(file); // Read the file as an ArrayBuffer
-            });
-          });
-        
           try {
-            const fileObjects = await Promise.all(filePromises); // Wait for all files to be processed
-            setDocsToBeUploaded([...docsToBeUploaded, ...fileObjects]); // Update state with processed files
+            // Wrap FileReader in a Promise for each file
+            const fileObjects = await Promise.all(
+              acceptedFiles.map((file) => {
+                return new Promise((resolve, reject) => {
+                  const reader = new FileReader();
+        
+                  reader.onabort = () => {
+                    console.error('File reading was aborted');
+                    reject(new Error('File reading was aborted'));
+                  };
+        
+                  reader.onerror = () => {
+                    console.error('File reading has failed');
+                    reject(new Error('File reading has failed'));
+                  };
+        
+                  reader.onload = () => {
+                    const arrayBuffer = reader.result; // This is an ArrayBuffer
+                    const base64Data = _arrayBufferToBase64(arrayBuffer); // Convert to Base64
+                    resolve({
+                      project: ctx.project.id,
+                      data: base64Data, // Base64-encoded data
+                      createdBy: actx.user.id,
+                      metadata: {
+                        MIMEType: file.type,
+                        FileName: file.name,
+                      },
+                      file,
+                    });
+                  };
+        
+                  reader.readAsArrayBuffer(file); // Read the file as an ArrayBuffer
+                });
+              })
+            );
+        
+            // console.log(fileObjects[0]); // Now this will have the processed data
+            setDocToBeUploaded(fileObjects[0]); // Update state with the first processed file
             onOpen(); // Open the modal
           } catch (error) {
             console.error('Error processing files:', error);
           }
         }}
         accept={{ 'application/pdf': ['.pdf'], 'image/*': ['.jpeg', '.jpg', '.png'], 'text/*': ['.csv', '.txt'] }}
-        multiple
         // noClick
         noKeyboard
       >
@@ -159,7 +160,7 @@ const FileDropZone = ({ kpiUpdateId, taskId }) => {
               onClick: (event) => {
                 event.stopPropagation();
                 event.preventDefault();
-                if (docsToBeUploaded.length === 0) {
+                if (!docToBeUploaded) {
                   open(); // Open the file dialog if no files are uploaded
                 } else {
                   onOpen(); // Open the modal if files are already uploaded
@@ -185,9 +186,9 @@ const FileDropZone = ({ kpiUpdateId, taskId }) => {
             <ArrowUpTrayIcon className="h-10 w-10 text-gray-500" />
             <input {...getInputProps()} />
             {isDragActive ? (
-              <p className="text-blue-500">Drop the files here...</p>
+              <p className="text-blue-500">Drop the file here...</p>
             ) : (
-              <p className="text-gray-500">Drag and drop files here, or click to select files</p>
+              <p className="text-gray-500">Drag and drop a file here, or click to select one</p>
             )}
           </div>
         )}
