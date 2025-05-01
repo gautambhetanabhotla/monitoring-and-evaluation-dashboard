@@ -72,7 +72,7 @@ const ProjectHeader = () => {
 const Nav = () => {
 
   const actx = useContext(AuthContext);
-  console.dir(actx.user);
+  // console.dir(actx.user);
 
   let tabname = useLocation().pathname.split("/").pop();
   if (!(['overview', 'charts', 'kpis', 'timeline', 'success-stories', 'log-framework'].includes(tabname))) {

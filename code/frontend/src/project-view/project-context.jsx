@@ -6,6 +6,7 @@ const ProjectContext = createContext();
 
 const ProjectContextProvider = ({ children }) => {
 
+  // const [projectID, setProjectID] = useState(null);
   const [project, setProject] = useState({});
   const [successStories, setSuccessStories] = useState([]);
   const [KPIUpdates, setKPIUpdates] = useState([]);
@@ -13,8 +14,10 @@ const ProjectContextProvider = ({ children }) => {
   const [KPIs, setKPIs] = useState([]);
   const [adjustedKPIs, setAdjustedKPIs] = useState([]);
   const [documents, setDocuments] = useState([]);
+  const [adjustedProgress, setAdjustedProgress] = useState(0);
 
   const location = useLocation();
+  const projectID = location.pathname.split('/')[1];
 
   // KPIs
   useEffect(() => {
@@ -30,7 +33,7 @@ const ProjectContextProvider = ({ children }) => {
           element.id = element._id;
         }
         setKPIs(data.data);
-        console.dir(data);
+        // console.dir(data);
       }
     })
     .catch(error => console.error("Error fetching KPIs - " + error));
@@ -84,9 +87,9 @@ const ProjectContextProvider = ({ children }) => {
     // .then(data => setProject(data))
     // .catch(error => console.error("Error fetching project" + error));
     // console.dir(location.pathname.split('/'));
-    const project_id = location.pathname.split('/')[1];
+    // const project_id = location.pathname.split('/')[1];
     // console.log(project_id);
-    axios.get(`/api/projects/get/${project_id}`, { credentials: 'include' })
+    axios.get(`/api/projects/get/${projectID}`, { credentials: 'include' })
     .then(response => {
       // console.dir(response);
       if(response.data.success) {
@@ -98,7 +101,7 @@ const ProjectContextProvider = ({ children }) => {
         setProject(proj);
       }
     });
-  }, [location.pathname]);
+  }, [projectID]);
 
   // Success stories
   useEffect(() => {
@@ -134,7 +137,7 @@ const ProjectContextProvider = ({ children }) => {
     fetch(`/api/document/getDocuments/${project.id}`)
     .then(res => res.json())
     .then(data => {
-      console.dir(data);
+      // console.dir(data);
       setDocuments(data.documents.map(d => {
         return {
           id: d._id,
@@ -191,6 +194,17 @@ const ProjectContextProvider = ({ children }) => {
     setDocuments(documents => [...documents, newDocument]);
   };
 
+  // Progress
+  useEffect(() => {
+    if(adjustedKPIs.length === 0) return;
+    const avg_kpi_progress = adjustedKPIs.reduce((acc, kpi) => {
+      console.log(((kpi.current - kpi.baseline)/(kpi.target - kpi.baseline)));
+      return acc + ((kpi.current - kpi.baseline)/(kpi.target - kpi.baseline));
+    }, 0) / adjustedKPIs.length;
+    console.log("AVERAGE KPI PROGRES: ", avg_kpi_progress);
+    setAdjustedProgress(avg_kpi_progress);
+  }, [adjustedKPIs]);
+
   return (
     <ProjectContext.Provider
       value={{
@@ -211,7 +225,8 @@ const ProjectContextProvider = ({ children }) => {
         addKPI,
         documents,
         addDocuments,
-        addDocument
+        addDocument,
+        adjustedProgress,
       }}
     >
       {children}
