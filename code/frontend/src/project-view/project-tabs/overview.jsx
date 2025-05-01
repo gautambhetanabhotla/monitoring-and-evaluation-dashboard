@@ -1,36 +1,46 @@
-import {Button} from "@heroui/button";
-import {Textarea} from "@heroui/input";
-// import {Divider} from "@heroui/divider";
-import {Card} from "@heroui/card";
-import {Link} from "@heroui/link";
-import {Autocomplete, AutocompleteItem} from "@heroui/autocomplete";
-import {Select, SelectItem} from "@heroui/select";
-// import {Chip} from "@heroui/chip";
-import {Popover, PopoverTrigger, PopoverContent} from "@heroui/popover";
-import {Form} from "@heroui/form";
-import {Input} from "@heroui/input";
-// import {NumberInput} from "@heroui/number-input";
-import {Spacer} from "@heroui/spacer";
 import {Progress} from "@heroui/progress";
 import Dropzone from '../../components/file-drop-zone.jsx';
 
-import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
-
 import { useState, useContext, useEffect } from 'react';
-import axios from 'axios';
 
 import { ProjectContext } from "../project-context.jsx";
 import DocumentViewer, { DocumentCard } from "../../components/document-viewer.jsx";
 
 const Overview = () => {
   const ctx = useContext(ProjectContext);
+  // const [progress, setProgress] = useState(ctx.adjustedProgress);
   const [documents, setDocuments] = useState([]);
   useEffect(() => {
     setDocuments(ctx.documents?.filter(doc => !doc.task));
   }, [ctx?.documents]);
-  console.log(ctx.adjustedProgress);
-  const predictedEndDate = Date(Date(ctx.project.start) + Date((Date(ctx.project.end) - Date(ctx.project.start))/(ctx.adjustedProgress)));
-  console.log(predictedEndDate);
+  // console.log("ctx.adjustedProgress: ", ctx.adjustedProgress);
+  // useEffect(() => {
+  //   console.log("progress = ", progress);
+  //   console.log("ctx.adjustedProgress = ", ctx.adjustedProgress);
+  // }, [progress, ctx.adjustedProgress]);
+  // useEffect(() => {
+  //   setProgress(ctx.adjustedProgress);
+  // }, [ctx.adjustedProgress]);
+  const calculatePredictedEndDate = () => {
+    if (!ctx.project.start || !ctx.project.end || !ctx.adjustedProgress) {
+      return new Date();
+    }
+    
+    const startDate = new Date(ctx.project.start);
+    const endDate = new Date(ctx.project.end);
+    const totalDuration = endDate.getTime() - startDate.getTime();
+    
+    // Calculate predicted duration based on progress
+    const predictedDuration = ctx.adjustedProgress > 0 
+      ? totalDuration / ctx.adjustedProgress 
+      : totalDuration;
+    
+    return new Date(startDate.getTime() + predictedDuration);
+  };
+  
+  const predictedEndDate = calculatePredictedEndDate();
+  // console.log(predictedEndDate);
+  const isOverdue = predictedEndDate > new Date(ctx.project.end);
   const formatDate = (date) => {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, '0');
@@ -38,7 +48,7 @@ const Overview = () => {
     const year = d.getFullYear();
     return `${day}/${month}/${year}`;
   };
-  console.log(predictedEndDate > Date(ctx.project.end));
+  // console.log(predictedEndDate > Date(ctx.project.end));
   return (
     <>
     <div className="my-10 mx-20">
@@ -58,7 +68,7 @@ const Overview = () => {
         />
         <p className="prose text-lg">
           Expected to finish by {
-            predictedEndDate && predictedEndDate !== 'Invalid Date' && predictedEndDate > ctx.project.end ?
+            isOverdue ?
             <span className="prose text-danger">{formatDate(predictedEndDate)} (Overdue)</span> : formatDate(predictedEndDate)
           }
         </p>

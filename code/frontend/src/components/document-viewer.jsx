@@ -27,6 +27,16 @@ import {
   ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
 
+
+/**
+ * An example slot for the `DocumentViewer` component.
+ * @param {Object} props - The component props.
+ * @param {Object} props.document - The document to be displayed when the card is pressed.
+ * @param {Function} props.onPress - The function to be called when the card is pressed.
+ * @returns {ReactNode} The DocumentCard component.
+ * @description
+ *  `DocumentViewer` passes the `onPress` prop to this component, which opens the modal.
+ */
 const DocumentCard = ({ document, onPress }) => {
   return (
     <>
@@ -63,6 +73,16 @@ const DocumentCard = ({ document, onPress }) => {
   );
 };
 
+/**
+ * A button which, when clicked, downloads the document passed in as the prop..
+ * @param {Object} props - The component props.
+ * @param {Object} props.doc - The document to be downloaded when the button is clicked.
+ * @returns {ReactNode} The download button.
+ * @example
+ * <DownloadButton doc={document} />
+ * @description
+ * Returns a HeroUI button which implements the onPress prop, and downloads the respective document through a data URI.
+ */
 const DownloadButton = ({ doc }) => {
   const handleDownload = () => {
     const link = document.createElement("a");
@@ -202,6 +222,21 @@ const PDFViewer = ({ document }) => {
   );
 };
 
+/**
+ * Renders an element which, when clicked, opens a modal with the document viewer.
+ * @param {Object} props - The component props.
+ * @param {Object} props.document - The document to be viewed.
+ * @param {ReactNode} props.slot - The element to be rendered as a button to open the modal. Must implement the `onPress` prop.
+ * @returns {ReactNode} The DocumentViewer component.
+ * @example
+ * <DocumentViewer
+ *   document={document}
+ *   slot={<Button>View Document</Button>}
+ * />
+ * @description
+ * The DocumentViewer component renders a button (or any other element) that, when clicked, opens a modal displaying the document.
+ * The document can be a PDF, CSV, or image file. The component uses the react-pdf library to render PDF files and the papaparse library to parse CSV files.
+ */
 const DocumentViewer = ({ document, slot }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
