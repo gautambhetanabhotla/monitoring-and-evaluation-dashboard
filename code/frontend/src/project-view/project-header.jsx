@@ -75,10 +75,10 @@ const Nav = () => {
   console.dir(actx.user);
 
   let tabname = useLocation().pathname.split("/").pop();
-  if (!(['overview', 'charts', 'kpis', 'timeline', 'success-stories', 'log-framework'].includes(tabname))) {
+  if (!(['overview', 'charts', 'kpis', 'timeline', 'success-stories', 'chatbot'].includes(tabname))) {
     tabname = 'overview';
   }
-  // const [selectedTab, setSelectedTab] = useState(tabname);
+
   const navbarRef = useRef(null);
   const { user, logout } = useContext(AuthContext);
 
@@ -134,7 +134,7 @@ const Nav = () => {
           </Link>
         </NavbarBrand>
         <NavbarContent className="hidden md:flex">
-          <NavbarItem isActive={tabname !== "charts" && tabname !== "kpis" && tabname !== "timeline" && tabname !== "success-stories" && tabname !== "log-framework"}>
+          <NavbarItem isActive={tabname !== "charts" && tabname !== "kpis" && tabname !== "timeline" && tabname !== "success-stories" && tabname !== "chatbot"}>
             <Link to={clientDetails?.role === 'client' ? 'overview' : `overview?clientId=${clientId}`}>Overview</Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "charts"}>
@@ -149,8 +149,8 @@ const Nav = () => {
           <NavbarItem isActive={tabname === "success-stories"}>
             <Link to={clientDetails?.role === 'client' ? 'success-stories' : `success-stories?clientId=${clientId}`}>Success stories</Link>
           </NavbarItem>
-          <NavbarItem isActive={tabname === "log-framework"}>
-            <Link to={clientDetails?.role === 'client' ? 'log-framework' : `log-framework?clientId=${clientId}`}>Log framework</Link>
+          <NavbarItem isActive={tabname === "chatbot"}>
+            <Link to={clientDetails?.role === 'client' ? 'chatbot' : `chatbot?clientId=${clientId}`}>ChatBot</Link>
           </NavbarItem>
         </NavbarContent>
         <NavbarContent justify='end'>
@@ -189,7 +189,7 @@ const Nav = () => {
             <Link to={clientDetails?.role === 'client' ? 'success-stories' : `success-stories?clientId=${clientId}`}>Success stories</Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to={clientDetails?.role === 'client' ? 'log-framework' : `log-framework?clientId=${clientId}`}>Log framework</Link>
+            <Link to={clientDetails?.role === 'client' ? 'chatbot' : `chatbot?clientId=${clientId}`}>ChatBot</Link>
           </NavbarMenuItem>
         </NavbarMenu>
       </Navbar>
