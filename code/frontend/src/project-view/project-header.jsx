@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useRef } from 'react';
+import { useContext, useRef } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
@@ -72,7 +72,7 @@ const ProjectHeader = () => {
 const Nav = () => {
 
   const actx = useContext(AuthContext);
-  console.dir(actx.user);
+  // console.dir(actx.user);
 
   let tabname = useLocation().pathname.split("/").pop();
   if (!(['overview', 'charts', 'kpis', 'timeline', 'success-stories', 'chatbot'].includes(tabname))) {
@@ -84,24 +84,7 @@ const Nav = () => {
 
   const queryParams = new URLSearchParams(location.search);
   const clientId = queryParams.get('clientId');
-
-  const [clientDetails, setClientDetails] = useState(null);
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const response = await fetch(`/api/user/getUser`, { credentials: 'include' });
-        const data = await response.json();
-        if (data.success) {
-          setClientDetails(data.user);
-        } else {
-          alert(data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching user details:', error);
-      }
-    };
-    fetchUserDetails();
-  }, []);
+  const staffId = queryParams.get('staffId');
 
   return (
     <>
@@ -128,29 +111,97 @@ const Nav = () => {
         }}
       >
         <NavbarBrand>
-          <Link className='inline' to={clientDetails?.role === 'client' ? '/projects' : `/projects?clientId=${clientId}`}>
+          <Link className='inline' 
+            to={
+              clientId
+                ? `/projects?clientId=${clientId}`
+                : staffId
+                  ? `/projects?staffId=${staffId}`
+                  : "/projects"
+            }
+          >
             <HomeIcon className="size-6 inline" />
             <p className='prose inline pl-2'>Home</p>
           </Link>
         </NavbarBrand>
         <NavbarContent className="hidden md:flex">
           <NavbarItem isActive={tabname !== "charts" && tabname !== "kpis" && tabname !== "timeline" && tabname !== "success-stories" && tabname !== "chatbot"}>
-            <Link to={clientDetails?.role === 'client' ? 'overview' : `overview?clientId=${clientId}`}>Overview</Link>
+            <Link 
+              to={
+                clientId 
+                  ? `overview?clientId=${clientId}` 
+                  : staffId
+                    ? `overview?staffId=${staffId}`
+                    : "overview"
+              }
+            >
+              Overview
+            </Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "charts"}>
-            <Link to={clientDetails?.role === 'client' ? 'charts' : `charts?clientId=${clientId}`}>Charts</Link>
+            <Link 
+              to={
+                clientId 
+                  ? `charts?clientId=${clientId}` 
+                  : staffId
+                    ? `charts?staffId=${staffId}`
+                    : "charts"
+              }
+            >
+              Charts
+            </Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "kpis"}>
-            <Link to={clientDetails?.role === 'client' ? 'kpis' : `kpis?clientId=${clientId}`}>KPIs</Link>
+            <Link 
+              to={
+                clientId 
+                  ? `kpis?clientId=${clientId}` 
+                  : staffId
+                    ? `kpis?staffId=${staffId}`
+                    : "kpis"
+              }
+            >
+              KPIs
+            </Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "timeline"}>
-            <Link to={clientDetails?.role === 'client' ? 'timeline' : `timeline?clientId=${clientId}`}>Timeline</Link>
+            <Link 
+              to={
+                clientId 
+                  ? `timeline?clientId=${clientId}` 
+                  : staffId
+                    ? `timeline?staffId=${staffId}`
+                    : "timeline"
+              }
+            >
+              Timeline
+            </Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "success-stories"}>
-            <Link to={clientDetails?.role === 'client' ? 'success-stories' : `success-stories?clientId=${clientId}`}>Success stories</Link>
+            <Link 
+              to={
+                clientId 
+                  ? `success-stories?clientId=${clientId}` 
+                  : staffId
+                    ? `success-stories?staffId=${staffId}`
+                    : "success-stories"
+              }
+            >
+              Success stories
+            </Link>
           </NavbarItem>
           <NavbarItem isActive={tabname === "chatbot"}>
-            <Link to={clientDetails?.role === 'client' ? 'chatbot' : `chatbot?clientId=${clientId}`}>ChatBot</Link>
+            <Link 
+              to={
+                clientId 
+                  ? `chatbot?clientId=${clientId}` 
+                  : staffId
+                    ? `chatbot?staffId=${staffId}`
+                    : "chatbot"
+              }
+            >
+              Chat
+            </Link>
           </NavbarItem>
         </NavbarContent>
         <NavbarContent justify='end'>
@@ -174,22 +225,82 @@ const Nav = () => {
         <NavbarMenuToggle />
         <NavbarMenu portalContainer={navbarRef.current}>
           <NavbarMenuItem>
-            <Link to={clientDetails?.role === 'client' ? 'overview' : `overview?clientId=${clientId}`}>Overview</Link>
+            <Link 
+              to={
+                clientId 
+                  ? `overview?clientId=${clientId}` 
+                  : staffId
+                    ? `overview?staffId=${staffId}`
+                    : "overview"
+              }
+            >
+              Overview
+            </Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to={clientDetails?.role === 'client' ? 'charts' : `charts?clientId=${clientId}`}>Charts</Link>
+            <Link 
+              to={
+                clientId 
+                  ? `charts?clientId=${clientId}` 
+                  : staffId
+                    ? `charts?staffId=${staffId}`
+                    : "charts"
+              }
+            >
+              Charts
+            </Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to={clientDetails?.role === 'client' ? 'kpis' : `kpis?clientId=${clientId}`}>KPIs</Link>
+            <Link 
+              to={
+                clientId 
+                  ? `kpis?clientId=${clientId}` 
+                  : staffId
+                    ? `kpis?staffId=${staffId}`
+                    : "kpis"
+              }
+            >
+              KPIs
+            </Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to={clientDetails?.role === 'client' ? 'timeline' : `timeline?clientId=${clientId}`}>Timeline</Link>
+            <Link 
+              to={
+                clientId 
+                  ? `timeline?clientId=${clientId}` 
+                  : staffId
+                    ? `timeline?staffId=${staffId}`
+                    : "timeline"
+              }
+            >
+              Timeline
+            </Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to={clientDetails?.role === 'client' ? 'success-stories' : `success-stories?clientId=${clientId}`}>Success stories</Link>
+            <Link 
+              to={
+                clientId 
+                  ? `success-stories?clientId=${clientId}` 
+                  : staffId
+                    ? `success-stories?staffId=${staffId}`
+                    : "success-stories"
+              }
+            >
+              Success stories
+            </Link>
           </NavbarMenuItem>
           <NavbarMenuItem>
-            <Link to={clientDetails?.role === 'client' ? 'chatbot' : `chatbot?clientId=${clientId}`}>ChatBot</Link>
+            <Link 
+              to={
+                clientId 
+                  ? `chatbot?clientId=${clientId}` 
+                  : staffId
+                    ? `chatbot?staffId=${staffId}`
+                    : "chatbot"
+              }
+            >
+              Log framework
+            </Link>
           </NavbarMenuItem>
         </NavbarMenu>
       </Navbar>

@@ -32,9 +32,9 @@ const userSchema = new mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Project',
-            required: function () {
-                return this.role === 'field staff';
-            },
+            // required: function () {
+            //     return this.role === 'field staff';
+            // },
         },
     ],
 });

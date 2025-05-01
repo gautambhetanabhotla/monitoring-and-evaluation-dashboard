@@ -131,7 +131,7 @@ describe('Project Routes (Real Database)', () => {
     test('Should return 400 when provided an invalid clientId query parameter', async () => {
       await loginAs(agent, clientUser.email, clientPassword);
 
-      const res = await agent.get('/api/projects/getProjects?clientId=invalidId');
+      const res = await agent.get('/api/projects/getProjects?userId=invalidId');
       expect(res.statusCode).toBe(400);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe('Invalid user ID');
@@ -141,7 +141,7 @@ describe('Project Routes (Real Database)', () => {
       const fakeId = new mongoose.Types.ObjectId().toHexString();
       await loginAs(agent, clientUser.email, clientPassword);
 
-      const res = await agent.get(`/api/projects/getProjects?clientId=${fakeId}`);
+      const res = await agent.get(`/api/projects/getProjects?userId=${fakeId}`);
       expect(res.statusCode).toBe(404);
       expect(res.body.success).toBe(false);
       expect(res.body.message).toBe('User not found');
@@ -160,7 +160,7 @@ describe('Project Routes (Real Database)', () => {
 
       await loginAs(agent, fieldUser.email, 'password123');
 
-      const res = await agent.get(`/api/projects/getProjects?clientId=${fieldUser._id.toString()}`);
+      const res = await agent.get(`/api/projects/getProjects?userId=${fieldUser._id.toString()}`);
       // The middleware destroys the session and returns 403 Forbidden if the role is unauthorized.
       expect(res.statusCode).toBe(403);
       expect(res.body.success).toBe(false);
@@ -184,7 +184,7 @@ describe('Project Routes (Real Database)', () => {
 
       await loginAs(agent, noProjectClient.email, 'password123');
 
-      const res = await agent.get(`/api/projects/getProjects?clientId=${noProjectClient._id.toString()}`);
+      const res = await agent.get(`/api/projects/getProjects?userId=${noProjectClient._id.toString()}`);
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
       expect(res.body.message).toBe('No projects assigned to this user');
@@ -196,7 +196,7 @@ describe('Project Routes (Real Database)', () => {
     test('Should return the assigned projects for a valid client', async () => {
       await loginAs(agent, clientUser.email, clientPassword);
 
-      const res = await agent.get(`/api/projects/getProjects?clientId=${clientUser._id.toString()}`);
+      const res = await agent.get(`/api/projects/getProjects?userId=${clientUser._id.toString()}`);
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
       expect(Array.isArray(res.body.projects)).toBe(true);
@@ -331,7 +331,7 @@ describe('Unauthenticated Access', () => {
   });
 
   test('GET /api/projects/getProjects should return 401 when not logged in', async () => {
-    const res = await agent.get('/api/projects/getProjects?clientId=' + clientUser._id.toString());
+    const res = await agent.get('/api/projects/getProjects?userId=' + clientUser._id.toString());
     expect(res.statusCode).toBe(401);
     expect(res.body.success).toBe(false);
     expect(res.body.message).toBe('Unauthorized');

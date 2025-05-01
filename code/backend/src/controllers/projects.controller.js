@@ -18,25 +18,25 @@ export const getProjectById = async (req, res) => {
 }
 
 export const getProjectsByClientId = async (req, res) => {
-    let clientId = req.query.clientId;
-    if (!clientId) {
-        clientId = req.session.userId;
+    let userId = req.query.userId;
+    if (!userId) {
+        userId = req.session.userId;
     }
 
     try {
-        if (!mongoose.Types.ObjectId.isValid(clientId)) {
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({ success: false, message: 'Invalid user ID' });
         }
 
-        const user = await User.findById(clientId).populate('assigned_projects');
+        const user = await User.findById(userId).populate('assigned_projects');
 
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        if(user.role === 'field staff') {
-            return res.status(400).json({ success: false, message: 'User is not authorized to view this page' });
-        }
+        // if(user.role === 'field staff') {
+        //     return res.status(400).json({ success: false, message: 'User is not authorized to view this page' });
+        // }
 
         if (!user.assigned_projects || user.assigned_projects.length === 0) {
             return res.status(200).json({ success: true, message: 'No projects assigned to this user', projects: [] });

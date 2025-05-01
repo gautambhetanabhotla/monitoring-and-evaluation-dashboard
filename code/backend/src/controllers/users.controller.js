@@ -71,7 +71,7 @@ export const getUserDetails = async (req, res) => {
     return res.status(401).json({ success: false, message: "Not authenticated" });
   }
   try {
-    let userId = req.query.clientId;
+    let userId = req.query.userId;
     if (!userId) {
       userId = req.session.userId;
     }
@@ -184,6 +184,35 @@ export const updatePassword = async (req, res) => {
       emailSent: emailSent
     });
 
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateProjects = async (req, res) => {
+  const { projectId, fieldStaffIds } = req.body;
+
+  if (!projectId || !Array.isArray(fieldStaffIds) || fieldStaffIds.length === 0) {
+    return res.status(400).json({ success: false, message: "Please select a project and at least one field staff." });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(projectId)) {
+    return res.status(400).json({ success: false, message: "Invalid project." });
+  }
+
+  for (const id of fieldStaffIds) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: `Invalid field staff ID: ${id}` });
+    }
+  }
+
+  try {
+    await User.updateMany(
+      { _id: { $in: fieldStaffIds } },
+      { $addToSet: { assigned_projects: projectId } }
+    );
+
+    return res.status(200).json({ success: true, message: "Field staff updated for project." });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
