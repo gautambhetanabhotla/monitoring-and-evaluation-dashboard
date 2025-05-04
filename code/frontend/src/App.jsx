@@ -10,6 +10,7 @@ import KPIs from './project-view/project-tabs/kpis.jsx';
 import Timeline from './project-view/project-tabs/timeline/timeline.jsx';
 import SuccessStories from './project-view/project-tabs/success-stories.jsx';
 import LogFramework from './project-view/project-tabs/log-framework.jsx';
+import ChatLayout from './Chatbot/ChatLayout.jsx';
 import Admin from './Admin.jsx';
 import Field_Staff from './Field_Staff.jsx'; 
 import { ClientGallery } from './project-gallery/client-gallery.jsx';
@@ -64,7 +65,7 @@ const App = () => {
           <Route path='kpis' element={<KPIs />} />
           <Route path='timeline' element={<Timeline />} />
           <Route path='success-stories' element={<SuccessStories />} />
-          <Route path='log-framework' element={<LogFramework />} />
+          <Route path='chatbot' element={<ChatLayout />} />
         </Route>
       </Routes>
       </AuthProvider>

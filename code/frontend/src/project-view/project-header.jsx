@@ -75,10 +75,10 @@ const Nav = () => {
   // console.dir(actx.user);
 
   let tabname = useLocation().pathname.split("/").pop();
-  if (!(['overview', 'charts', 'kpis', 'timeline', 'success-stories', 'log-framework'].includes(tabname))) {
+  if (!(['overview', 'charts', 'kpis', 'timeline', 'success-stories', 'chatbot'].includes(tabname))) {
     tabname = 'overview';
   }
-  // const [selectedTab, setSelectedTab] = useState(tabname);
+
   const navbarRef = useRef(null);
   const { user, logout } = useContext(AuthContext);
 
@@ -125,7 +125,7 @@ const Nav = () => {
           </Link>
         </NavbarBrand>
         <NavbarContent className="hidden md:flex">
-          <NavbarItem isActive={tabname !== "charts" && tabname !== "kpis" && tabname !== "timeline" && tabname !== "success-stories" && tabname !== "log-framework"}>
+          <NavbarItem isActive={tabname !== "charts" && tabname !== "kpis" && tabname !== "timeline" && tabname !== "success-stories" && tabname !== "chatbot"}>
             <Link 
               to={
                 clientId 
@@ -190,17 +190,17 @@ const Nav = () => {
               Success stories
             </Link>
           </NavbarItem>
-          <NavbarItem isActive={tabname === "log-framework"}>
+          <NavbarItem isActive={tabname === "chatbot"}>
             <Link 
               to={
                 clientId 
-                  ? `log-framework?clientId=${clientId}` 
+                  ? `chatbot?clientId=${clientId}` 
                   : staffId
-                    ? `log-framework?staffId=${staffId}`
-                    : "log-framework"
+                    ? `chatbot?staffId=${staffId}`
+                    : "chatbot"
               }
             >
-              Log framework
+              Chat
             </Link>
           </NavbarItem>
         </NavbarContent>
@@ -293,10 +293,10 @@ const Nav = () => {
             <Link 
               to={
                 clientId 
-                  ? `log-framework?clientId=${clientId}` 
+                  ? `chatbot?clientId=${clientId}` 
                   : staffId
-                    ? `log-framework?staffId=${staffId}`
-                    : "log-framework"
+                    ? `chatbot?staffId=${staffId}`
+                    : "chatbot"
               }
             >
               Log framework
