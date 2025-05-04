@@ -36,6 +36,10 @@ const KpiUpdateSchema = new mongoose.Schema({
         type : mongoose.Schema.Types.ObjectId,
         ref : 'User',
         required : [true, 'Updated by is required'],
+    },
+    location: {
+        type: Object,
+        required: [true, 'Location is required'],
     }
 });
 

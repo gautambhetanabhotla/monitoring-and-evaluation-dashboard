@@ -1,7 +1,7 @@
 import {Button} from "@heroui/button";
 import {Textarea} from "@heroui/input";
 // import {Divider} from "@heroui/divider";
-import {Card} from "@heroui/card";
+import {Card, CardHeader, CardBody} from "@heroui/card";
 import {Link} from "@heroui/link";
 import {Autocomplete, AutocompleteItem} from "@heroui/autocomplete";
 import {Select, SelectItem} from "@heroui/select";
@@ -11,11 +11,16 @@ import {Form} from "@heroui/form";
 import {Input} from "@heroui/input";
 // import {NumberInput} from "@heroui/number-input";
 import {Spacer} from "@heroui/spacer";
+import {Accordion, AccordionItem} from "@heroui/accordion";
+import {Alert} from "@heroui/alert";
+
+import Map from '../../../components/map.jsx';
 
 import { 
   ArrowTrendingDownIcon,
   ArrowTrendingUpIcon,
-  PlusIcon
+  PlusIcon,
+  InformationCircleIcon
 } from "@heroicons/react/24/outline";
 
 import { useState, useContext, useEffect } from 'react';
@@ -178,11 +183,12 @@ const Timeline = () => {
 
 const KPIUpdate = ({ update }) => {
   const ctx = useContext(ProjectContext);
+  // if (update.location) console.dir(update.location);
   return (
     <>
       <Card className="max-w-2xl m-2 ml-10 p-5">
-        <h3 data-testid="kpi-update" className="prose text-xl font-bold">{ctx.adjustedKPIs?.find(kpi => kpi.id === update.kpi)?.indicator}</h3>
-        <span className="prose pt-2 flex items-center gap-6">
+        <CardHeader><h3 data-testid="kpi-update" className="prose text-xl font-bold">{ctx.adjustedKPIs?.find(kpi => kpi.id === update.kpi)?.indicator}</h3></CardHeader>
+        <span className="prose pt-2 ml-3 flex items-center gap-6">
           <span className="prose flex items-center gap-3 text-xl">{update.initial}
           {update.final > update.initial ?
             <ArrowTrendingUpIcon className="size-5 text-green-500" /> :
@@ -190,8 +196,22 @@ const KPIUpdate = ({ update }) => {
           }
           {update.final}
           </span>
-          <p className="prose text-md">on {update.date.toString()} <br />by <Link>{update.updatedby}</Link></p>
-        </span>
+          <p className="prose text-md">on {update.date.toString()} <br />by <Link>{update.updated_by ? update.updated_by.username : "ERROR"}</Link></p>
+        </span> 
+        <Accordion>
+          <AccordionItem key="1" title="Details" startContent={<InformationCircleIcon className="size-5" />}>
+            {update.note && update.note.length > 0 && <>
+              <div className="bg-gray-100 rounded-lg p-5 mb-2 ">
+                <h1 className="prose font-semibold text-xl">Note</h1>
+                <p className="prose text-md">{update.note}</p>
+              </div>
+            </>}
+            <div className="bg-gray-100 rounded-lg p-5">
+              <h1 className="prose font-semibold text-xl mb-2">Location</h1>
+              {update.location ? <Map location={update.location} /> : <Alert color="danger">Not recorded</Alert>}
+            </div>
+          </AccordionItem>
+        </Accordion>
       </Card>
     </>
   );
