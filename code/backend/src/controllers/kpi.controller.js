@@ -69,18 +69,15 @@ export const getKpisByProject = async (req, res) => {
 
 export const updateKpi = async (req, res) => {
     const {kpi_id} = req.params;
-    const {project_id, task_id,initial,final,updated_at,note} = req.body;
+    const {project_id, task_id,initial,final,updated_at,note,location} = req.body;
     const updated_by = req.session.userId;
-    console.dir({
-        project_id, kpi_id, task_id,initial,final,updated_at,note,updated_by
-    })
 
     if(!task_id || initial == null || final == null || !updated_at || !updated_by){
         return res.status(400).json({ success: false, message: "Please give values for all the fields" });
     }
 
     try {
-        const kpiUpdate = new KpiUpdate({project_id,task_id,kpi_id,initial,final,updated_at,note,updated_by});
+        const kpiUpdate = new KpiUpdate({project_id,task_id,kpi_id,initial,final,updated_at,note,updated_by,location});
         const newKpiUpdate = await kpiUpdate.save();
         return res.status(201).json({success : true, message : "KPI update saved successfully", id: newKpiUpdate._id, updatedby: newKpiUpdate.updated_by});
     } catch (error) {
@@ -191,18 +188,59 @@ export const getKpiUpdatesAsData = async (req, res) => {
 export const getKpiUpdatesbyProject = async (req, res) => {
     const { project_id } = req.params;
     try {
+        // console.log("WFIVHWEHFW");
         if(!mongoose.Types.ObjectId.isValid(project_id)){
             return res.status(400).json({ success : false , message: "Invalid project ID" });
         }
 
-    const kpiUpdates = await KpiUpdate.find({ project_id });
+        // const kpiUpdates = await KpiUpdate.find({ project_id });
+        const kpiUpdates = await KpiUpdate.aggregate([
+            {
+                $match: {
+                    project_id: new mongoose.Types.ObjectId(project_id)
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "updated_by",
+                    foreignField: "_id",
+                    as: "user_details"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$user_details",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    project_id: 1,
+                    task_id: 1,
+                    kpi_id: 1,
+                    initial: 1,
+                    final: 1,
+                    updated_at: 1,
+                    note: 1,
+                    location: 1,
+                    updated_by: {
+                        _id: "$user_details._id",
+                        username: "$user_details.username"
+                    }
+                }
+            }
+        ]);
 
-    if(kpiUpdates.length === 0){
-        return res.status(200).json({ success : true , message: "No KPI updates found for this project" });
-    }
+        // console.dir(kpiUpdates);
 
-    return res.status(200).json({success : true, message : `KPI updates fetched successfully`, data : kpiUpdates});
+        if(kpiUpdates.length === 0){
+            res.status(200).json({ success : true , message: "No KPI updates found for this project" });
+        }
+
+        res.status(200).json({success : true, message : `KPI updates fetched successfully`, data : kpiUpdates});
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
 };

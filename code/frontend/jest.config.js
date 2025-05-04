@@ -6,6 +6,8 @@ export default {
         '\\.(css|less|scss|sass)$': 'jest-transform-stub',
         '^@heroui(.*)$/': '<rootDir>/node_modules/@heroui$1',
         '^@heroicons/react(.*)$/': '<rootDir>/node_modules/@heroicons/react$1',
+        '^@maptiler/sdk$': 'jest-transform-stub',
+        '^@maptiler/sdk/(.*)$': 'jest-transform-stub',
     },
     testMatch: ["**/tests/**/*.test.jsx"],
     transform: {

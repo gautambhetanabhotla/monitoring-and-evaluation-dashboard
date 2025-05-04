@@ -56,28 +56,47 @@ const ProjectContextProvider = ({ children }) => {
   // KPI Updates
   useEffect(() => {
     if(!project?.id || !KPIs || KPIs.length === 0) return;
-    for (const kpi of KPIs) {
-      fetch(`/api/kpi/getKpiUpdates/${kpi?.id}`, { credentials: 'include' })
-      .then(response => response.json())
-      .then(data => {
-        // console.dir(data);
-        if(!data.success || !data.data) return;
-        for (const update of data.data) {
-          update.id = update._id;
-          update.date = update.updated_at;
-          update.kpi = update.kpi_id;
-          update.task = update.task_id;
-          update.updatedby = update.updated_by;
-          update.project = update.project_id;
-          const d = update.date;
-          const date = new Date(d);
-          update.date = date;
-        }
-        setKPIUpdates(KPIUpdates => [...KPIUpdates, ...data.data]);
-        // console.dir(data.data);
-      })
-      .catch(error => console.error("Error fetching KPI updates" + error));
-    }
+    // for (const kpi of KPIs) {
+    //   fetch(`/api/kpi/getKpiUpdates/${kpi?.id}`, { credentials: 'include' })
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     console.dir(data);
+    //     if(!data.success || !data.data) return;
+    //     for (const update of data.data) {
+    //       update.id = update._id;
+    //       update.date = update.updated_at;
+    //       update.kpi = update.kpi_id;
+    //       update.task = update.task_id;
+    //       // update.updatedby = update.updated_by;
+    //       update.project = update.project_id;
+    //       const d = update.date;
+    //       const date = new Date(d);
+    //       update.date = date;
+    //     }
+    //     setKPIUpdates(KPIUpdates => [...KPIUpdates, ...data.data]);
+    //     // console.dir(data.data);
+    //   })
+    //   .catch(error => console.error("Error fetching KPI updates" + error));
+    // }
+    axios.get(`/api/kpi/getKpiUpdatesForProject/${project?.id}`, { credentials: 'include' })
+    .then(response => {
+      // console.dir(response);
+      if(!response.data.success || !response.data.data) return;
+      const updates = response.data.data.map(update => {
+        update.id = update._id;
+        update.date = update.updated_at;
+        update.kpi = update.kpi_id;
+        update.task = update.task_id;
+        // update.updatedby = update.updated_by;
+        update.project = update.project_id;
+        const d = update.date;
+        const date = new Date(d);
+        update.date = date;
+        return update;
+      });
+      setKPIUpdates(updates);
+    })
+    .catch(error => console.error("Error fetching KPI updates" + error));
   }, [project?.id, KPIs]);
 
   // Project
@@ -198,10 +217,10 @@ const ProjectContextProvider = ({ children }) => {
   useEffect(() => {
     if(adjustedKPIs.length === 0) return;
     const avg_kpi_progress = adjustedKPIs.reduce((acc, kpi) => {
-      console.log(((kpi.current - kpi.baseline)/(kpi.target - kpi.baseline)));
+      // console.log(((kpi.current - kpi.baseline)/(kpi.target - kpi.baseline)));
       return acc + ((kpi.current - kpi.baseline)/(kpi.target - kpi.baseline));
     }, 0) / adjustedKPIs.length;
-    console.log("AVERAGE KPI PROGRES: ", avg_kpi_progress);
+    // console.log("AVERAGE KPI PROGRES: ", avg_kpi_progress);
     setAdjustedProgress(avg_kpi_progress);
   }, [adjustedKPIs]);
 

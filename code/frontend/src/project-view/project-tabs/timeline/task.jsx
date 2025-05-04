@@ -6,14 +6,16 @@ import {Form} from "@heroui/form";
 import {NumberInput} from "@heroui/number-input";
 import {Spacer} from "@heroui/spacer";
 import {Autocomplete, AutocompleteItem} from "@heroui/autocomplete";
+// import {Alert} from "@heroui/alert";
 
-import {PencilSquareIcon, CheckCircleIcon, ArrowsUpDownIcon, PlusIcon, CheckIcon} from "@heroicons/react/24/outline";
+import {PencilSquareIcon, CheckCircleIcon, ArrowsUpDownIcon, PlusIcon, CheckIcon, ListBulletIcon} from "@heroicons/react/24/outline";
 
 import {useContext, useEffect, useState} from "react";
 
 import axios from "axios";
 
 import { ProjectContext } from "../../project-context.jsx";
+import { AuthContext } from "../../../AuthContext.jsx";
 import { KPIUpdate } from "./timeline.jsx";
 import DocumentViewer, { DocumentCard } from "../../../components/document-viewer.jsx";
 
@@ -60,9 +62,9 @@ const Task = ({ task }) => {
   return (
     <>
       <Divider className="mt-10" />
-      <h1 data-testid="task" className="prose text-5xl pl-10 mt-10">{title}</h1>
-      <div className="pl-10">
-        <h2 className="prose text-3xl p-10">Description</h2>
+      <h1 data-testid="task" className="prose text-4xl pl-10 mt-10 flex flex-row items-center gap-4"><ListBulletIcon className="size-14" />{title}</h1>
+      <div className="">
+        <h2 className="prose text-3xl p-5 px-10">About</h2>
         <Textarea
           isReadOnly={!editableDescription}
           value={description}
@@ -80,7 +82,7 @@ const Task = ({ task }) => {
             </Button>
           }
         />
-        <h2 className="prose text-3xl p-10 flex items-center gap-5">
+        <h2 className="prose text-3xl p-5 pl-10 flex items-center gap-5">
           KPI Updates
           <KPIUpdateButton task={task} />
           <Button isIconOnly onPress={() => setChronologicalOrder(!chronologicalOrder)}>
@@ -108,57 +110,129 @@ const KPIUpdateButton = ({ task }) => {
   const [loading, setLoading] = useState(false);
 
   const ctx = useContext(ProjectContext);
+  const actx = useContext(AuthContext);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedKPIid, setSelectedKPIid] = useState(null);
-  const [finalValue, setFinalValue] = useState(""); // Initialize as empty string
+  const [finalValue, setFinalValue] = useState(0); // Initialize as empty string
   const [note, setNote] = useState("");
   const initialValue = ctx.adjustedKPIs?.find(kpi => kpi.id === selectedKPIid)?.current;
+  // Add these state variables with your other state declarations
+  const [location, setLocation] = useState(null);
+  const [locationError, setLocationError] = useState(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by your browser");
+      return Promise.reject("Geolocation not supported");
+    }
+  
+    setLocationLoading(true);
+    setLocationError(null);
+    
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const locationData = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: position.timestamp
+          };
+          setLocation(locationData);
+          setLocationLoading(false);
+          resolve(locationData);
+        },
+        (error) => {
+          let errorMessage;
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Location permission denied";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Location information unavailable";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "Location request timed out";
+              break;
+            default:
+              errorMessage = "Unknown error occurred";
+          }
+          setLocationError(errorMessage);
+          setLocationLoading(false);
+          reject(errorMessage);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      );
+    });
+  };
 
   const handleKPIselectionChange = (id) => {
     setSelectedKPIid(id);
     setSearchQuery(ctx.adjustedKPIs?.find(kpi => kpi.id === id)?.indicator || "");
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    // console.log("SUBMITTING");
-    // console.log(finalValue);
-    const update = {
-      // id: `kpi${ctx.KPIUpdates.length + 1}`,
-      project: ctx.project.id,
-      task: task.id,
-      kpi: selectedKPIid,
-      note: note,
-      initial: initialValue,
-      final: finalValue,
-      date: new Date(),
-    };
-    axios.put(`/api/kpi/update/${selectedKPIid}`, {
-      project_id: ctx.project.id,
-      task_id: task.id,
-      kpi_id: selectedKPIid,
-      initial: initialValue,
-      final: finalValue,
-      updated_at: new Date(),
-      note: note,
-    })
-    .then(res => {
-      // console.log(ctx.project.id);
-      // console.dir(res);
-      ctx.updateKPI({
-        ...update,
-        id: res.data.id,
-        updatedby: res.data.updatedby
+    
+    try {
+      // Get location before submitting
+      let locationData = null;
+      try {
+        locationData = await getCurrentLocation();
+      } catch (locErr) {
+        console.warn("Could not get location:", locErr);
+        // Continue without location if there's an error
+        setLoading(false);
+        return;
+      }
+      
+      const update = {
+        project: ctx.project.id,
+        task: task.id,
+        kpi: selectedKPIid,
+        note: note,
+        initial: initialValue,
+        final: finalValue,
+        date: new Date(),
+        location: locationData, // Add location data to the update
+      };
+      
+      axios.put(`/api/kpi/update/${selectedKPIid}`, {
+        project_id: ctx.project.id,
+        task_id: task.id,
+        kpi_id: selectedKPIid,
+        initial: initialValue,
+        final: finalValue,
+        updated_at: new Date(),
+        note: note,
+        location: locationData, // Include location in API request
+      })
+      .then(res => {
+        // console.dir(actx.user);
+        ctx.updateKPI({
+          ...update,
+          id: res.data.id,
+          updated_by: {
+            _id: actx.user.id,
+            username: actx.user.name,
+          },
+          // location: locationData,
+        });
+        setLoading(false);
+        onClose();
+      })
+      .catch(err => {
+        console.error("Axios request failed:", err.response?.data?.message || err.message);
+        setLoading(false);
+        onClose();
       });
+    } catch (error) {
+      console.error("Error in form submission:", error);
       setLoading(false);
-      onClose();
-    })
-    .catch(err => {
-      console.error("Axios request failed:", err.response?.data?.message || err.message);
-      setLoading(false);
-      onClose();
-    });
+    }
   };
 
   return (
@@ -202,6 +276,19 @@ const KPIUpdateButton = ({ task }) => {
               value={note}
               onValueChange={setNote}
             />
+            <div className="flex items-center text-sm gap-2">
+            {locationLoading ? (
+              <span className="text-gray-500">Getting your location...</span>
+            ) : locationError ? (
+              <span className="text-danger">{locationError}, can&apos;t continue</span>
+            ) : location ? (
+              <span className="text-success flex items-center gap-1">
+                <CheckIcon className="size-4" /> Location collected
+              </span>
+            ) : (
+              <span className="text-gray-500">Location will be collected when submitting</span>
+            )}
+          </div>
             <Spacer />
             <Button isLoading={loading} color='primary' type="submit" startContent={<CheckIcon className="size-6" />}>Update</Button>
             <Spacer />
