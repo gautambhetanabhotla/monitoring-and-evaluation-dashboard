@@ -5,6 +5,7 @@ import { useState, useContext, useEffect } from 'react';
 
 import { ProjectContext } from "../project-context.jsx";
 import DocumentViewer, { DocumentCard } from "../../components/document-viewer.jsx";
+import { AuthContext } from "../../AuthContext.jsx";
 
 const Overview = () => {
   const ctx = useContext(ProjectContext);
@@ -38,6 +39,7 @@ const Overview = () => {
     return new Date(startDate.getTime() + predictedDuration);
   };
   
+  const { user } = useContext(AuthContext);
   const predictedEndDate = calculatePredictedEndDate();
   // console.log(predictedEndDate);
   const isOverdue = predictedEndDate > new Date(ctx.project.end);
@@ -80,7 +82,9 @@ const Overview = () => {
         {documents && documents.map(
           (document, index) => <DocumentViewer document={document} slot={<DocumentCard />} key={index} />
         )}
-        <Dropzone />
+        {user?.role === 'admin' && (
+          <Dropzone />
+        )}
       </div>
     </div>
     </>

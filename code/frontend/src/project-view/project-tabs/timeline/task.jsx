@@ -27,6 +27,7 @@ const Task = ({ task }) => {
   const [chronologicalOrder, setChronologicalOrder] = useState(false);
   const [documents, setDocuments] = useState([]);
   const ctx = useContext(ProjectContext);
+  const {user} = useContext(AuthContext);
 
   useEffect(() => {
     setTitle(task?.title);
@@ -70,7 +71,7 @@ const Task = ({ task }) => {
           value={description}
           onValueChange={setDescription}
           className="max-w-2xl ml-10"
-          endContent={
+          endContent={user?.role === 'admin' && (
             <Button
               isIconOnly
               color={editableDescription ? 'success' : 'primary'}
@@ -80,11 +81,13 @@ const Task = ({ task }) => {
               {!editableDescription ? 
               <PencilSquareIcon className="size-5" /> : <CheckCircleIcon className="size-6" />}
             </Button>
-          }
+          )}
         />
         <h2 className="prose text-3xl p-5 pl-10 flex items-center gap-5">
           KPI Updates
-          <KPIUpdateButton task={task} />
+          {user?.role !== 'client' && (
+            <KPIUpdateButton task={task} />
+          )}
           <Button isIconOnly onPress={() => setChronologicalOrder(!chronologicalOrder)}>
             <ArrowsUpDownIcon className="size-6" />
           </Button>

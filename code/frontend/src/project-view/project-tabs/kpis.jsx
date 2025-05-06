@@ -12,6 +12,7 @@ import {NumberInput} from "@heroui/number-input";
 import {Form} from "@heroui/form";
 import {RadioGroup, Radio} from "@heroui/radio";
 import {Spacer} from '@heroui/spacer';
+import {AuthContext} from '../../AuthContext.jsx';
 
 import axios from 'axios';
 
@@ -131,12 +132,15 @@ const KPI = ({ kpi }) => {
   const percentagecompletion = parseInt(100 * (
     (parseFloat(kpi.current) - parseFloat(kpi.baseline))
     / (parseFloat(kpi.target) - parseFloat(kpi.baseline))));
+  const {user} = useContext(AuthContext);
   return (
     <>
       <Card className="m-3 z-0">
         <CardHeader className="relative">
           <span className="prose text-2xl font-bold py-5 px-2 z-0 pr-16">{kpi.indicator}</span>
-          <EditKPIButton kpi={kpi} aria-label="Edit KPI" />
+          {user?.role !== 'client' && (
+            <EditKPIButton kpi={kpi} aria-label="Edit KPI" />
+          )}
         </CardHeader>
         <Divider />
         <CardBody className="px-5 py-6">
@@ -316,6 +320,7 @@ const KPIs = () => {
   const logframeLevels = ['Goal', 'Outcome', 'Output', 'Activity'];
   const [selectedLogframeLevels, setSelectedLogframeLevels] = useState(new Set(['Goal', 'Outcome', 'Output', 'Activity']));
   const [searchQuery, setSearchQuery] = useState('');
+  const {user} = useContext(AuthContext);
   return (
     <>
       <div className="flex flex-row justify-center">
@@ -355,7 +360,9 @@ const KPIs = () => {
             <SelectItem key={level}>{level}</SelectItem>
           ))}
         </Select>
-        <AddKPIButton />
+        {user?.role !== 'client' && (
+          <AddKPIButton />
+        )}
       </div>
       <KPIsList kpis={ctx.adjustedKPIs?.filter(kpi => {
         return (selectedLogframeLevels.size == 0 || selectedLogframeLevels.has(kpi.logframe_level))

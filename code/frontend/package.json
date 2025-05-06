@@ -115,6 +115,7 @@
     "postcss": "8.4.38",
     "prettier": "3.3.3",
     "vite": "^6.2.0",
-    "whatwg-fetch": "^3.6.20"
+    "whatwg-fetch": "^3.6.20",
+    "rollup": "4.9.0"
   }
 }

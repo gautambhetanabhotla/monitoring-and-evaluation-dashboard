@@ -1,7 +1,7 @@
 import {Button} from "@heroui/button";
 import {Textarea} from "@heroui/input";
 // import {Divider} from "@heroui/divider";
-import {Card, CardHeader, CardBody} from "@heroui/card";
+import { Card, CardHeader } from "@heroui/card";
 import {Link} from "@heroui/link";
 import {Autocomplete, AutocompleteItem} from "@heroui/autocomplete";
 import {Select, SelectItem} from "@heroui/select";
@@ -30,6 +30,7 @@ import axios from 'axios';
 import { Task, KPIUpdateButton } from "./task.jsx";
 
 import { ProjectContext } from "../../project-context.jsx";
+import { AuthContext } from "../../../AuthContext.jsx";
 
 const AddTaskButton = () => {
   const [title, setTitle] = useState('');
@@ -114,6 +115,7 @@ const Timeline = () => {
   const ctx = useContext(ProjectContext);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredTasks, setFilteredTasks] = useState(ctx.tasks);
+  const {user} = useContext(AuthContext);
 
   const [value, setValue] = useState(new Set(['Sort: Newest to oldest']));
 
@@ -165,7 +167,9 @@ const Timeline = () => {
           <SelectItem key='Sort: Newest to oldest'>Sort: Newest to oldest</SelectItem>
           <SelectItem key='Sort: Oldest to newest'>Sort: Oldest to newest</SelectItem>
         </Select>
-        <AddTaskButton />
+        {user?.role !== 'client' && (
+          <AddTaskButton />
+        )}
       </div>
       {chronologicalOrder ? 
         filteredTasks.map((task, index) => <Task task={task} key={index} /> ) : 

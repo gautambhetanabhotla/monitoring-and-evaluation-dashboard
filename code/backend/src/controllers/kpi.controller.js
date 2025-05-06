@@ -236,11 +236,11 @@ export const getKpiUpdatesbyProject = async (req, res) => {
         // console.dir(kpiUpdates);
 
         if(kpiUpdates.length === 0){
-            res.status(200).json({ success : true , message: "No KPI updates found for this project" });
+            return res.status(200).json({ success : true , message: "No KPI updates found for this project" });
         }
 
-        res.status(200).json({success : true, message : `KPI updates fetched successfully`, data : kpiUpdates});
+        return res.status(200).json({success : true, message : `KPI updates fetched successfully`, data : kpiUpdates});
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 };
