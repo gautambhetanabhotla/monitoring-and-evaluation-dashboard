@@ -75,7 +75,7 @@
     "react-simple-maps": "^3.0.0",
     "style-to-js": "^1.1.16",
     "tailwind-variants": "0.3.0",
-    "tailwindcss": "^3.4.16",
+    "tailwindcss": "^3.3.0",
     "whatwg-fetch": "^3.6.20",
     "xlsx": "^0.18.5"
   },
