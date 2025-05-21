@@ -4,7 +4,11 @@
     "main": "main.js",
     "scripts": {
         "test": "jest --detectOpenHandles --silent --verbose",
+<<<<<<< HEAD
         "dev": "concurrently \"nodemon main.js\" \"source Chatbot/venv/bin/activate && python Chatbot/main.py\"",
+=======
+        "dev": "concurrently \"nodemon main.js\" \"python Chatbot/main.py\"",
+>>>>>>> location
         "lint": "eslint . --ext .js",
         "lint:fix": "eslint . --ext .js --fix",
         "prettier": "prettier --write .",
