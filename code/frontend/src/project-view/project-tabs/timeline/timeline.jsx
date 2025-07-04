@@ -1,7 +1,7 @@
 import {Button} from "@heroui/button";
 import {Textarea} from "@heroui/input";
 // import {Divider} from "@heroui/divider";
-import {Card, CardHeader, CardBody} from "@heroui/card";
+import {Card, CardHeader} from "@heroui/card";
 import {Link} from "@heroui/link";
 import {Autocomplete, AutocompleteItem} from "@heroui/autocomplete";
 import {Select, SelectItem} from "@heroui/select";
@@ -15,18 +15,12 @@ import {Accordion, AccordionItem} from "@heroui/accordion";
 import {Alert} from "@heroui/alert";
 
 import Map from '../../../components/map.jsx';
-import {Accordion, AccordionItem} from "@heroui/accordion";
-import {Alert} from "@heroui/alert";
-
-import Map from '../../../components/map.jsx';
 
 import { 
   ArrowTrendingDownIcon,
   ArrowTrendingUpIcon,
   PlusIcon,
-  InformationCircleIcon
-  PlusIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 
 import { useState, useContext, useEffect } from 'react';
