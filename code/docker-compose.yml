@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5011:5011"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - CLIENT_URL=${CLIENT_URL}
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    networks:
+      - dass-network
+
+  chatbot:
+    build:
+      context: ./backend/Chatbot
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - dass-network
+
+networks:
+  dass-network:
+    driver: bridge

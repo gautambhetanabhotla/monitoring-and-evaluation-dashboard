@@ -5,8 +5,8 @@
     "scripts": {
         "test": "jest --detectOpenHandles --silent --verbose",
         "dev": "concurrently \"nodemon main.js\" \"source Chatbot/venv/bin/activate && python Chatbot/main.py\"",
-        "lint": "eslint . --ext .js",
-        "lint:fix": "eslint . --ext .js --fix",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
         "prettier": "prettier --write .",
         "start": "node main.js"
     },

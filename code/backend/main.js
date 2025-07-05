@@ -11,8 +11,8 @@ process.on('unhandledRejection', (reason, promise) => {
     // Optionally exit: process.exit(1);
 });
 
-import https from 'https';
-import fs from 'fs';
+// import https from 'https';
+// import fs from 'fs';
 import express from 'express';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
@@ -75,11 +75,15 @@ app.use('/api/success-story', successStoryRouter);
 
 const PORT = process.env.PORT || 5011;
 
-const sslOptions = {
-    key: fs.readFileSync('./certs/key.pem'),
-    cert: fs.readFileSync('./certs/cert.pem'),
-};
+// const sslOptions = {
+//     key: fs.readFileSync('./certs/key.pem'),
+//     cert: fs.readFileSync('./certs/cert.pem'),
+// };
 
-https.createServer(sslOptions, app).listen(PORT, () => {
-    console.log(`HTTPS Server is running on https://0.0.0.0:${PORT}`);
+// https.createServer(sslOptions, app).listen(PORT, () => {
+//     console.log(`HTTPS Server is running on https://0.0.0.0:${PORT}`);
+// });
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://0.0.0.0:${PORT}`);
 });
