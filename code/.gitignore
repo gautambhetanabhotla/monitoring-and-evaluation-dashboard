@@ -130,3 +130,5 @@ dist
 
 .DS_Store
 .vercel
+
+.venv/
