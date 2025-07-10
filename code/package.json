@@ -1,7 +1,10 @@
 {
     "name": "monitoring-and-evaluation-dashboard",
     "private": true,
-    "workspaces": ["frontend", "backend"],
+    "workspaces": [
+        "frontend",
+        "backend"
+    ],
     "scripts": {
         "install:dev": "npm install --workspaces",
         "install:prod": "npm install --workspaces --omit=dev",

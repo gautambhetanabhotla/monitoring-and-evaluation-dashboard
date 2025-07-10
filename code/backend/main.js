@@ -49,10 +49,6 @@ app.use(
             mongoUrl: process.env.MONGO_URI || 'mongodb://localhost:27017/session_db',
             collectionName: 'sessions',
         }),
-        cookie: {
-            secure: false,
-            httpOnly: false
-        },
     })
 );
 
