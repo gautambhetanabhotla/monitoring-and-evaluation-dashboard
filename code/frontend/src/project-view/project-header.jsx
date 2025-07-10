@@ -299,7 +299,7 @@ const Nav = () => {
                     : "chatbot"
               }
             >
-              Log framework
+              Chat
             </Link>
           </NavbarMenuItem>
         </NavbarMenu>

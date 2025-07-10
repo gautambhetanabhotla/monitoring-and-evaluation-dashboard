@@ -29,6 +29,7 @@ const Overview = () => {
     
     const startDate = new Date(ctx.project.start);
     const endDate = new Date(ctx.project.end);
+    const currentDate = new Date();
     const totalDuration = endDate.getTime() - startDate.getTime();
     
     // Calculate predicted duration based on progress
@@ -36,7 +37,7 @@ const Overview = () => {
       ? totalDuration / ctx.adjustedProgress 
       : totalDuration;
     
-    return new Date(startDate.getTime() + predictedDuration);
+    return new Date(currentDate.getTime() + predictedDuration);
   };
   
   const { user } = useContext(AuthContext);
